@@ -87,6 +87,7 @@ end;
 $$;
 
 drop trigger if exists on_auth_user_created on auth.users;
+
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute procedure public.handle_new_user();
@@ -98,36 +99,90 @@ alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
-create policy "profiles_select_own" on public.profiles for select using (auth.uid() = id);
+create policy "profiles_select_own"
+on public.profiles
+for select
+using (auth.uid() = id);
+
 drop policy if exists "profiles_insert_own" on public.profiles;
-create policy "profiles_insert_own" on public.profiles for insert with check (auth.uid() = id);
+create policy "profiles_insert_own"
+on public.profiles
+for insert
+with check (auth.uid() = id);
+
 drop policy if exists "profiles_update_own" on public.profiles;
-create policy "profiles_update_own" on public.profiles for update using (auth.uid() = id) with check (auth.uid() = id);
+create policy "profiles_update_own"
+on public.profiles
+for update
+using (auth.uid() = id)
+with check (auth.uid() = id);
 
 drop policy if exists "products_public_read" on public.products;
-create policy "products_public_read" on public.products for select using (is_active = true or auth.uid() = seller_id);
+create policy "products_public_read"
+on public.products
+for select
+using (is_active = true or auth.uid() = seller_id);
+
 drop policy if exists "products_seller_insert" on public.products;
-create policy "products_seller_insert" on public.products for insert with check (auth.uid() = seller_id);
+create policy "products_seller_insert"
+on public.products
+for insert
+with check (auth.uid() = seller_id);
+
 drop policy if exists "products_seller_update" on public.products;
-create policy "products_seller_update" on public.products for update using (auth.uid() = seller_id) with check (auth.uid() = seller_id);
+create policy "products_seller_update"
+on public.products
+for update
+using (auth.uid() = seller_id)
+with check (auth.uid() = seller_id);
+
 drop policy if exists "products_seller_delete" on public.products;
-create policy "products_seller_delete" on public.products for delete using (auth.uid() = seller_id);
+create policy "products_seller_delete"
+on public.products
+for delete
+using (auth.uid() = seller_id);
 
 drop policy if exists "favorites_own" on public.favorites;
-create policy "favorites_own" on public.favorites for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "favorites_own"
+on public.favorites
+for all
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 drop policy if exists "orders_own_select" on public.orders;
-create policy "orders_own_select" on public.orders for select using (auth.uid() = user_id);
+create policy "orders_own_select"
+on public.orders
+for select
+using (auth.uid() = user_id);
+
 drop policy if exists "orders_own_insert" on public.orders;
-create policy "orders_own_insert" on public.orders for insert with check (auth.uid() = user_id);
+create policy "orders_own_insert"
+on public.orders
+for insert
+with check (auth.uid() = user_id);
 
 drop policy if exists "order_items_own_select" on public.order_items;
-create policy "order_items_own_select" on public.order_items
-for select using (
-  exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid())
+create policy "order_items_own_select"
+on public.order_items
+for select
+using (
+  exists (
+    select 1
+    from public.orders o
+    where o.id = order_id
+      and o.user_id = auth.uid()
+  )
 );
+
 drop policy if exists "order_items_own_insert" on public.order_items;
-create policy "order_items_own_insert" on public.order_items
-for insert with check (
-  exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid())
+create policy "order_items_own_insert"
+on public.order_items
+for insert
+with check (
+  exists (
+    select 1
+    from public.orders o
+    where o.id = order_id
+      and o.user_id = auth.uid()
+  )
 );
