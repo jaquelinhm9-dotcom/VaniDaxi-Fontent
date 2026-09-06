@@ -6,7 +6,7 @@
 html {
   width: 100%;
   min-height: 100%;
-  background: #fffffffff;
+  background: #ffffff;
 }
 
 body {
@@ -15,7 +15,7 @@ body {
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
-  background: #fffffffff;
+  background: #ffffff;
   color: #25252d;
   font-family:
     Inter,
@@ -47,7 +47,24 @@ a {
   width: 100%;
   min-height: 100vh;
   padding-bottom: 96px;
-  background: #fffffffff;
+  background: #ffffff;
+}
+
+/* =========================================================
+   VaniDaxi 2.0 — IDENTIDAD VISUAL OFICIAL
+   ========================================================= */
+
+:root {
+  --vd-pink: #ef2d65;
+  --vd-fuchsia: #e52b9a;
+  --vd-magenta: #c52c92;
+  --vd-purple: #7a2cff;
+  --vd-violet: #5e20b8;
+  --vd-indigo: #2b1d72;
+  --vd-dark: #151026;
+  --vd-soft: #f8f3ff;
+  --vd-line: #e8def2;
+  --vd-text: #21172d;
 }
 
 /* ================= HEADER ================= */
@@ -66,8 +83,10 @@ a {
   padding: 0 22px;
 
   background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid var(--vd-line);
+
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .header-menu,
@@ -89,25 +108,81 @@ a {
   color: #40384b;
 }
 
-.brand {
-  font-size: 34px;
-  font-weight: 900;
-  letter-spacing: -2px;
-}
-
-.brand span {
-  color: #7a2cff;
-}
-
-.brand strong {
-  color: #ef2d65;
-}
-
 .header-actions {
   display: flex;
   align-items: center;
   gap: 14px;
 }
+
+/* ================= LOGO ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+}
+
+.brand .vani-logo-image {
+  width: 43px;
+  height: 43px;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 13px;
+
+  box-shadow:
+    0 7px 18px rgba(94, 32, 184, 0.20);
+}
+
+.logo-word {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.logo-word strong:first-child {
+  color: var(--vd-pink) !important;
+}
+
+.logo-word strong:last-child {
+  color: var(--vd-purple) !important;
+}
+
+/* Logo compacto */
+
+.vani-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vani-logo-image {
+  width: 46px;
+  height: 46px;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 20px rgba(94, 32, 184, 0.20);
+}
+
+.vani-logo-compact .vani-logo-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+/* ================= HEADER ICONS ================= */
 
 .header-search-icon {
   font-size: 30px;
@@ -126,7 +201,8 @@ a {
   font-size: 29px;
 }
 
-.cart-badge {
+.cart-badge,
+.cart-count {
   position: absolute;
   top: 2px;
   right: 0;
@@ -140,8 +216,9 @@ a {
   padding: 0 5px;
 
   border-radius: 50%;
-  background: #ff3f7f;
-  color: white;
+
+  background: var(--vd-pink) !important;
+  color: #ffffff;
 
   font-size: 11px;
   font-weight: 800;
@@ -179,8 +256,10 @@ a {
   border: 1px solid #dedee5;
   border-radius: 28px;
 
-  background: #fffffffff;
-  box-shadow: 0 8px 25px rgba(32, 24, 60, 0.07);
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 25px rgba(32, 24, 60, 0.07);
 
   color: #6e6f78;
 
@@ -218,7 +297,7 @@ a {
   border: 0;
   border-radius: 25px;
 
-  color: white;
+  color: #ffffff;
   text-align: left;
 
   box-shadow:
@@ -229,20 +308,20 @@ a {
   background:
     linear-gradient(
       135deg,
-      #f12d68 0%,
-      #e72b83 58%,
+      var(--vd-pink) 0%,
+      var(--vd-fuchsia) 58%,
       #b72ad5 100%
-    );
+    ) !important;
 }
 
 .account-card-main {
   background:
     linear-gradient(
       135deg,
-      #7b2bd4 0%,
-      #5e20b8 55%,
-      #43219b 100%
-    );
+      var(--vd-magenta) 0%,
+      var(--vd-violet) 55%,
+      var(--vd-indigo) 100%
+    ) !important;
 }
 
 .main-card-icon {
@@ -258,13 +337,13 @@ a {
 
   border-radius: 18px;
 
-  background: #fffffffff;
+  background: #ffffff;
   color: #6f238f;
 
   font-size: 35px;
 
   box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.1);
+    0 8px 18px rgba(0, 0, 0, 0.10);
 }
 
 .main-card-content {
@@ -275,7 +354,7 @@ a {
 .main-card h2 {
   margin: 0 0 8px;
 
-  color: white;
+  color: #ffffff;
 
   font-size: 22px;
   line-height: 1.12;
@@ -285,7 +364,7 @@ a {
 .main-card p {
   margin: 0;
 
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.90);
 
   font-size: 14px;
   line-height: 1.45;
@@ -304,7 +383,8 @@ a {
   height: 49px;
 
   border-radius: 50%;
-  background: white;
+
+  background: #ffffff;
 
   color: #6e2689;
 
@@ -353,7 +433,7 @@ a {
 
   padding-bottom: 4px;
 
-  color: #6725b8;
+  color: var(--vd-purple);
 
   font-size: 15px;
   font-weight: 800;
@@ -396,7 +476,7 @@ a {
   border: 1px solid #eeeeee;
   border-radius: 22px;
 
-  background: white;
+  background: #ffffff;
 
   box-shadow:
     0 6px 18px rgba(36, 22, 58, 0.06);
@@ -444,7 +524,7 @@ a {
       #5d25a8 100%
     );
 
-  color: white;
+  color: #ffffff;
 
   box-shadow:
     0 15px 30px rgba(117, 20, 100, 0.16);
@@ -477,7 +557,7 @@ a {
 
   border-radius: 30px;
 
-  background: white;
+  background: #ffffff;
 
   color: #a72d82;
 
@@ -517,7 +597,7 @@ a {
   border: 1px solid #eeeeee;
   border-radius: 16px;
 
-  background: white;
+  background: #ffffff;
 
   box-shadow:
     0 7px 20px rgba(30, 20, 50, 0.06);
@@ -554,8 +634,9 @@ a {
 
   border-radius: 5px;
 
-  background: #df2a61;
-  color: white;
+  background: var(--vd-pink);
+
+  color: #ffffff;
 
   font-size: 10px;
   font-weight: 800;
@@ -625,11 +706,11 @@ a {
   background:
     linear-gradient(
       135deg,
-      #ef2d65,
-      #7525bb
+      var(--vd-pink),
+      var(--vd-purple)
     );
 
-  color: white;
+  color: #ffffff;
 
   font-size: 10px;
   font-weight: 800;
@@ -646,7 +727,7 @@ a {
   border: 1px solid #e9e2ed;
   border-radius: 18px;
 
-  background: white;
+  background: #ffffff;
 
   box-shadow:
     0 8px 20px rgba(30, 20, 50, 0.05);
@@ -708,7 +789,7 @@ a {
   border: 1px solid #e4deea;
   border-radius: 18px;
 
-  background: white;
+  background: #ffffff;
 }
 
 .catalog-search input {
@@ -743,7 +824,7 @@ a {
   border: 1px solid #e4e4e8;
   border-radius: 25px;
 
-  background: white;
+  background: #ffffff;
 
   color: #5f566b;
 
@@ -757,16 +838,18 @@ a {
   background:
     linear-gradient(
       135deg,
-      #ef2d65,
-      #761c99
+      var(--vd-pink),
+      var(--vd-purple)
     );
 
-  color: white;
+  color: #ffffff;
 }
 
 .catalog-products {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+
+/* ================= PRODUCT PAGE ================= */
 
 .product-page {
   display: grid;
@@ -820,7 +903,9 @@ a {
   line-height: 1.6;
 }
 
-.gradient-button {
+.gradient-button,
+.primary-button,
+.search-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -834,17 +919,17 @@ a {
   background:
     linear-gradient(
       135deg,
-      #ef174f 0%,
-      #c41677 52%,
-      #72199a 100%
-    );
+      var(--vd-pink) 0%,
+      var(--vd-fuchsia) 52%,
+      var(--vd-purple) 100%
+    ) !important;
 
-  color: white;
+  color: #ffffff;
 
   font-weight: 800;
 
   box-shadow:
-    0 10px 22px rgba(195, 22, 97, 0.2);
+    0 10px 22px rgba(195, 22, 97, 0.20);
 }
 
 /* ================= CART ================= */
@@ -927,18 +1012,19 @@ a {
   background:
     linear-gradient(
       135deg,
-      #ef2d65,
-      #741a99
+      var(--vd-pink),
+      var(--vd-purple)
     );
 
-  color: white;
+  color: #ffffff;
 
   font-size: 20px;
 }
 
 /* ================= BOTTOM NAV ================= */
 
-.bottom-nav {
+.bottom-nav,
+.mobile-bottom {
   position: fixed;
   right: 0;
   bottom: 0;
@@ -951,6 +1037,7 @@ a {
 
   width: 100%;
   min-height: 78px;
+
   padding:
     8px 10px
     max(8px, env(safe-area-inset-bottom));
@@ -960,6 +1047,7 @@ a {
   background: rgba(255, 255, 255, 0.97);
 
   backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .bottom-nav a,
@@ -986,34 +1074,83 @@ a {
 }
 
 .bottom-nav a.active {
-  color: #df164a;
+  color: var(--vd-pink);
 }
+
+/* Botón central de vender */
 
 .bottom-nav .sell-nav {
   width: 82px;
   height: 82px;
   margin-top: -45px;
+
   justify-self: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   border-radius: 27px;
 
   background:
     linear-gradient(
       145deg,
-      #ee174f,
-      #c01675,
-      #731a9b
+      var(--vd-pink),
+      var(--vd-fuchsia),
+      var(--vd-purple)
     );
 
-  color: white;
+  color: #ffffff;
 
   box-shadow:
-    0 12px 28px rgba(168, 22, 104, 0.3);
+    0 12px 28px rgba(168, 22, 104, 0.30);
 }
 
 .bottom-nav .sell-nav span {
   font-size: 37px;
   line-height: 1;
+}
+
+/* ================= ICONO EN BOTÓN CENTRAL ================= */
+
+.mobile-sell {
+  position: relative;
+  margin-top: -18px;
+}
+
+.mobile-sell-icon {
+  width: 58px;
+  height: 58px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--vd-pink),
+      var(--vd-purple)
+    );
+
+  box-shadow:
+    0 8px 18px rgba(122, 44, 255, 0.28);
+}
+
+.mobile-sell-icon .vani-logo {
+  display: block;
+}
+
+.mobile-sell-icon .vani-logo-image {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  box-shadow: none;
 }
 
 /* ================= FLOATING CHAT ================= */
@@ -1033,14 +1170,16 @@ a {
 
   border-radius: 50%;
 
+  border: 0;
+
   background:
     linear-gradient(
       135deg,
-      #ef2d65,
-      #701b99
+      var(--vd-pink),
+      var(--vd-purple)
     );
 
-  color: white;
+  color: #ffffff;
 
   font-size: 34px;
 
@@ -1055,7 +1194,7 @@ a {
   inset: 0;
   z-index: 100;
 
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.40);
 }
 
 .side-menu {
@@ -1063,7 +1202,7 @@ a {
   min-height: 100vh;
   padding: 22px;
 
-  background: white;
+  background: #ffffff;
 
   box-shadow:
     15px 0 40px rgba(0, 0, 0, 0.15);
@@ -1078,16 +1217,21 @@ a {
 }
 
 .side-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: var(--vd-pink);
+
   font-size: 29px;
   font-weight: 900;
 }
 
-.side-brand span {
-  color: #6f22c8;
-}
+.side-brand .vani-logo-image {
+  width: 40px;
+  height: 40px;
 
-.side-brand {
-  color: #ec164e;
+  border-radius: 12px;
 }
 
 .side-menu-top button {
@@ -1140,7 +1284,7 @@ a {
 
   border-radius: 28px;
 
-  background: white;
+  background: #ffffff;
 }
 
 .auth-close {
@@ -1155,18 +1299,28 @@ a {
 }
 
 .auth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
   margin-bottom: 25px;
 
-  text-align: center;
-
-  color: #ef2d65;
+  color: var(--vd-pink);
 
   font-size: 32px;
   font-weight: 900;
 }
 
+.auth-logo .vani-logo-image {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 13px;
+}
+
 .auth-logo span {
-  color: #6f22c8;
+  color: var(--vd-purple);
 }
 
 .auth-tabs {
@@ -1186,9 +1340,9 @@ a {
 }
 
 .auth-tabs button.active {
-  border-bottom-color: #e52b78;
+  border-bottom-color: var(--vd-fuchsia);
 
-  color: #e52b78;
+  color: var(--vd-fuchsia);
 
   font-weight: 800;
 }
@@ -1218,12 +1372,215 @@ a {
   outline: none;
 }
 
+.auth-modal input:focus {
+  border-color: var(--vd-purple);
+
+  box-shadow:
+    0 0 0 3px rgba(122, 44, 255, 0.10);
+}
+
 .auth-message {
   margin: 0;
 
   color: #b31b5e;
 
   font-size: 13px;
+}
+
+/* ================= FORM STATES ================= */
+
+.form-message {
+  padding: 12px 14px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.form-message.error {
+  background: #fff3f6;
+  color: #b51f58;
+  border: 1px solid #f3cbd4;
+}
+
+.form-message.success {
+  background: #eef9f1;
+  color: #1f6b39;
+  border: 1px solid #c9e8d2;
+}
+
+button:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+/* ================= DASHBOARD ================= */
+
+.dashboard-page {
+  padding: 28px 0 42px;
+}
+
+.dashboard-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+
+  padding: 28px;
+
+  border-radius: 28px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--vd-dark),
+      var(--vd-indigo) 48%,
+      var(--vd-purple)
+    );
+
+  box-shadow:
+    0 18px 42px rgba(43, 29, 114, 0.20);
+}
+
+.dashboard-hero h1 {
+  margin: 8px 0 8px;
+
+  max-width: 700px;
+
+  font-size: clamp(28px, 5vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+}
+
+.dashboard-hero p {
+  margin: 0;
+
+  max-width: 650px;
+
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.dashboard-hero .eyebrow {
+  color: #ffb0cc;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+
+  margin: 18px 0;
+}
+
+.dashboard-stats article {
+  background: #ffffff;
+
+  border: 1px solid var(--vd-line);
+  border-radius: 20px;
+
+  padding: 18px;
+
+  box-shadow:
+    0 8px 24px rgba(43, 29, 114, 0.07);
+}
+
+.dashboard-stats span {
+  display: block;
+
+  color: #786d84;
+
+  font-size: 13px;
+}
+
+.dashboard-stats strong {
+  display: block;
+
+  margin-top: 7px;
+
+  font-size: 25px;
+
+  color: var(--vd-dark);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.dashboard-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+
+  padding: 20px;
+
+  min-height: 110px;
+
+  border: 1px solid var(--vd-line);
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 24px rgba(43, 29, 114, 0.06);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 30px rgba(43, 29, 114, 0.11);
+}
+
+.dashboard-card > svg:first-child {
+  color: var(--vd-purple);
+}
+
+.dashboard-card strong,
+.dashboard-card span {
+  display: block;
+}
+
+.dashboard-card strong {
+  margin-bottom: 4px;
+}
+
+.dashboard-card span {
+  color: #776c83;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.dashboard-card-primary {
+  color: #ffffff;
+
+  border: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--vd-pink),
+      var(--vd-fuchsia) 42%,
+      var(--vd-purple)
+    ) !important;
+}
+
+.dashboard-card-primary > svg {
+  color: #ffffff;
+}
+
+.dashboard-card-primary span {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 /* ================= MOBILE ================= */
@@ -1239,7 +1596,14 @@ a {
   }
 
   .brand {
-    font-size: 30px;
+    font-size: 26px;
+    gap: 7px;
+  }
+
+  .brand .vani-logo-image {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
   }
 
   .header-menu {
@@ -1265,6 +1629,7 @@ a {
   .main-card-icon {
     width: 63px;
     height: 63px;
+
     margin-right: 10px;
 
     font-size: 30px;
@@ -1303,9 +1668,44 @@ a {
   .product-page-image {
     min-height: 250px;
   }
+
+  .dashboard-page {
+    padding: 18px 15px 32px;
+  }
+
+  .dashboard-hero {
+    padding: 22px 18px;
+
+    border-radius: 24px;
+  }
+
+  .dashboard-hero h1 {
+    font-size: 30px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-hero .vani-logo {
+    display: none;
+  }
 }
 
 @media (max-width: 390px) {
+  .brand {
+    font-size: 24px;
+  }
+
+  .brand .vani-logo-image {
+    width: 35px;
+    height: 35px;
+  }
+
   .main-card {
     min-height: 195px;
     padding: 16px 10px;
@@ -1314,6 +1714,7 @@ a {
   .main-card-icon {
     width: 56px;
     height: 56px;
+
     margin-right: 8px;
 
     border-radius: 15px;
@@ -1342,100 +1743,4 @@ a {
 
     font-size: 17px;
   }
-}
-
-/* VaniDaxi application states */
-.form-message {
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.4;
-}
-.form-message.error { background: #ffffff1f3; color: #b51f58; border: 1px solid #f3cbd4; }
-.form-message.success { background: #eef9f1; color: #1f6b39; border: 1px solid #c9e8d2; }
-button:disabled { opacity: .62; cursor: not-allowed; }
-
-
-/* =========================================================
-   VaniDaxi 2.0 — identidad visual oficial
-   Basada en el icono seleccionado: V + degradado rosa/fucsia/morado/índigo.
-   ========================================================= */
-:root {
-  --vd-pink: #ef2d65;
-  --vd-fuchsia: #e52b9a;
-  --vd-magenta: #c52c92;
-  --vd-purple: #7a2cff;
-  --vd-violet: #5e20b8;
-  --vd-indigo: #2b1d72;
-  --vd-dark: #151026;
-  --vd-soft: #f8f3ff;
-  --vd-line: #e8def2;
-  --vd-text: #21172d;
-}
-
-.vani-logo-image {
-  width: 46px;
-  height: 46px;
-  display: block;
-  object-fit: cover;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(94,32,184,.20);
-}
-.vani-logo-compact .vani-logo-image { width: 40px; height: 40px; border-radius: 12px; }
-.logo-word { align-items: baseline; }
-.logo-word strong:first-child { color: var(--vd-pink) !important; }
-.logo-word strong:last-child { color: var(--vd-purple) !important; }
-
-.top-header {
-  background: rgba(255,255,255,.92) !important;
-  border-bottom-color: var(--vd-line) !important;
-}
-.header-search input:focus { border-color: var(--vd-purple) !important; box-shadow: 0 0 0 3px rgba(122,44,255,.10) !important; }
-.search-button, .primary-button, .sell-card, .dashboard-card-primary {
-  background: linear-gradient(135deg, var(--vd-pink), var(--vd-fuchsia) 42%, var(--vd-purple) 100%) !important;
-}
-.secondary-button:hover, .text-link, .section-link, .category-link.active { color: var(--vd-purple) !important; }
-.category-link.active::after { background: linear-gradient(90deg,var(--vd-pink),var(--vd-purple)) !important; }
-.cart-count, .badge-discount, .product-badge.discount { background: var(--vd-pink) !important; }
-.account-card-main { background: linear-gradient(135deg,var(--vd-magenta),var(--vd-violet) 55%,var(--vd-indigo)) !important; }
-
-.dashboard-page { padding: 28px 0 42px; }
-.dashboard-hero {
-  display:flex; justify-content:space-between; align-items:center; gap:24px;
-  padding:28px; border-radius:28px; color:#fff;
-  background: linear-gradient(135deg,var(--vd-dark),var(--vd-indigo) 48%,var(--vd-purple));
-  box-shadow:0 18px 42px rgba(43,29,114,.20);
-}
-.dashboard-hero h1 { margin:8px 0 8px; max-width:700px; font-size:clamp(28px,5vw,46px); line-height:1.05; letter-spacing:-1.5px; }
-.dashboard-hero p { margin:0; max-width:650px; color:rgba(255,255,255,.78); }
-.eyebrow { font-size:11px; font-weight:900; letter-spacing:1.6px; color:#ffb0cc; }
-.dashboard-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:18px 0; }
-.dashboard-stats article { background:#fff; border:1px solid var(--vd-line); border-radius:20px; padding:18px; box-shadow:0 8px 24px rgba(43,29,114,.07); }
-.dashboard-stats span { display:block; color:#786d84; font-size:13px; }
-.dashboard-stats strong { display:block; margin-top:7px; font-size:25px; color:var(--vd-dark); }
-.dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-.dashboard-card { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:16px; padding:20px; min-height:110px; border:1px solid var(--vd-line); border-radius:22px; background:#fff; box-shadow:0 8px 24px rgba(43,29,114,.06); transition:transform .18s ease, box-shadow .18s ease; }
-.dashboard-card:hover { transform:translateY(-2px); box-shadow:0 14px 30px rgba(43,29,114,.11); }
-.dashboard-card > svg:first-child { color:var(--vd-purple); }
-.dashboard-card strong,.dashboard-card span { display:block; }
-.dashboard-card strong { margin-bottom:4px; }
-.dashboard-card span { color:#776c83; font-size:13px; line-height:1.4; }
-.dashboard-card-primary { color:#fff; border:0; }
-.dashboard-card-primary > svg { color:#fff; }
-.dashboard-card-primary span { color:rgba(255,255,255,.78); }
-.dashboard-card-primary .vani-logo-image { filter:none; }
-.mobile-bottom { grid-template-columns:repeat(5,1fr) !important; }
-.mobile-sell { position:relative; margin-top:-18px; }
-.mobile-sell-icon { width:52px; height:52px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,var(--vd-pink),var(--vd-purple)); box-shadow:0 8px 18px rgba(122,44,255,.28); }
-.mobile-sell-icon .vani-logo { display:block; }
-.mobile-sell-icon .vani-logo-image { width:44px; height:44px; border-radius:50%; box-shadow:none; }
-.mobile-cart-wrap { position:relative; display:inline-flex; }
-
-@media (max-width:650px){
-  .dashboard-page { padding:18px 15px 32px; }
-  .dashboard-hero { padding:22px 18px; border-radius:24px; }
-  .dashboard-hero h1 { font-size:30px; }
-  .dashboard-stats { grid-template-columns:1fr; }
-  .dashboard-grid { grid-template-columns:1fr; }
-  .dashboard-hero .vani-logo { display:none; }
 }
