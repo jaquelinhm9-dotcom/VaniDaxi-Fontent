@@ -23,3 +23,4 @@ La integración de pagos con tarjeta/mercado-pago/Stripe no está activada todav
 
 ### VaniDaxi 2.0
 La identidad visual usa el icono VaniDaxi seleccionado y una paleta rosa/fucsia/morado/índigo. El panel `/vendedor` está protegido y sirve como punto de entrada al flujo de vendedor.
+ 
