@@ -1,3 +1,4 @@
+================================================================================
 import { useEffect, useMemo, useState } from "react";
 import {
   Link,
@@ -10,7 +11,7 @@ import {
 } from "react-router-dom";
 
 import { supabase } from "./supabaseClient";
-import { createOrder, createProduct, getFavorites, getProfile, getProducts, isSupabaseAvailable, setFavorite, upsertProfile } from "./services/marketplace";
+import { createOrder, createProduct, getFavorites, getProfile, getProducts, isSupabaseAvailable, setFavorite, upsertProfile } from "./marketplace";
 
 /* =========================================================
    VaniDaxi
@@ -4117,3 +4118,6 @@ function App() {
 }
 
 export default App;
+
+================================================================================
+
