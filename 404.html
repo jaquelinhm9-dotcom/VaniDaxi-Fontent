@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VaniDaxi</title>
+    <script>
+      // GitHub Pages SPA fallback: preserve the requested path and let Vite/React restore it.
+      const base = "/VaniDaxi-frontend/";
+      const path = location.pathname.startsWith(base) ? location.pathname.slice(base.length) : "";
+      const query = location.search || "";
+      const hash = location.hash || "";
+      const target = base + "?p=" + encodeURIComponent("/" + path) + encodeURIComponent(query) + hash;
+      location.replace(target);
+    </script>
+  </head>
+  <body></body>
+</html>
