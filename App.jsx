@@ -192,7 +192,7 @@ function saveStorage(key, value) {
    ICONOS
    ========================================================= */
 
-function Icon({ name, size = 21, stroke = 2 }) {
+function Icon({ name, size = 21, stroke = 2, ...props }) {
   const common = {
     width: size,
     height: size,
@@ -301,7 +301,11 @@ function Icon({ name, size = 21, stroke = 2 }) {
     ),
   };
 
-  return <svg {...common}>{icons[name] || icons.help}</svg>;
+  return (
+    <svg {...common} {...props}>
+      {icons[name] || icons.help}
+    </svg>
+  );
 }
 
 /* =========================================================
@@ -346,7 +350,7 @@ function GlobalStyles() {
         --muted: #71677b;
         --line: #eadff0;
         --soft: #fbf8ff;
-        --white: #fffffffff;
+        --white: #ffffff;
         --shadow: 0 10px 30px rgba(53,22,63,.10);
         --shadow-soft: 0 5px 18px rgba(53,22,63,.08);
       }
@@ -1328,7 +1332,7 @@ function GlobalStyles() {
 
       @media (max-width: 980px) {
         .categories-grid {
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
         }
 
         .product-grid {
@@ -1398,7 +1402,7 @@ function GlobalStyles() {
         }
 
         .categories-grid {
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 7px;
         }
 
@@ -1448,7 +1452,7 @@ function GlobalStyles() {
         .mobile-bottom {
           position: fixed;
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           bottom: 0;
           left: 0;
           right: 0;
@@ -3306,7 +3310,7 @@ function AuthPage({ onSuccess }) {
       if (forgotMode) {
         if (!email) throw new Error("Escribe tu correo electrónico.");
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/VaniDaxi-frontend/perfil`,
+          redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}perfil`,
         });
         if (resetError) throw resetError;
         setNotice("Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.");
@@ -3436,7 +3440,7 @@ function AuthPage({ onSuccess }) {
                 style={{
                   padding: 11,
                   borderRadius: 10,
-                  background: "#ffffff1f3",
+                  background: "#fff1f3",
                   color: "#b51f58",
                   fontSize: 12,
                 }}
