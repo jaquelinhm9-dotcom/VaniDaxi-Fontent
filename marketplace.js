@@ -1,153 +1,287 @@
 import { supabase } from "./supabaseClient";
 
+export const TABLES = {
+  products: "products",
+  favorites: "favorites",
+  profiles: "profiles",
+  orders: "orders",
+  orderItems: "order_items",
+};
+
 export function isSupabaseAvailable() {
-  return Boolean(supabase);
+  return Boolean(supabase?.from);
 }
 
-function normalizeProduct(product) {
-  if (!product) return null;
+export function mapProduct(row) {
+  if (!row) return null;
 
   return {
-    ...product,
-    price:
-      typeof product.price === "number"
-        ? product.price
-        : Number(product.price || 0),
+    id: String(row.id),
+    name: row.name || "Producto",
+    price: Number(row.price) || 0,
+    oldPrice: row.old_price == null ? null : Number(row.old_price),
+    rating: Number(row.rating) || 0,
+    reviews: Number(row.reviews) || 0,
+    discount: Number(row.discount) || 0,
+    category: row.category || "Otros",
+    type: row.type || "Nuevo",
+    image: row.image || "",
+    description: row.description || "",
+    specifications: Array.isArray(row.specifications)
+      ? row.specifications
+      : [],
+    sellerId: row.seller_id || null,
+    stock: row.stock == null ? 0 : Number(row.stock),
+    createdAt: row.created_at || null,
   };
 }
 
 export async function getProducts() {
-  if (!supabase) return [];
+  if (!isSupabaseAvailable()) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
 
   const { data, error } = await supabase
-    .from("products")
+    .from(TABLES.products)
     .select("*")
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error al obtener productos:", error);
-    return [];
+    return {
+      data: null,
+      error,
+      unavailable: false,
+    };
   }
 
-  return (data || []).map(normalizeProduct);
+  return {
+    data: (data || []).map(mapProduct),
+    error: null,
+    unavailable: false,
+  };
+}
+
+export async function createProduct(product, userId) {
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from(TABLES.products)
+    .insert({
+      seller_id: userId,
+      name: product.name,
+      price: Number(product.price),
+      old_price: product.oldPrice ?? null,
+      category: product.category,
+      type: product.type || "Nuevo",
+      image: product.image || null,
+      description: product.description || "",
+      specifications: product.specifications || [],
+      stock: Number(product.stock ?? 1),
+      is_active: true,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return {
+      data: null,
+      error,
+      unavailable: false,
+    };
+  }
+
+  return {
+    data: mapProduct(data),
+    error: null,
+    unavailable: false,
+  };
 }
 
 export async function getProfile(userId) {
-  if (!supabase || !userId) return null;
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
 
   const { data, error } = await supabase
-    .from("profiles")
+    .from(TABLES.profiles)
     .select("*")
     .eq("id", userId)
     .maybeSingle();
 
-  if (error) {
-    console.error("Error al obtener perfil:", error);
-    return null;
-  }
-
-  return data;
+  return {
+    data,
+    error,
+    unavailable: false,
+  };
 }
 
-export async function upsertProfile(profile) {
-  if (!supabase || !profile?.id) return null;
+export async function upsertProfile(userId, values) {
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
 
   const { data, error } = await supabase
-    .from("profiles")
-    .upsert(profile, { onConflict: "id" })
+    .from(TABLES.profiles)
+    .upsert({
+      id: userId,
+      ...values,
+      updated_at: new Date().toISOString(),
+    })
     .select()
     .single();
 
-  if (error) {
-    console.error("Error al guardar perfil:", error);
-    return null;
-  }
-
-  return data;
+  return {
+    data,
+    error,
+    unavailable: false,
+  };
 }
 
 export async function getFavorites(userId) {
-  if (!supabase || !userId) return [];
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
 
   const { data, error } = await supabase
-    .from("favorites")
+    .from(TABLES.favorites)
     .select("product_id")
     .eq("user_id", userId);
 
-  if (error) {
-    console.error("Error al obtener favoritos:", error);
-    return [];
-  }
-
-  return (data || []).map((item) => item.product_id);
+  return {
+    data: (data || []).map((row) => String(row.product_id)),
+    error,
+    unavailable: false,
+  };
 }
 
-export async function setFavorite(userId, productId, isFavorite) {
-  if (!supabase || !userId || !productId) return false;
+export async function setFavorite(userId, productId, active) {
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      error: null,
+      unavailable: true,
+    };
+  }
 
-  if (isFavorite) {
-    const { error } = await supabase.from("favorites").upsert(
-      {
+  if (active) {
+    const { error } = await supabase
+      .from(TABLES.favorites)
+      .upsert({
         user_id: userId,
         product_id: productId,
-      },
-      {
-        onConflict: "user_id,product_id",
-      }
-    );
+      });
 
-    if (error) {
-      console.error("Error al guardar favorito:", error);
-      return false;
-    }
-
-    return true;
+    return {
+      error,
+      unavailable: false,
+    };
   }
 
   const { error } = await supabase
-    .from("favorites")
+    .from(TABLES.favorites)
     .delete()
     .eq("user_id", userId)
     .eq("product_id", productId);
 
-  if (error) {
-    console.error("Error al eliminar favorito:", error);
-    return false;
-  }
-
-  return true;
+  return {
+    error,
+    unavailable: false,
+  };
 }
 
-export async function createProduct(product) {
-  if (!supabase) return null;
+export async function createOrder({
+  userId,
+  customer,
+  cart,
+  total,
+  paymentMethod = "contra_entrega",
+}) {
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
 
-  const { data, error } = await supabase
-    .from("products")
-    .insert(product)
+  const { data: order, error: orderError } = await supabase
+    .from(TABLES.orders)
+    .insert({
+      user_id: userId,
+      customer_name: customer.name,
+      phone: customer.phone,
+      address: customer.address,
+      city: customer.city,
+      reference: customer.reference || null,
+      total: Number(total),
+      status: "pending",
+      payment_method: paymentMethod,
+    })
     .select()
     .single();
 
-  if (error) {
-    console.error("Error al crear producto:", error);
-    return null;
+  if (orderError) {
+    return {
+      data: null,
+      error: orderError,
+      unavailable: false,
+    };
   }
 
-  return normalizeProduct(data);
-}
+  const items = (cart || []).map((item) => ({
+    order_id: order.id,
+    product_id:
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        String(item.id)
+      )
+        ? item.id
+        : null,
+    product_name: item.name,
+    unit_price: Number(item.price),
+    quantity: Number(item.quantity),
+    subtotal: Number(item.price) * Number(item.quantity),
+    seller_id: item.sellerId || null,
+  }));
 
-export async function createOrder(order) {
-  if (!supabase) return null;
+  if (items.length > 0) {
+    const { error: itemsError } = await supabase
+      .from(TABLES.orderItems)
+      .insert(items);
 
-  const { data, error } = await supabase
-    .from("orders")
-    .insert(order)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Error al crear pedido:", error);
-    return null;
+    if (itemsError) {
+      return {
+        data: order,
+        error: itemsError,
+        unavailable: false,
+      };
+    }
   }
 
-  return data;
+  return {
+    data: order,
+    error: null,
+    unavailable: false,
+  };
 }
