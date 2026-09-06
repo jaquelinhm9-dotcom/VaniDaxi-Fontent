@@ -1,4 +1,4 @@
-import { supabase } from "../supabaseClient";
+import { supabase } from "./supabaseClient";
 
 export const TABLES = {
   products: "products",
@@ -14,6 +14,7 @@ export function isSupabaseAvailable() {
 
 export function mapProduct(row) {
   if (!row) return null;
+
   return {
     id: String(row.id),
     name: row.name || "Producto",
@@ -26,7 +27,9 @@ export function mapProduct(row) {
     type: row.type || "Nuevo",
     image: row.image || "",
     description: row.description || "",
-    specifications: Array.isArray(row.specifications) ? row.specifications : [],
+    specifications: Array.isArray(row.specifications)
+      ? row.specifications
+      : [],
     sellerId: row.seller_id || null,
     stock: row.stock == null ? 0 : Number(row.stock),
     createdAt: row.created_at || null,
@@ -34,19 +37,44 @@ export function mapProduct(row) {
 }
 
 export async function getProducts() {
-  if (!isSupabaseAvailable()) return { data: null, error: null, unavailable: true };
+  if (!isSupabaseAvailable()) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
+
   const { data, error } = await supabase
     .from(TABLES.products)
     .select("*")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
-  if (error) return { data: null, error, unavailable: false };
-  return { data: (data || []).map(mapProduct), error: null, unavailable: false };
+  if (error) {
+    return {
+      data: null,
+      error,
+      unavailable: false,
+    };
+  }
+
+  return {
+    data: (data || []).map(mapProduct),
+    error: null,
+    unavailable: false,
+  };
 }
 
 export async function createProduct(product, userId) {
-  if (!isSupabaseAvailable()) return { data: null, error: null, unavailable: true };
+  if (!isSupabaseAvailable()) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
+
   const { data, error } = await supabase
     .from(TABLES.products)
     .insert({
@@ -65,44 +93,138 @@ export async function createProduct(product, userId) {
     .select()
     .single();
 
-  if (error) return { data: null, error, unavailable: false };
-  return { data: mapProduct(data), error: null, unavailable: false };
+  if (error) {
+    return {
+      data: null,
+      error,
+      unavailable: false,
+    };
+  }
+
+  return {
+    data: mapProduct(data),
+    error: null,
+    unavailable: false,
+  };
 }
 
 export async function getProfile(userId) {
-  if (!isSupabaseAvailable() || !userId) return { data: null, error: null, unavailable: true };
-  const { data, error } = await supabase.from(TABLES.profiles).select("*").eq("id", userId).maybeSingle();
-  return { data, error, unavailable: false };
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from(TABLES.profiles)
+    .select("*")
+    .eq("id", userId)
+    .maybeSingle();
+
+  return {
+    data,
+    error,
+    unavailable: false,
+  };
 }
 
 export async function upsertProfile(userId, values) {
-  if (!isSupabaseAvailable() || !userId) return { data: null, error: null, unavailable: true };
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
+
   const { data, error } = await supabase
     .from(TABLES.profiles)
-    .upsert({ id: userId, ...values, updated_at: new Date().toISOString() })
+    .upsert({
+      id: userId,
+      ...values,
+      updated_at: new Date().toISOString(),
+    })
     .select()
     .single();
-  return { data, error, unavailable: false };
+
+  return {
+    data,
+    error,
+    unavailable: false,
+  };
 }
 
 export async function getFavorites(userId) {
-  if (!isSupabaseAvailable() || !userId) return { data: null, error: null, unavailable: true };
-  const { data, error } = await supabase.from(TABLES.favorites).select("product_id").eq("user_id", userId);
-  return { data: (data || []).map((row) => String(row.product_id)), error, unavailable: false };
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from(TABLES.favorites)
+    .select("product_id")
+    .eq("user_id", userId);
+
+  return {
+    data: (data || []).map((row) => String(row.product_id)),
+    error,
+    unavailable: false,
+  };
 }
 
 export async function setFavorite(userId, productId, active) {
-  if (!isSupabaseAvailable() || !userId) return { error: null, unavailable: true };
-  if (active) {
-    const { error } = await supabase.from(TABLES.favorites).upsert({ user_id: userId, product_id: productId });
-    return { error, unavailable: false };
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      error: null,
+      unavailable: true,
+    };
   }
-  const { error } = await supabase.from(TABLES.favorites).delete().eq("user_id", userId).eq("product_id", productId);
-  return { error, unavailable: false };
+
+  if (active) {
+    const { error } = await supabase
+      .from(TABLES.favorites)
+      .upsert({
+        user_id: userId,
+        product_id: productId,
+      });
+
+    return {
+      error,
+      unavailable: false,
+    };
+  }
+
+  const { error } = await supabase
+    .from(TABLES.favorites)
+    .delete()
+    .eq("user_id", userId)
+    .eq("product_id", productId);
+
+  return {
+    error,
+    unavailable: false,
+  };
 }
 
-export async function createOrder({ userId, customer, cart, total, paymentMethod = "contra_entrega" }) {
-  if (!isSupabaseAvailable() || !userId) return { data: null, error: null, unavailable: true };
+export async function createOrder({
+  userId,
+  customer,
+  cart,
+  total,
+  paymentMethod = "contra_entrega",
+}) {
+  if (!isSupabaseAvailable() || !userId) {
+    return {
+      data: null,
+      error: null,
+      unavailable: true,
+    };
+  }
 
   const { data: order, error: orderError } = await supabase
     .from(TABLES.orders)
@@ -120,11 +242,22 @@ export async function createOrder({ userId, customer, cart, total, paymentMethod
     .select()
     .single();
 
-  if (orderError) return { data: null, error: orderError, unavailable: false };
+  if (orderError) {
+    return {
+      data: null,
+      error: orderError,
+      unavailable: false,
+    };
+  }
 
   const items = cart.map((item) => ({
     order_id: order.id,
-    product_id: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(item.id)) ? item.id : null,
+    product_id:
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        String(item.id)
+      )
+        ? item.id
+        : null,
     product_name: item.name,
     unit_price: Number(item.price),
     quantity: Number(item.quantity),
@@ -132,8 +265,21 @@ export async function createOrder({ userId, customer, cart, total, paymentMethod
     seller_id: item.sellerId || null,
   }));
 
-  const { error: itemsError } = await supabase.from(TABLES.orderItems).insert(items);
-  if (itemsError) return { data: order, error: itemsError, unavailable: false };
+  const { error: itemsError } = await supabase
+    .from(TABLES.orderItems)
+    .insert(items);
 
-  return { data: order, error: null, unavailable: false };
+  if (itemsError) {
+    return {
+      data: order,
+      error: itemsError,
+      unavailable: false,
+    };
+  }
+
+  return {
+    data: order,
+    error: null,
+    unavailable: false,
+  };
 }
