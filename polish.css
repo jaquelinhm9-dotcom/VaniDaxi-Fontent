@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap');
+
+:root{
+  --vd-font:'Manrope',sans-serif;
+  --vd-display:'Outfit',sans-serif;
+}
+
+html,body,#root,.app,.device,button,input{font-family:var(--vd-font)!important}
+
+.logo b,.page-heading h1,.section-title h2,.home-hero h1,.detail-content h1,.profile-card h1,.category-tile b,.result-line span,.promo-card strong,.solo-banner b{
+  font-family:var(--vd-display),var(--vd-font),sans-serif!important;
+}
+
+.logo b{font-weight:700;letter-spacing:-.7px}
+.header{padding-top:14px}
+.search{height:42px;border:1px solid rgba(112,66,154,.07)}
+.search input{font-size:12px}
+.section-title h2{font-size:15px;font-weight:700}
+.section-title button{font-size:9px}
+.page-heading h1{font-weight:700;font-size:24px}
+.home-hero h1{font-weight:700}
+.product-info h3{font-size:10px;font-weight:600}
+.product-info small,.product-info .rating{font-size:8px}
+.price b{font-size:12px;font-weight:800}
+.product-image{box-shadow:0 7px 18px rgba(83,48,104,.055)}
+.category-tile{transition:transform .16s ease,box-shadow .16s ease}
+.category-tile:active,.product-card:active{transform:scale(.985)}
+.icon-btn:active,.heart:active,.add-button:active,.profile-list button:active{transform:scale(.96)}
+.add-button{font-family:var(--vd-display),var(--vd-font),sans-serif!important;letter-spacing:.05px}
+
+/* El perfil no expone datos personales incrustados en el prototipo. */
+.profile-card h1{font-size:0!important}
+.profile-card h1::after{content:'Mi cuenta';font-size:15px;font-family:var(--vd-display),var(--vd-font),sans-serif}
+.profile-card p{font-size:0!important}
+.profile-card p::after{content:'Cliente VaniDaxi';font-size:8px;color:#9b919e}
+
+/* Acabado más limpio para la barra inferior. */
+.bottom-nav{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(255,255,255,.93)!important;border-top:1px solid rgba(112,66,154,.08)!important}
