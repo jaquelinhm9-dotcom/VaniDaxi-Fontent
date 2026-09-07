@@ -1,28 +1,228 @@
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, Route, Routes, useNavigate, useParams, useLocation } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import { createOrder, createProduct, getFavorites, getProducts, getProfile, setFavorite, upsertProfile } from "./marketplace";
-const BASE=import.meta.env.BASE_URL;
-const IMG={shoe:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85",laptop:"https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=85",watch:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=85",headphones:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85",fashion:"https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=700&q=85",man:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=85",woman:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=85",home:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=700&q=85",beauty:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=85",car:"https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=85",food:"https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=700&q=85",toy:"https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=700&q=85",sport:"https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=85"};
-const categories=[["Moda",IMG.fashion],["Hombre",IMG.man],["Mujer",IMG.woman],["Tecnología",IMG.laptop],["Hogar",IMG.home],["Belleza",IMG.beauty],["Autos y Motos",IMG.car],["Comida",IMG.food],["Juguetes",IMG.toy],["Deportes",IMG.sport]];
-const demoProducts=[{id:"demo-shoe",name:"Tenis deportivos",price:599,oldPrice:999,discount:40,rating:4.8,reviews:124,category:"Moda",image:IMG.shoe,stock:12},{id:"demo-headphones",name:"Audífonos inalámbricos",price:799,oldPrice:1199,discount:35,rating:4.8,reviews:176,category:"Tecnología",image:IMG.headphones,stock:8},{id:"demo-watch",name:"Smartwatch",price:1299,oldPrice:1899,discount:30,rating:4.8,reviews:124,category:"Tecnología",image:IMG.watch,stock:6},{id:"demo-laptop",name:"Laptop ultradelgada",price:7499,oldPrice:8999,discount:25,rating:4.7,reviews:86,category:"Tecnología",image:IMG.laptop,stock:4},{id:"demo-home",name:"Licuadora Profesional",price:749,oldPrice:999,discount:25,rating:4.7,reviews:86,category:"Hogar",image:IMG.home,stock:9}];
-function money(v){return new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0}).format(Number(v||0))}
-function Icon({name,size=21}){const p={home:"M3 10.5 12 3l9 7.5v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",grid:"M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",heart:"M20.8 8.8c0 5.5-8.8 10.2-8.8 10.2S3.2 14.3 3.2 8.8A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.7Z",bag:"M5 8h14l-1 12H6L5 8Zm3 0V6a4 4 0 0 1 8 0v2",user:"M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8",bell:"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",cart:"M3 4h2l2.4 11.1a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.5L21 8H7M10 21h.01M18 21h.01",search:"m21 21-4.4-4.4M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4",back:"M19 12H5m6-6-6 6 6 6"};return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d={p[name]||p.grid}/></svg>}
-function Logo(){return <Link className="brand" to="/"><img src={`${BASE}vanidaxi-icon.png`} alt="VaniDaxi"/><strong>VaniDaxi</strong></Link>}
-function Header({cartCount}){const[q,setQ]=useState("");const navigate=useNavigate();return <header className="header"><div className="header-row"><Logo/><form className="search" onSubmit={e=>{e.preventDefault();navigate(`/productos?q=${encodeURIComponent(q)}`)}}><Icon name="search"/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar productos, marcas..."/></form><div className="header-actions"><Link to="/notificaciones" className="icon-button"><Icon name="bell"/><b>3</b></Link><Link to="/carrito" className="icon-button"><Icon name="cart"/>{cartCount>0&&<b>{cartCount}</b>}</Link></div></div></header>}
-function BottomNav(){return <nav className="bottom-nav">{[["/","home","Inicio"],["/categorias","grid","Categorías"],["/favoritos","heart","Favoritos"],["/pedidos","bag","Pedidos"],["/perfil","user","Perfil"]].map(([to,icon,label])=><NavLink key={to} to={to} end={to==="/"}><Icon name={icon}/><span>{label}</span></NavLink>)}</nav>}
-function ProductCard({product,favorite,onFavorite,onAdd}){return <article className="product-card"><Link to={`/producto/${product.id}`} className="product-image"><img src={product.image||IMG.shoe} alt=""/><span className="discount">-{product.discount||0}%</span></Link><button className={`heart ${favorite?"active":""}`} onClick={()=>onFavorite(product)} aria-label="Favorito"><Icon name="heart"/></button><div className="product-info"><small>{product.category}</small><Link to={`/producto/${product.id}`}><strong>{product.name}</strong></Link><div className="rating">★ {product.rating||4.8} <em>({product.reviews||0})</em></div><div className="price">{money(product.price)} <del>{product.oldPrice?money(product.oldPrice):""}</del></div><button className="add" onClick={()=>onAdd(product)}>Agregar al carrito</button></div></article>}
-function SectionTitle({title,to="/productos"}){return <div className="section-title"><h2>{title}</h2><Link to={to}>Ver todo →</Link></div>}
-function Home({products,favorites,onFavorite,onAdd}){return <main className="home"><section className="hero"><div><span>Tecnología</span><h1>Tecnología que te conecta.</h1><p>Los mejores dispositivos y accesorios a un mejor precio.</p><Link className="light-btn" to="/productos?categoria=Tecnología">Explorar tecnología →</Link></div><img src={IMG.laptop} alt="Tecnología"/></section><section className="section"><SectionTitle title="Categorías" to="/categorias"/><div className="category-grid">{categories.map(([n,i])=><Link className="category" to={`/productos?categoria=${encodeURIComponent(n)}`} key={n}><img src={i} alt=""/><span>{n}</span></Link>)}</div></section><section className="section"><SectionTitle title="Ofertas del día"/><div className="product-grid">{products.slice(0,6).map(p=><ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd}/>)}</div></section><section className="solo-banner"><div><small>Para él</small><h2>Estilo, tecnología<br/>y rendimiento.</h2><Link className="light-btn" to="/productos">Ver productos →</Link></div></section><section className="section"><SectionTitle title="Categorías destacadas" to="/categorias"/><div className="mini-grid">{categories.slice(0,5).map(([n,i])=><Link key={n} to={`/productos?categoria=${encodeURIComponent(n)}`}><img src={i} alt=""/><span>{n}</span></Link>)}</div></section><section className="section"><SectionTitle title="Más vendidos"/><div className="product-grid">{products.slice(1,4).map(p=><ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd}/>)}</div></section><section className="section"><SectionTitle title="Recomendados para ti"/><div className="product-grid">{products.slice(2,5).map(p=><ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd}/>)}</div></section></main>}
-function Categories(){return <main className="page"><SectionTitle title="Categorías" to="/"/><div className="category-large-grid">{categories.map(([n,i])=><Link className="category-large" key={n} to={`/productos?categoria=${encodeURIComponent(n)}`}><img src={i} alt=""/><strong>{n}</strong><span>Explorar productos →</span></Link>)}</div></main>}
-function Products({products,favorites,onFavorite,onAdd}){const params=new URLSearchParams(useLocation().search);const q=(params.get("q")||"").toLowerCase();const cat=params.get("categoria");const list=products.filter(p=>(!q||p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q))&&(!cat||p.category===cat));return <main className="page"><SectionTitle title={cat||(q?`Resultados para “${q}”`:"Productos")}/><div className="filter-row"><span>{list.length} productos</span><Link to="/productos">Todos</Link></div><div className="product-grid">{list.map(p=><ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd}/>)}</div>{!list.length&&<div className="empty">No encontramos productos con esos criterios.</div>}</main>}
-function ProductDetail({products,favorites,onFavorite,onAdd}){const{id}=useParams();const p=products.find(x=>x.id===id)||products[0];if(!p)return null;return <main className="detail"><Link className="back" to="/productos"><Icon name="back"/> Volver</Link><div className="detail-grid"><div className="detail-image"><img src={p.image||IMG.shoe} alt={p.name}/><span className="discount">-{p.discount||0}%</span></div><div className="detail-info"><small>{p.category}</small><h1>{p.name}</h1><div className="rating">★ {p.rating||4.8} <em>({p.reviews||0} reseñas)</em></div><div className="big-price">{money(p.price)} <del>{p.oldPrice?money(p.oldPrice):""}</del></div><p>{p.description||"Producto seleccionado de VaniDaxi. Consulta disponibilidad y agrega al carrito para continuar tu compra."}</p><button className="primary" onClick={()=>onAdd(p)}>🛒 Agregar al carrito</button><button className={`outline ${favorites.includes(p.id)?"selected":""}`} onClick={()=>onFavorite(p)}><Icon name="heart"/> {favorites.includes(p.id)?"En favoritos":"Agregar a favoritos"}</button></div></div></main>}
-function Favorites({products,favorites,onFavorite,onAdd}){const list=products.filter(p=>favorites.includes(p.id));return <main className="page"><SectionTitle title="Favoritos" to="/productos"/><div className="product-grid">{list.map(p=><ProductCard key={p.id} product={p} favorite onFavorite={onFavorite} onAdd={onAdd}/>)}</div>{!list.length&&<div className="empty"><Icon name="heart" size={34}/><h2>Aún no tienes favoritos</h2><p>Guarda productos para encontrarlos rápidamente.</p><Link className="primary inline" to="/productos">Explorar productos</Link></div>}</main>}
-function Cart({cart,onRemove,onAdd,onCheckout}){const total=cart.reduce((s,p)=>s+p.price*p.quantity,0);return <main className="page"><SectionTitle title="Carrito" to="/productos"/>{!cart.length?<div className="empty"><Icon name="cart" size={34}/><h2>Tu carrito está vacío</h2><Link className="primary inline" to="/productos">Ver productos</Link></div>:<div className="cart-layout"><div>{cart.map(p=><div className="cart-item" key={p.id}><img src={p.image||IMG.shoe} alt=""/><div><strong>{p.name}</strong><small>{p.category}</small><b>{money(p.price)}</b><div className="qty"><button onClick={()=>onAdd(p,-1)}>−</button><span>{p.quantity}</span><button onClick={()=>onAdd(p,1)}>+</button><button onClick={()=>onRemove(p.id)}>Eliminar</button></div></div></div>)}</div><aside className="summary"><h3>Resumen</h3><p>Productos <span>{money(total)}</span></p><p>Envío <span>Gratis</span></p><hr/><strong>Total <span>{money(total)}</span></strong><button className="primary" onClick={onCheckout}>Continuar compra</button></aside></div>}</main>}
-function Auth({onLogin=()=>{}}){const[mode,setMode]=useState("login");const[email,setEmail]=useState("");const[password,setPassword]=useState("");const[name,setName]=useState("");const[error,setError]=useState("");const[busy,setBusy]=useState(false);const submit=async e=>{e.preventDefault();setBusy(true);setError("");const r=mode==="login"?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password,options:{data:{full_name:name}}});setBusy(false);if(r.error)setError(r.error.message);else if(mode==="signup"&&!r.data.session)setError("Revisa tu correo para confirmar tu cuenta.");else onLogin(r.data.user)};return <main className="auth"><div className="auth-card"><Logo/><h1>{mode==="login"?"Bienvenida a VaniDaxi":"Crea tu cuenta"}</h1><p>{mode==="login"?"Compra, guarda favoritos y consulta tus pedidos.":"Únete a VaniDaxi y empieza a comprar."}</p><form onSubmit={submit}>{mode==="signup"&&<input value={name} onChange={e=>setName(e.target.value)} placeholder="Nombre" required/>}<input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Correo electrónico" required/><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Contraseña" minLength="6" required/><button className="primary" disabled={busy}>{busy?"Procesando...":mode==="login"?"Iniciar sesión":"Crear cuenta"}</button></form>{error&&<div className="error">{error}</div>}<button className="text-button" onClick={()=>setMode(mode==="login"?"signup":"login")}>{mode==="login"?"Crear una cuenta":"Ya tengo una cuenta"}</button></div></main>}
-function Profile({user}){const[profile,setProfile]=useState({full_name:"",phone:"",address:""});const[saved,setSaved]=useState(false);useEffect(()=>{getProfile(user.id).then(r=>{if(r.data)setProfile(p=>({...p,...r.data}))})},[user.id]);const save=async()=>{await upsertProfile(user.id,profile);setSaved(true);setTimeout(()=>setSaved(false),1800)};return <main className="profile"><div className="profile-head"><div className="avatar">{(profile.full_name||user.email||"V").slice(0,1).toUpperCase()}</div><div><h1>{profile.full_name||"Mi cuenta"}</h1><p>{user.email}</p></div></div><div className="profile-menu"><Link to="/pedidos"><Icon name="bag"/> Mis pedidos <span>›</span></Link><Link to="/favoritos"><Icon name="heart"/> Favoritos <span>›</span></Link><Link to="/publicar"><Icon name="grid"/> Publicar producto <span>›</span></Link></div><div className="profile-form"><h2>Datos de cuenta</h2><input value={profile.full_name||""} onChange={e=>setProfile({...profile,full_name:e.target.value})} placeholder="Nombre"/><input value={profile.phone||""} onChange={e=>setProfile({...profile,phone:e.target.value})} placeholder="Teléfono"/><input value={profile.address||""} onChange={e=>setProfile({...profile,address:e.target.value})} placeholder="Dirección de envío"/><button className="primary" onClick={save}>{saved?"Guardado ✓":"Guardar cambios"}</button></div><button className="logout" onClick={()=>supabase.auth.signOut()}>Cerrar sesión</button></main>}
-function Orders({user}){const[orders,setOrders]=useState([]);useEffect(()=>{supabase.from("orders").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).then(r=>setOrders(r.data||[]))},[user.id]);return <main className="page"><SectionTitle title="Mis pedidos" to="/"/>{!orders.length?<div className="empty"><Icon name="bag" size={34}/><h2>Aún no tienes pedidos</h2><Link className="primary inline" to="/productos">Comprar ahora</Link></div>:<div className="orders">{orders.map(o=><article key={o.id}><div><strong>Pedido #{String(o.id).slice(0,8)}</strong><small>{new Date(o.created_at).toLocaleDateString("es-MX")}</small></div><b>{money(o.total)}</b><span>{o.status||"pending"}</span></article>)}</div>}</main>}
-function Publish({user}){const[data,setData]=useState({name:"",description:"",price:"",category:"Moda",image_url:"",stock:1});const[msg,setMsg]=useState("");const submit=async e=>{e.preventDefault();setMsg("");const r=await createProduct(data,user.id);setMsg(r.error?r.error.message:"Producto publicado correctamente.")};return <main className="page form-page"><SectionTitle title="Publicar producto" to="/"/><form onSubmit={submit}><input placeholder="Nombre del producto" value={data.name} onChange={e=>setData({...data,name:e.target.value})} required/><textarea placeholder="Descripción" value={data.description} onChange={e=>setData({...data,description:e.target.value})}/><input type="number" placeholder="Precio" value={data.price} onChange={e=>setData({...data,price:e.target.value})} required/><input placeholder="URL de imagen" value={data.image_url} onChange={e=>setData({...data,image_url:e.target.value})}/><select value={data.category} onChange={e=>setData({...data,category:e.target.value})}>{categories.map(([c])=><option key={c}>{c}</option>)}</select><input type="number" min="1" placeholder="Stock" value={data.stock} onChange={e=>setData({...data,stock:e.target.value})}/><button className="primary">Publicar producto</button>{msg&&<div className="success">{msg}</div>}</form></main>}
-function Protected({user,children}){return user?children:<Auth onLogin={()=>{}}/>}
-function Checkout({user,cart,onDone}){const[busy,setBusy]=useState(false);const[msg,setMsg]=useState("");const total=cart.reduce((s,p)=>s+p.price*p.quantity,0);const submit=async()=>{if(!user){setMsg("Inicia sesión para continuar.");return}setBusy(true);if(cart.some(p=>String(p.id).startsWith("demo-"))){setBusy(false);onDone();return}const r=await createOrder({userId:user.id,customer:{name:user.email},cart,total,paymentMethod:"pending"});setBusy(false);if(r.error)setMsg(r.error.message);else onDone()};return <main className="page"><SectionTitle title="Confirmar compra" to="/carrito"/><div className="checkout"><h2>Resumen de compra</h2><p>Productos <b>{money(total)}</b></p><p>Envío <b>Gratis</b></p><hr/><h2>Total <b>{money(total)}</b></h2><button className="primary" onClick={submit} disabled={busy||!cart.length}>{busy?"Creando pedido…":"Confirmar pedido"}</button>{msg&&<div className="error">{msg}</div>}</div></main>}
-export default function App(){const[user,setUser]=useState(null);const[ready,setReady]=useState(false);const[products,setProducts]=useState(demoProducts);const[favorites,setFavorites]=useState([]);const[cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem("vanidaxi-cart")||"[]")}catch{return[]}});const navigate=useNavigate();useEffect(()=>{let active=true;Promise.all([supabase.auth.getSession(),getProducts()]).then(([s,p])=>{if(!active)return;setUser(s.data?.session?.user||null);if(p.data?.length)setProducts(p.data);setReady(true)});const{data}=supabase.auth.onAuthStateChange((_e,s)=>{setUser(s?.user||null);if(s?.user)getFavorites(s.user.id).then(r=>setFavorites(r.data||[]));else setFavorites([])});return()=>{active=false;data.subscription.unsubscribe()}},[]);useEffect(()=>{localStorage.setItem("vanidaxi-cart",JSON.stringify(cart))},[cart]);const onFavorite=async p=>{const active=!favorites.includes(p.id);setFavorites(v=>active?[...v,p.id]:v.filter(x=>x!==p.id));if(user&&!String(p.id).startsWith("demo-"))await setFavorite(user.id,p.id,active)};const onAdd=(p,delta=1)=>setCart(c=>{const f=c.find(x=>x.id===p.id);if(delta<0&&f?.quantity===1)return c.filter(x=>x.id!==p.id);if(f)return c.map(x=>x.id===p.id?{...x,quantity:Math.max(1,x.quantity+delta)}:x);return[...c,{...p,quantity:1}]});const onRemove=id=>setCart(c=>c.filter(x=>x.id!==id));if(!ready)return <div className="loading"><img src={`${BASE}vanidaxi-icon.png`} alt=""/>Cargando VaniDaxi…</div>;const count=cart.reduce((s,p)=>s+p.quantity,0);return <div className="app"><Header cartCount={count}/><Routes><Route path="/" element={<Home products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd}/>}/><Route path="/categorias" element={<Categories/>}/><Route path="/productos" element={<Products products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd}/>}/><Route path="/producto/:id" element={<ProductDetail products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd}/>}/><Route path="/favoritos" element={<Favorites products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd}/>}/><Route path="/carrito" element={<Cart cart={cart} onRemove={onRemove} onAdd={onAdd} onCheckout={()=>user?navigate("/checkout"):navigate("/login")}/>}/><Route path="/login" element={user?<main className="page"><div className="empty"><h2>Ya tienes la sesión iniciada</h2><Link className="primary inline" to="/">Ir a Inicio</Link></div></main>:<Auth onLogin={setUser}/>}/><Route path="/perfil" element={<Protected user={user}><Profile user={user}/></Protected>}/><Route path="/pedidos" element={<Protected user={user}><Orders user={user}/></Protected>}/><Route path="/publicar" element={<Protected user={user}><Publish user={user}/></Protected>}/><Route path="/checkout" element={<Checkout user={user} cart={cart} onDone={()=>{setCart([]);navigate("/pedidos")}}/>}/><Route path="/notificaciones" element={<main className="page"><SectionTitle title="Notificaciones" to="/"/><div className="empty">No tienes notificaciones nuevas.</div></main>}/></Routes><footer><Logo/><span>Todo lo que necesitas, en un solo lugar.</span></footer><BottomNav/></div>}
+
+const BASE = import.meta.env.BASE_URL;
+const IMG = {
+  shoe: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85",
+  laptop: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=85",
+  watch: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=85",
+  headphones: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85",
+  fashion: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=700&q=85",
+  man: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=85",
+  woman: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=85",
+  home: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=700&q=85",
+  beauty: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=85",
+  car: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=85",
+  food: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=700&q=85",
+  toy: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=700&q=85",
+  sport: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=85"
+};
+
+const categories = [
+  ["Moda", IMG.fashion], ["Hombre", IMG.man], ["Mujer", IMG.woman], ["Tecnología", IMG.laptop], ["Hogar", IMG.home],
+  ["Belleza", IMG.beauty], ["Autos y Motos", IMG.car], ["Comida", IMG.food], ["Juguetes", IMG.toy], ["Deportes", IMG.sport]
+];
+const homeCategories = categories.slice(0, 5);
+const featuredCategories = [["Moda", IMG.fashion], ["Tecnología", IMG.laptop], ["Hogar", IMG.home], ["Belleza", IMG.beauty]];
+const demoProducts = [
+  { id: "demo-shoe", name: "Tenis deportivos", price: 599, oldPrice: 999, discount: 40, rating: 4.8, reviews: 124, category: "Moda", image: IMG.shoe, stock: 12 },
+  { id: "demo-headphones", name: "Audífonos inalámbricos", price: 799, oldPrice: 1199, discount: 35, rating: 4.8, reviews: 176, category: "Tecnología", image: IMG.headphones, stock: 8 },
+  { id: "demo-watch", name: "Smartwatch", price: 1299, oldPrice: 1899, discount: 30, rating: 4.8, reviews: 124, category: "Tecnología", image: IMG.watch, stock: 6 },
+  { id: "demo-laptop", name: "Laptop ultradelgada", price: 7499, oldPrice: 8999, discount: 25, rating: 4.7, reviews: 86, category: "Tecnología", image: IMG.laptop, stock: 4 },
+  { id: "demo-home", name: "Licuadora Profesional", price: 749, oldPrice: 999, discount: 25, rating: 4.7, reviews: 86, category: "Hogar", image: IMG.home, stock: 9 }
+];
+
+function money(v) {
+  return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(Number(v || 0));
+}
+
+function Icon({ name, size = 21 }) {
+  const p = {
+    home: "M3 10.5 12 3l9 7.5v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+    grid: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
+    heart: "M20.8 8.8c0 5.5-8.8 10.2-8.8 10.2S3.2 14.3 3.2 8.8A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.7Z",
+    bag: "M5 8h14l-1 12H6L5 8Zm3 0V6a4 4 0 0 1 8 0v2",
+    user: "M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8",
+    bell: "M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",
+    cart: "M3 4h2l2.4 11.1a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.5L21 8H7M10 21h.01M18 21h.01",
+    search: "m21 21-4.4-4.4M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4",
+    back: "M19 12H5m6-6-6 6 6 6"
+  };
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d={p[name] || p.grid} /></svg>;
+}
+
+function Logo() {
+  return <Link className="brand" to="/"><img src={`${BASE}vanidaxi-icon.png`} alt="VaniDaxi" /><strong>VaniDaxi</strong></Link>;
+}
+
+function Header({ cartCount }) {
+  const [q, setQ] = useState("");
+  const navigate = useNavigate();
+  return <header className="header"><div className="header-row"><Logo /><form className="search" onSubmit={e => { e.preventDefault(); navigate(`/productos?q=${encodeURIComponent(q)}`); }}><Icon name="search" /><input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar productos, marcas..." /></form><div className="header-actions"><Link to="/notificaciones" className="icon-button"><Icon name="bell" /><b>3</b></Link><Link to="/carrito" className="icon-button"><Icon name="cart" />{cartCount > 0 && <b>{cartCount}</b>}</Link></div></div></header>;
+}
+
+function BottomNav() {
+  return <nav className="bottom-nav">{[["/", "home", "Inicio"], ["/categorias", "grid", "Categorías"], ["/favoritos", "heart", "Favoritos"], ["/pedidos", "bag", "Pedidos"], ["/perfil", "user", "Perfil"]].map(([to, icon, label]) => <NavLink key={to} to={to} end={to === "/"}><Icon name={icon} /><span>{label}</span></NavLink>)}</nav>;
+}
+
+function ProductCard({ product, favorite, onFavorite, onAdd }) {
+  return <article className="product-card"><Link to={`/producto/${product.id}`} className="product-image"><img src={product.image || IMG.shoe} alt="" /><span className="discount">-{product.discount || 0}%</span></Link><button className={`heart ${favorite ? "active" : ""}`} onClick={() => onFavorite(product)} aria-label="Favorito"><Icon name="heart" /></button><div className="product-info"><small>{product.category}</small><Link to={`/producto/${product.id}`}><strong>{product.name}</strong></Link><div className="rating">★ {product.rating || 4.8} <em>({product.reviews || 0})</em></div><div className="price">{money(product.price)} <del>{product.oldPrice ? money(product.oldPrice) : ""}</del></div><button className="add" onClick={() => onAdd(product)}>Agregar al carrito</button></div></article>;
+}
+
+function SectionTitle({ title, to = "/productos" }) {
+  return <div className="section-title"><h2>{title}</h2><Link to={to}>Ver todo →</Link></div>;
+}
+
+function Home({ products, favorites, onFavorite, onAdd }) {
+  return <main className="home">
+    <section className="hero"><div><span>VaniDaxi</span><h1>Tu estilo, sin límites.</h1><p>Moda, tecnología y todo lo que buscas en un solo lugar.</p><Link className="light-btn" to="/productos?categoria=Moda">Explorar ahora →</Link></div><img src={IMG.shoe} alt="Moda VaniDaxi" /></section>
+    <section className="section"><SectionTitle title="Categorías" to="/categorias" /><div className="category-grid">{homeCategories.map(([n, i]) => <Link className="category" to={`/productos?categoria=${encodeURIComponent(n)}`} key={n}><img src={i} alt="" /><span>{n}</span></Link>)}</div></section>
+    <section className="section"><SectionTitle title="Ofertas del día" /><div className="product-grid">{products.slice(0, 3).map(p => <ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd} />)}</div></section>
+    <section className="solo-banner"><div><small>Para él</small><h2>Estilo, tecnología<br />y rendimiento.</h2><Link className="light-btn" to="/productos?categoria=Hombre">Ver productos →</Link></div></section>
+    <section className="section"><SectionTitle title="Categorías destacadas" to="/categorias" /><div className="mini-grid">{featuredCategories.map(([n, i]) => <Link key={n} to={`/productos?categoria=${encodeURIComponent(n)}`}><img src={i} alt="" /><span>{n}</span></Link>)}</div></section>
+    <section className="section"><SectionTitle title="Ofertas relámpago" /><div className="product-grid">{products.slice(1, 4).map(p => <ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd} />)}</div></section>
+    <section className="section"><SectionTitle title="Más vendidos" /><div className="product-grid">{products.slice(0, 3).map(p => <ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd} />)}</div></section>
+    <section className="section"><SectionTitle title="Recomendados para ti" /><div className="product-grid">{products.slice(2, 5).map(p => <ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd} />)}</div></section>
+  </main>;
+}
+
+function Categories() {
+  return <main className="page"><SectionTitle title="Categorías" to="/" /><div className="category-large-grid">{categories.map(([n, i]) => <Link className="category-large" key={n} to={`/productos?categoria=${encodeURIComponent(n)}`}><img src={i} alt="" /><strong>{n}</strong><span>Explorar productos →</span></Link>)}</div></main>;
+}
+
+function Products({ products, favorites, onFavorite, onAdd }) {
+  const params = new URLSearchParams(useLocation().search);
+  const q = (params.get("q") || "").toLowerCase();
+  const cat = params.get("categoria");
+  const list = products.filter(p => (!q || p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)) && (!cat || p.category === cat));
+  return <main className="page"><SectionTitle title={cat || (q ? `Resultados para “${q}”` : "Productos")} /><div className="filter-row"><span>{list.length} productos</span><Link to="/productos">Todos</Link></div><div className="product-grid">{list.map(p => <ProductCard key={p.id} product={p} favorite={favorites.includes(p.id)} onFavorite={onFavorite} onAdd={onAdd} />)}</div>{!list.length && <div className="empty">No encontramos productos con esos criterios.</div>}</main>;
+}
+
+function ProductDetail({ products, favorites, onFavorite, onAdd }) {
+  const { id } = useParams();
+  const p = products.find(x => x.id === id) || products[0];
+  if (!p) return null;
+  return <main className="detail"><Link className="back" to="/productos"><Icon name="back" /> Volver</Link><div className="detail-grid"><div className="detail-image"><img src={p.image || IMG.shoe} alt={p.name} /><span className="discount">-{p.discount || 0}%</span></div><div className="detail-info"><small>{p.category}</small><h1>{p.name}</h1><div className="rating">★ {p.rating || 4.8} <em>({p.reviews || 0} reseñas)</em></div><div className="big-price">{money(p.price)} <del>{p.oldPrice ? money(p.oldPrice) : ""}</del></div><p>{p.description || "Producto seleccionado de VaniDaxi. Consulta disponibilidad y agrega al carrito para continuar tu compra."}</p><button className="primary" onClick={() => onAdd(p)}>🛒 Agregar al carrito</button><button className={`outline ${favorites.includes(p.id) ? "selected" : ""}`} onClick={() => onFavorite(p)}><Icon name="heart" /> {favorites.includes(p.id) ? "En favoritos" : "Agregar a favoritos"}</button></div></div></main>;
+}
+
+function Favorites({ products, favorites, onFavorite, onAdd }) {
+  const list = products.filter(p => favorites.includes(p.id));
+  return <main className="page"><SectionTitle title="Favoritos" to="/productos" /><div className="product-grid">{list.map(p => <ProductCard key={p.id} product={p} favorite onFavorite={onFavorite} onAdd={onAdd} />)}</div>{!list.length && <div className="empty"><Icon name="heart" size={34} /><h2>Aún no tienes favoritos</h2><p>Guarda productos para encontrarlos rápidamente.</p><Link className="primary inline" to="/productos">Explorar productos</Link></div>}</main>;
+}
+
+function Cart({ cart, onRemove, onAdd, onCheckout }) {
+  const total = cart.reduce((s, p) => s + p.price * p.quantity, 0);
+  return <main className="page"><SectionTitle title="Carrito" to="/productos" />{!cart.length ? <div className="empty"><Icon name="cart" size={34} /><h2>Tu carrito está vacío</h2><Link className="primary inline" to="/productos">Ver productos</Link></div> : <div className="cart-layout"><div>{cart.map(p => <div className="cart-item" key={p.id}><img src={p.image || IMG.shoe} alt="" /><div><strong>{p.name}</strong><small>{p.category}</small><b>{money(p.price)}</b><div className="qty"><button onClick={() => onAdd(p, -1)}>−</button><span>{p.quantity}</span><button onClick={() => onAdd(p, 1)}>+</button><button onClick={() => onRemove(p.id)}>Eliminar</button></div></div></div>)}</div><aside className="summary"><h3>Resumen</h3><p>Productos <span>{money(total)}</span></p><p>Envío <span>Gratis</span></p><hr /><strong>Total <span>{money(total)}</span></strong><button className="primary" onClick={onCheckout}>Continuar compra</button></aside></div>}</main>;
+}
+
+function Auth({ onLogin = () => {} }) {
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async e => {
+    e.preventDefault(); setBusy(true); setError("");
+    const r = mode === "login" ? await supabase.auth.signInWithPassword({ email, password }) : await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+    setBusy(false);
+    if (r.error) setError(r.error.message);
+    else if (mode === "signup" && !r.data.session) setError("Revisa tu correo para confirmar tu cuenta.");
+    else onLogin(r.data.user);
+  };
+  return <main className="auth"><div className="auth-card"><Logo /><h1>{mode === "login" ? "Bienvenida a VaniDaxi" : "Crea tu cuenta"}</h1><p>{mode === "login" ? "Compra, guarda favoritos y consulta tus pedidos." : "Únete a VaniDaxi y empieza a comprar."}</p><form onSubmit={submit}>{mode === "signup" && <input value={name} onChange={e => setName(e.target.value)} placeholder="Nombre" required />}<input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Correo electrónico" required /><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Contraseña" minLength="6" required /><button className="primary" disabled={busy}>{busy ? "Procesando..." : mode === "login" ? "Iniciar sesión" : "Crear cuenta"}</button></form>{error && <div className="error">{error}</div>}<button className="text-button" onClick={() => setMode(mode === "login" ? "signup" : "login")}>{mode === "login" ? "Crear una cuenta" : "Ya tengo una cuenta"}</button></div></main>;
+}
+
+function Profile({ user }) {
+  const [profile, setProfile] = useState({ full_name: "", phone: "", address: "" });
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { getProfile(user.id).then(r => { if (r.data) setProfile(p => ({ ...p, ...r.data })); }); }, [user.id]);
+  const save = async () => { await upsertProfile(user.id, profile); setSaved(true); setTimeout(() => setSaved(false), 1800); };
+  return <main className="profile"><div className="profile-head"><div className="avatar">{(profile.full_name || user.email || "V").slice(0, 1).toUpperCase()}</div><div><h1>{profile.full_name || "Mi cuenta"}</h1><p>{user.email}</p></div></div><div className="profile-menu"><Link to="/pedidos"><Icon name="bag" /> Mis pedidos <span>›</span></Link><Link to="/favoritos"><Icon name="heart" /> Favoritos <span>›</span></Link><Link to="/publicar"><Icon name="grid" /> Publicar producto <span>›</span></Link></div><div className="profile-form"><h2>Datos de cuenta</h2><input value={profile.full_name || ""} onChange={e => setProfile({ ...profile, full_name: e.target.value })} placeholder="Nombre" /><input value={profile.phone || ""} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="Teléfono" /><input value={profile.address || ""} onChange={e => setProfile({ ...profile, address: e.target.value })} placeholder="Dirección de envío" /><button className="primary" onClick={save}>{saved ? "Guardado ✓" : "Guardar cambios"}</button></div><button className="logout" onClick={() => supabase.auth.signOut()}>Cerrar sesión</button></main>;
+}
+
+function Orders({ user }) {
+  const [orders, setOrders] = useState([]);
+  useEffect(() => { supabase.from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).then(r => setOrders(r.data || [])); }, [user.id]);
+  return <main className="page"><SectionTitle title="Mis pedidos" to="/" />{!orders.length ? <div className="empty"><Icon name="bag" size={34} /><h2>Aún no tienes pedidos</h2><Link className="primary inline" to="/productos">Comprar ahora</Link></div> : <div className="orders">{orders.map(o => <article key={o.id}><div><strong>Pedido #{String(o.id).slice(0, 8)}</strong><small>{new Date(o.created_at).toLocaleDateString("es-MX")}</small></div><b>{money(o.total)}</b><span>{o.status || "pending"}</span></article>)}</div>}</main>;
+}
+
+function Publish({ user }) {
+  const [data, setData] = useState({ name: "", description: "", price: "", category: "Moda", image_url: "", stock: 1 });
+  const [msg, setMsg] = useState("");
+  const submit = async e => { e.preventDefault(); setMsg(""); const r = await createProduct(data, user.id); setMsg(r.error ? r.error.message : "Producto publicado correctamente."); };
+  return <main className="page form-page"><SectionTitle title="Publicar producto" to="/" /><form onSubmit={submit}><input placeholder="Nombre del producto" value={data.name} onChange={e => setData({ ...data, name: e.target.value })} required /><textarea placeholder="Descripción" value={data.description} onChange={e => setData({ ...data, description: e.target.value })} /><input type="number" placeholder="Precio" value={data.price} onChange={e => setData({ ...data, price: e.target.value })} required /><input placeholder="URL de imagen" value={data.image_url} onChange={e => setData({ ...data, image_url: e.target.value })} /><select value={data.category} onChange={e => setData({ ...data, category: e.target.value })}>{categories.map(([c]) => <option key={c}>{c}</option>)}</select><input type="number" min="1" placeholder="Stock" value={data.stock} onChange={e => setData({ ...data, stock: e.target.value })} /><button className="primary">Publicar producto</button>{msg && <div className="success">{msg}</div>}</form></main>;
+}
+
+function Protected({ user, children }) {
+  return user ? children : <Auth />;
+}
+
+function Checkout({ user, cart, onDone }) {
+  const [busy, setBusy] = useState(false); const [msg, setMsg] = useState("");
+  const total = cart.reduce((s, p) => s + p.price * p.quantity, 0);
+  const submit = async () => {
+    if (!user) { setMsg("Inicia sesión para continuar."); return; }
+    setBusy(true);
+    if (cart.some(p => String(p.id).startsWith("demo-"))) { setBusy(false); onDone(); return; }
+    const r = await createOrder({ userId: user.id, customer: { name: user.email }, cart, total, paymentMethod: "pending" });
+    setBusy(false); if (r.error) setMsg(r.error.message); else onDone();
+  };
+  return <main className="page"><SectionTitle title="Confirmar compra" to="/carrito" /><div className="checkout"><h2>Resumen de compra</h2><p>Productos <b>{money(total)}</b></p><p>Envío <b>Gratis</b></p><hr /><h2>Total <b>{money(total)}</b></h2><button className="primary" onClick={submit} disabled={busy || !cart.length}>{busy ? "Creando pedido…" : "Confirmar pedido"}</button>{msg && <div className="error">{msg}</div>}</div></main>;
+}
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [ready, setReady] = useState(false);
+  const [products, setProducts] = useState(demoProducts);
+  const [favorites, setFavorites] = useState([]);
+  const [cart, setCart] = useState(() => { try { return JSON.parse(localStorage.getItem("vanidaxi-cart") || "[]"); } catch { return []; } });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([supabase.auth.getSession(), getProducts()]).then(([s, p]) => {
+      if (!active) return;
+      setUser(s.data?.session?.user || null);
+      if (p.data?.length) setProducts(p.data);
+      setReady(true);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => {
+      setUser(s?.user || null);
+      if (s?.user) getFavorites(s.user.id).then(r => setFavorites(r.data || [])); else setFavorites([]);
+    });
+    return () => { active = false; data.subscription.unsubscribe(); };
+  }, []);
+
+  useEffect(() => { localStorage.setItem("vanidaxi-cart", JSON.stringify(cart)); }, [cart]);
+  const onFavorite = async p => {
+    const active = !favorites.includes(p.id);
+    setFavorites(v => active ? [...v, p.id] : v.filter(x => x !== p.id));
+    if (user && !String(p.id).startsWith("demo-")) await setFavorite(user.id, p.id, active);
+  };
+  const onAdd = (p, delta = 1) => setCart(c => {
+    const f = c.find(x => x.id === p.id);
+    if (delta < 0 && f?.quantity === 1) return c.filter(x => x.id !== p.id);
+    if (f) return c.map(x => x.id === p.id ? { ...x, quantity: Math.max(1, x.quantity + delta) } : x);
+    return [...c, { ...p, quantity: 1 }];
+  });
+  const onRemove = id => setCart(c => c.filter(x => x.id !== id));
+  if (!ready) return <div className="loading"><img src={`${BASE}vanidaxi-icon.png`} alt="" />Cargando VaniDaxi…</div>;
+  const count = cart.reduce((s, p) => s + p.quantity, 0);
+  return <div className="app"><Header cartCount={count} /><Routes>
+    <Route path="/" element={<Home products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd} />} />
+    <Route path="/categorias" element={<Categories />} />
+    <Route path="/productos" element={<Products products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd} />} />
+    <Route path="/producto/:id" element={<ProductDetail products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd} />} />
+    <Route path="/favoritos" element={<Favorites products={products} favorites={favorites} onFavorite={onFavorite} onAdd={onAdd} />} />
+    <Route path="/carrito" element={<Cart cart={cart} onRemove={onRemove} onAdd={onAdd} onCheckout={() => user ? navigate("/checkout") : navigate("/login")} />} />
+    <Route path="/login" element={user ? <main className="page"><div className="empty"><h2>Ya tienes la sesión iniciada</h2><Link className="primary inline" to="/">Ir a Inicio</Link></div></main> : <Auth onLogin={setUser} />} />
+    <Route path="/perfil" element={<Protected user={user}><Profile user={user} /></Protected>} />
+    <Route path="/pedidos" element={<Protected user={user}><Orders user={user} /></Protected>} />
+    <Route path="/publicar" element={<Protected user={user}><Publish user={user} /></Protected>} />
+    <Route path="/checkout" element={<Checkout user={user} cart={cart} onDone={() => { setCart([]); navigate("/pedidos"); }} />} />
+    <Route path="/notificaciones" element={<main className="page"><SectionTitle title="Notificaciones" to="/" /><div className="empty">No tienes notificaciones nuevas.</div></main>} />
+  </Routes><footer><Logo /><span>Todo lo que necesitas, en un solo lugar.</span></footer><BottomNav /></div>;
+}
