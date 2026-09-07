@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./styles.css";
+import "./reference.css";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const redirectPath = new URLSearchParams(window.location.search).get("p");
