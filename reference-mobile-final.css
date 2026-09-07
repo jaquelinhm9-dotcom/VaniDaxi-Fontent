@@ -1,16 +1,16 @@
 /* Final mobile presentation for the supplied VaniDaxi reference. */
 @media (max-width: 720px) {
-  /* The legacy app header/home/footer are hidden only on the mobile home.
-     ReferenceMobileHome is the authoritative mobile Home presentation. */
   body,
   #root,
   .app { background: #f6eff9 !important; }
 
-  .top-header,
-  .category-nav,
-  .app > .home-page,
-  .app .footer,
-  .app .mobile-bottom { display: none !important; }
+  /* On mobile Home, the new reference composition replaces the legacy header,
+     category bar, Home content and footer. Other routes remain functional. */
+  .app:has(.home-page) .top-header,
+  .app:has(.home-page) .category-nav,
+  .app:has(.home-page) .home-page,
+  .app:has(.home-page) .footer,
+  .app:has(.home-page) .mobile-bottom { display: none !important; }
 
   .app { min-height: 0 !important; padding-bottom: 76px !important; }
 
@@ -24,14 +24,7 @@
     color: #241a32 !important;
   }
 
-  .reference-mobile-header {
-    height: 55px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
-  }
-
+  .reference-mobile-header { height:55px !important; display:flex !important; align-items:center !important; justify-content:space-between !important; gap:8px !important; }
   .reference-mobile-brand { display:flex !important; align-items:center !important; gap:6px !important; min-width:0 !important; }
   .reference-mobile-brand img { width:31px !important; height:31px !important; border-radius:9px !important; object-fit:cover !important; }
   .reference-mobile-brand strong { font-size:15px !important; letter-spacing:-.5px !important; }
@@ -101,7 +94,6 @@
   .reference-mobile-nav-icon { width:22px !important; height:22px !important; display:grid !important; place-items:center !important; }
   .reference-mobile-nav-icon svg { width:20px !important; height:20px !important; }
 
-  /* Other screens retain their functional App routes but use compact mobile sizing. */
   .inner-page { padding:14px 10px 90px !important; }
 }
 
