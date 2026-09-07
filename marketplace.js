@@ -17,16 +17,79 @@ function unavailableResult() {
   };
 }
 
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+
+export function isUuid(value) {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value
+    )
+  );
+}
+
+function normalizeProduct(row) {
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    name: row.name || "Producto sin nombre",
+    price: Number(row.price || 0),
+    oldPrice:
+      row.oldPrice != null
+        ? Number(row.oldPrice)
+        : null,
+    rating: Number(row.rating || 0),
+    reviews: Number(row.reviews || 0),
+    discount: Number(row.discount || 0),
+    category: row.category || "General",
+    type: row.type || "Nuevo",
+    image: row.image_url || row.image || "",
+    description: row.description || "",
+    specifications: Array.isArray(row.specifications)
+      ? row.specifications
+      : [],
+    stock: Number(row.stock ?? 0),
+    location: row.location || "",
+    sellerId: row.seller_id || row.sellerId || null,
+    active: row.active !== false,
+    createdAt: row.created_at || null,
+    updatedAt: row.updated_at || null,
+  };
+}
+
+/* =========================================================
+   PRODUCTOS
+   ========================================================= */
+
 export async function getProducts() {
   if (!isSupabaseAvailable) {
     return unavailableResult();
   }
 
-  return supabase
+  const result = await supabase
     .from("products")
     .select("*")
+    .eq("active", true)
     .order("created_at", { ascending: false });
+
+  if (result.error) {
+    return result;
+  }
+
+  return {
+    data: Array.isArray(result.data)
+      ? result.data.map(normalizeProduct).filter(Boolean)
+      : [],
+    error: null,
+  };
 }
+
+/* =========================================================
+   PERFIL
+   ========================================================= */
 
 export async function getProfile(userId) {
   if (!isSupabaseAvailable || !userId) {
@@ -61,20 +124,46 @@ export async function upsertProfile(userId, profile) {
     .single();
 }
 
+/* =========================================================
+   FAVORITOS
+   ========================================================= */
+
 export async function getFavorites(userId) {
   if (!isSupabaseAvailable || !userId) {
     return unavailableResult();
   }
 
-  return supabase
+  const result = await supabase
     .from("favorites")
     .select("product_id")
     .eq("user_id", userId);
+
+  if (result.error) {
+    return result;
+  }
+
+  return {
+    data: Array.isArray(result.data)
+      ? result.data
+          .map((item) => item.product_id)
+          .filter(Boolean)
+      : [],
+    error: null,
+  };
 }
 
 export async function setFavorite(userId, productId, active) {
-  if (!isSupabaseAvailable || !userId || !productId) {
-    return unavailableResult();
+  if (
+    !isSupabaseAvailable ||
+    !userId ||
+    !productId ||
+    !isUuid(productId)
+  ) {
+    return {
+      data: null,
+      error: null,
+      skipped: true,
+    };
   }
 
   if (active) {
@@ -98,20 +187,46 @@ export async function setFavorite(userId, productId, active) {
     .eq("product_id", productId);
 }
 
+/* =========================================================
+   CREAR PRODUCTO
+   ========================================================= */
+
 export async function createProduct(payload, userId) {
   if (!isSupabaseAvailable || !userId) {
     return unavailableResult();
   }
 
-  return supabase
+  const productPayload = {
+    name: payload?.name || "Producto sin nombre",
+    description: payload?.description || null,
+    price: Number(payload?.price || 0),
+    image_url: payload?.image_url || payload?.image || null,
+    category: payload?.category || null,
+    stock: Math.max(0, Number(payload?.stock ?? 1)),
+    location: payload?.location || null,
+    active: payload?.active !== false,
+    seller_id: userId,
+  };
+
+  const result = await supabase
     .from("products")
-    .insert({
-      ...payload,
-      seller_id: userId,
-    })
-    .select()
+    .insert(productPayload)
+    .select("*")
     .single();
+
+  if (result.error) {
+    return result;
+  }
+
+  return {
+    data: normalizeProduct(result.data),
+    error: null,
+  };
 }
+
+/* =========================================================
+   PEDIDOS
+   ========================================================= */
 
 export async function createOrder({
   userId,
@@ -124,13 +239,21 @@ export async function createOrder({
     return unavailableResult();
   }
 
-  const items = Array.isArray(cart)
-    ? cart.map((item) => ({
-        product_id: item.id,
-        quantity: Number(item.quantity || 1),
-        price: Number(item.price || 0),
-      }))
+  const validCart = Array.isArray(cart)
+    ? cart.filter(
+        (item) =>
+          item &&
+          isUuid(item.id) &&
+          Number(item.quantity || 0) > 0
+      )
     : [];
+
+  if (validCart.length === 0) {
+    return {
+      data: null,
+      error: new Error("No hay productos válidos para crear el pedido."),
+    };
+  }
 
   const orderResult = await supabase
     .from("orders")
@@ -150,21 +273,16 @@ export async function createOrder({
     return orderResult;
   }
 
-  if (items.length === 0) {
-    return {
-      data: orderResult.data,
-      error: null,
-    };
-  }
+  const items = validCart.map((item) => ({
+    order_id: orderResult.data.id,
+    product_id: item.id,
+    quantity: Math.max(1, Number(item.quantity || 1)),
+    price: Number(item.price || 0),
+  }));
 
   const itemsResult = await supabase
     .from("order_items")
-    .insert(
-      items.map((item) => ({
-        order_id: orderResult.data.id,
-        ...item,
-      }))
-    );
+    .insert(items);
 
   if (itemsResult.error) {
     return {
