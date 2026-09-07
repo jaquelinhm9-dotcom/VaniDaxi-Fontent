@@ -1,1 +1,1 @@
-{"name":"VaniDaxi","short_name":"VaniDaxi","start_url":"./","display":"standalone","background_color":"#f8f0fa","theme_color":"#70429a","icons":[{"src":"./logo.svg","sizes":"64x64","type":"image/svg+xml"}]}
+{"name":"VaniDaxi","short_name":"VaniDaxi","start_url":"/VaniDaxi-Fontent/","scope":"/VaniDaxi-Fontent/","display":"standalone","background_color":"#f8f0fa","theme_color":"#70429a","icons":[{"src":"/VaniDaxi-Fontent/logo.svg","sizes":"64x64","type":"image/svg+xml"}]}
