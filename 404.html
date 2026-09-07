@@ -1,23 +1,25 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>VaniDaxi</title>
+
     <script>
       const base = "/VaniDaxi-Fontent/";
-      const path = window.location.pathname.startsWith(base)
-        ? window.location.pathname.slice(base.length)
-        : window.location.pathname.replace(/^\/+/, "");
 
-      const search = window.location.search;
-      const hash = window.location.hash;
+      const path = location.pathname.startsWith(base)
+        ? location.pathname.slice(base.length)
+        : "";
 
-      const target = `${base}?p=/${path}${search ? `&${search.slice(1)}` : ""}${hash}`;
-      window.location.replace(target);
+      const query = location.search || "";
+      const hash = location.hash || "";
+
+      location.replace(
+        `${base}?p=${encodeURIComponent("/" + path + query)}${hash}`
+      );
     </script>
   </head>
-  <body>
-    <p>Cargando VaniDaxi...</p>
-  </body>
+
+  <body></body>
 </html>
