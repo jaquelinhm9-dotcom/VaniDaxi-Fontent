@@ -63,6 +63,19 @@ const fallbackSupabase = {
   },
 };
 
+function createConfiguredClient() {
+  const client = createClient(supabaseUrl, supabaseAnonKey);
+  const resetPasswordForEmail = client.auth.resetPasswordForEmail.bind(client.auth);
+
+  client.auth.resetPasswordForEmail = (email, options = {}) =>
+    resetPasswordForEmail(email, {
+      ...options,
+      redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}perfil`,
+    });
+
+  return client;
+}
+
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createConfiguredClient()
   : fallbackSupabase;
