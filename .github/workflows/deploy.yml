@@ -37,18 +37,50 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Apply one-time auth hydration fix
+      - name: Replace legacy auth patch with permanent App implementation
         run: |
-          node scripts/fix-auth-hydration.mjs
-          if git diff --quiet -- App.jsx; then
-            echo "Auth hydration fix already applied."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add App.jsx
-          git commit -m "Fix auth hydration guard"
-          git push origin HEAD:main
+          node <<'NODE'
+          const { readFileSync, writeFileSync, rmSync } = require('node:fs');
+          const path = 'App.jsx';
+          let source = readFileSync(path, 'utf8');
+
+          const replacements = [
+            [
+              'function ProtectedRoute({ user, children }) {\n  const navigate = useNavigate();\n  useEffect(() => { if (!user) navigate("/login", { replace: true }); }, [user, navigate]);\n  if (!user) return null;\n  return children;\n}',
+              'function ProtectedRoute({ user, authReady, children }) {\n  const navigate = useNavigate();\n\n  useEffect(() => {\n    if (authReady && !user) {\n      navigate("/login", { replace: true });\n    }\n  }, [authReady, user, navigate]);\n\n  if (!authReady) {\n    return (\n      <main className="page-shell inner-page">\n        <div className="empty">\n          <p>Comprobando sesión...</p>\n        </div>\n      </main>\n    );\n  }\n\n  if (!user) return null;\n  return children;\n}',
+            ],
+            [
+              '  const [user, setUser] = useState(null);\n  const [search, setSearch] = useState("");',
+              '  const [user, setUser] = useState(null);\n  const [authReady, setAuthReady] = useState(false);\n  const [search, setSearch] = useState("");',
+            ],
+            [
+              '      setUser(sessionUser);\n      if (productResult?.data?.length)',
+              '      setUser(sessionUser);\n      setAuthReady(true);\n      if (productResult?.data?.length)',
+            ],
+            [
+              '      setUser(nextUser);\n      if (nextUser?.id)',
+              '      setUser(nextUser);\n      setAuthReady(true);\n      if (nextUser?.id)',
+            ],
+            [
+              '<ProtectedRoute user={user}>',
+              '<ProtectedRoute user={user} authReady={authReady}>',
+            ],
+            [
+              'redirectTo: `${window.location.origin}/VaniDaxi-frontend/perfil`,',
+              'redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}perfil`,',
+            ],
+          ];
+
+          for (const [from, to] of replacements) {
+            if (!source.includes(from) && !source.includes(to)) {
+              throw new Error(`Expected legacy fragment was not found: ${from.slice(0, 80)}`);
+            }
+            if (source.includes(from)) source = source.replace(from, to);
+          }
+
+          writeFileSync(path, source);
+          rmSync('scripts/fix-auth-hydration.mjs', { force: true });
+          NODE
 
       - name: Validate build environment
         run: |
@@ -57,6 +89,18 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Commit permanent replacement and remove migration tooling
+        run: |
+          if git diff --quiet; then
+            echo "No migration changes detected."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add App.jsx scripts/fix-auth-hydration.mjs .github/workflows/deploy.yml
+          git commit -m "Replace legacy auth patch with permanent implementation"
+          git push origin HEAD:main
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
