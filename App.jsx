@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react'
-import { Bell, Heart, Home, Grid2X2, UserRound, ShoppingBag, Search, ChevronRight, ChevronLeft, SlidersHorizontal, MapPin, CreditCard, Package, HelpCircle, LogOut, Settings, Share2, Star, Zap } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Bell, Heart, Home, Grid2X2, UserRound, ShoppingBag, Search, ChevronRight, ChevronLeft, SlidersHorizontal, MapPin, CreditCard, Package, HelpCircle, LogOut, Settings, Share2, Star, Zap, Minus, Plus, Trash2, Check } from 'lucide-react'
 
 const categories = [
   { name: 'Moda', icon: '👕' }, { name: 'Hombre', icon: '🧥' }, { name: 'Mujer', icon: '👗' }, { name: 'Tecnología', icon: '📱' }, { name: 'Hogar', icon: '🏠' },
   { name: 'Calzado', icon: '👟' }, { name: 'Ropa', icon: '🧥' }, { name: 'Belleza', icon: '💄' }, { name: 'Deportes', icon: '🏋️' }, { name: 'Accesorios', icon: '👜' },
 ]
+
 const products = [
   { id: 1, name: 'Tenis casuales', category: 'Calzado', price: 599, old: 799, discount: '-25%', rating: 4.8, reviews: 124, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=85' },
   { id: 2, name: 'Smartwatch', category: 'Tecnología', price: 1299, old: 1899, discount: '-30%', rating: 4.9, reviews: 88, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=85' },
@@ -18,44 +19,172 @@ const products = [
   { id: 10, name: 'Tenis blancos', category: 'Calzado', price: 649, old: 899, discount: '-28%', rating: 4.9, reviews: 97, image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=700&q=85' },
   { id: 11, name: 'Camisa básica', category: 'Hombre', price: 449, old: 599, discount: '-25%', rating: 4.7, reviews: 51, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=85' },
   { id: 12, name: 'Lámpara LED', category: 'Hogar', price: 399, old: 599, discount: '-33%', rating: 4.7, reviews: 39, image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=700&q=85' },
+  { id: 13, name: 'Vestido satinado', category: 'Mujer', price: 579, old: 799, discount: '-28%', rating: 4.8, reviews: 74, image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=700&q=85' },
+  { id: 14, name: 'Set de skincare', category: 'Belleza', price: 429, old: 599, discount: '-28%', rating: 4.8, reviews: 64, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=700&q=85' },
+  { id: 15, name: 'Mancuernas fitness', category: 'Deportes', price: 899, old: 1199, discount: '-25%', rating: 4.7, reviews: 42, image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=700&q=85' },
 ]
-const formatPrice = n => `$${n.toLocaleString('es-MX')}`
+
+const money = n => `$${Number(n).toLocaleString('es-MX')}`
+const categoryMatches = (product, selected) => {
+  if (selected === 'Todos') return true
+  if (selected === 'Moda') return ['Mujer', 'Hombre', 'Ropa', 'Calzado', 'Accesorios'].includes(product.category)
+  return product.category === selected
+}
+
+function readSet(key) {
+  try { return new Set(JSON.parse(localStorage.getItem(key) || '[]')) } catch { return new Set() }
+}
+function readCart() {
+  try { return JSON.parse(localStorage.getItem('vanidaxi-cart') || '[]') } catch { return [] }
+}
 
 export default function App() {
   const [screen, setScreen] = useState('home')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(products[5])
-  const [favorites, setFavorites] = useState(new Set())
-  const [cart, setCart] = useState([])
+  const [favorites, setFavorites] = useState(() => readSet('vanidaxi-favorites'))
+  const [cart, setCart] = useState(() => readCart())
   const [toast, setToast] = useState('')
   const [category, setCategory] = useState('Todos')
-  const filtered = useMemo(() => products.filter(p => { const q=query.trim().toLowerCase(); const cat=category==='Todos'||p.category===category||p.name.toLowerCase().includes(category.toLowerCase()); return cat&&(!q||`${p.name} ${p.category}`.toLowerCase().includes(q)) }), [query,category])
-  const go = name => setScreen(name)
-  const toggleFavorite = id => setFavorites(prev => { const next=new Set(prev); next.has(id)?next.delete(id):next.add(id); return next })
-  const addCart = p => { setCart(prev=>[...prev,p]); setToast('Producto agregado al carrito'); setTimeout(()=>setToast(''),1800) }
-  const openProduct = p => { setSelected(p); go('detail') }
-  const exploreCategory = name => { setCategory(['Ropa','Calzado','Tecnología','Hogar'].includes(name)?name:'Todos'); go('products') }
+
+  useEffect(() => { localStorage.setItem('vanidaxi-favorites', JSON.stringify([...favorites])) }, [favorites])
+  useEffect(() => { localStorage.setItem('vanidaxi-cart', JSON.stringify(cart)) }, [cart])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return products.filter(p => categoryMatches(p, category) && (!q || `${p.name} ${p.category}`.toLowerCase().includes(q)))
+  }, [query, category])
+
+  const go = name => { setScreen(name); window.scrollTo?.(0, 0) }
+  const notify = message => { setToast(message); window.clearTimeout(window.__vanidaxiToast); window.__vanidaxiToast = window.setTimeout(() => setToast(''), 1800) }
+  const toggleFavorite = id => setFavorites(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
+  const openProduct = product => { setSelected(product); go('detail') }
+  const exploreCategory = name => { setCategory(name === 'Moda' ? 'Moda' : name); setQuery(''); go('products') }
+
+  const addCart = (product, options = {}) => {
+    const { color = 'Blanco', size = 'Única', qty = 1 } = options
+    setCart(prev => {
+      const index = prev.findIndex(item => item.product.id === product.id && item.color === color && item.size === size)
+      if (index < 0) return [...prev, { product, color, size, qty }]
+      return prev.map((item, i) => i === index ? { ...item, qty: item.qty + qty } : item)
+    })
+    notify('Producto agregado al carrito')
+  }
+
+  const updateCartQty = (index, delta) => setCart(prev => prev.map((item, i) => i !== index ? item : ({ ...item, qty: Math.max(1, item.qty + delta) })))
+  const removeCart = index => { setCart(prev => prev.filter((_, i) => i !== index)); notify('Producto eliminado') }
+  const checkout = () => { setCart([]); notify('Pedido creado correctamente'); go('home') }
+
   return <div className="app"><div className="device">
-    {screen==='home'&&<HomeScreen go={go} query={query} setQuery={setQuery} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct}/>} 
-    {screen==='offers'&&<OffersScreen go={go} products={products.slice(3,9)} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct}/>} 
-    {screen==='categories'&&<CategoriesScreen go={go} exploreCategory={exploreCategory}/>} 
-    {screen==='products'&&<ProductsScreen go={go} query={query} setQuery={setQuery} category={category} setCategory={setCategory} products={filtered} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct}/>} 
-    {screen==='detail'&&<DetailScreen go={go} product={selected} favorite={favorites.has(selected.id)} toggleFavorite={toggleFavorite} addCart={addCart}/>} 
-    {screen==='profile'&&<ProfileScreen go={go}/>} 
-    {screen==='cart'&&<CartScreen go={go} cart={cart}/>} 
-    {screen!=='detail'&&<BottomNav screen={screen} go={go} cartCount={cart.length}/>} 
-    {toast&&<div className="toast">✓ {toast}</div>}
+    {screen === 'home' && <HomeScreen go={go} query={query} setQuery={setQuery} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} exploreCategory={exploreCategory} />}
+    {screen === 'offers' && <OffersScreen go={go} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} />}
+    {screen === 'categories' && <CategoriesScreen go={go} exploreCategory={exploreCategory} />}
+    {screen === 'products' && <ProductsScreen go={go} query={query} setQuery={setQuery} category={category} setCategory={setCategory} products={filtered} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} />}
+    {screen === 'favorites' && <FavoritesScreen go={go} products={products.filter(p => favorites.has(p.id))} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} />}
+    {screen === 'detail' && <DetailScreen go={go} product={selected} favorite={favorites.has(selected.id)} toggleFavorite={toggleFavorite} addCart={addCart} cartCount={cart.reduce((s, x) => s + x.qty, 0)} />}
+    {screen === 'profile' && <ProfileScreen go={go} favoritesCount={favorites.size} cartCount={cart.reduce((s, x) => s + x.qty, 0)} />}
+    {screen === 'cart' && <CartScreen go={go} cart={cart} updateQty={updateCartQty} removeCart={removeCart} checkout={checkout} />}
+    {screen !== 'detail' && <BottomNav screen={screen} go={go} cartCount={cart.reduce((s, x) => s + x.qty, 0)} />}
+    {toast && <div className="toast"><Check size={15} /> {toast}</div>}
   </div></div>
 }
-function Header({go,query,setQuery,simple=false}){return <header className="header"><div className="header-row">{simple?<button className="icon-btn" onClick={()=>go('home')}><ChevronLeft size={18}/></button>:<button className="logo" onClick={()=>go('home')}><span className="logo-v">V</span><b>VaniDaxi</b></button>}{!simple?<div className="header-actions"><button className="icon-btn"><Bell size={17}/><i/></button><button className="icon-btn" onClick={()=>go('cart')}><ShoppingBag size={17}/></button></div>:<div className="header-actions"><button className="icon-btn"><Heart size={17}/></button><button className="icon-btn"><Share2 size={16}/></button></div>}</div>{!simple&&<div className="search"><Search size={15}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar productos, marcas..."/><SlidersHorizontal size={15}/></div>}</header>}
-function HomeScreen({go,query,setQuery,favorites,toggleFavorite,openProduct}){return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery}/><section className="hero home-hero"><div><span className="hero-label">HASTA 50% OFF</span><h1>Tu estilo,<br/><em>sin límites.</em></h1><p>Moda, tecnología, hogar<br/>y mucho más.</p><button onClick={()=>go('offers')}>Ver ofertas <ChevronRight size={13}/></button></div><div className="hero-photo"><img src={products[0].image} alt=""/><span>✦</span></div></section><SectionTitle title="Categorías" action="Ver todo" onClick={()=>go('categories')}/><div className="icon-categories">{categories.slice(0,5).map(c=><button key={c.name} onClick={()=>exploreCategory(c.name,go)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div><SectionTitle title="Ofertas del día" action="Ver todo" onClick={()=>go('offers')}/><div className="product-row">{products.slice(0,3).map(p=><ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={()=>toggleFavorite(p.id)} onOpen={()=>openProduct(p)} compact/>)}</div><section className="promo-card"><div><b>Para él</b><strong>Estilo, tecnología<br/>y rendimiento.</strong><button onClick={()=>go('products')}>Ver productos <ChevronRight size={12}/></button></div><img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=700&q=85" alt=""/></section><SectionTitle title="Categorías destacadas" action="Ver todo" onClick={()=>go('categories')}/><div className="mini-category-grid">{categories.slice(5,9).map(c=><button key={c.name} onClick={()=>exploreCategory(c.name,go)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div></main>}
-function exploreCategory(name,go){go('products')}
-function SectionTitle({title,action,onClick}){return <div className="section-title"><h2>{title}</h2><button onClick={onClick}>{action} <ChevronRight size={12}/></button></div>}
-function OffersScreen({go,products,favorites,toggleFavorite,openProduct}){return <main className="scroll-page"><Header go={go} simple/><div className="page-heading"><span>Para ti</span><h1>Ofertas relámpago</h1><p>Descuentos especiales por tiempo limitado.</p></div><div className="offer-hero"><Zap size={18}/><div><b>Hasta 50% OFF</b><span>Las mejores ofertas de hoy</span></div><strong>02:18:42</strong></div><div className="chip-row"><button className="active">Todos</button><button>Tecnología</button><button>Moda</button><button>Hogar</button></div><div className="product-grid">{products.map(p=><ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={()=>toggleFavorite(p.id)} onOpen={()=>openProduct(p)}/>)}</div></main>}
-function CategoriesScreen({go,exploreCategory}){return <main className="scroll-page"><Header go={go} simple/><div className="page-heading"><span>Descubre</span><h1>Categorías</h1><p>Todo lo que necesitas, organizado para ti.</p></div><div className="category-grid">{categories.map(c=><button key={c.name} className="category-tile" onClick={()=>exploreCategory(c.name)}><span>{c.icon}</span><b>{c.name}</b><small>Explorar <ChevronRight size={11}/></small></button>)}</div><section className="brands"><SectionTitle title="Marcas destacadas" action="Ver todas"/><div>{['NIKE','adidas','PUMA','SAMSUNG','Apple','ZARA','H&M','LEVI’S'].map(x=><b key={x}>{x}</b>)}</div></section><section className="solo-banner"><div><b>Lo mejor<br/>en un solo lugar.</b><small>Moda, tecnología, hogar<br/>y mucho más.</small></div><ChevronRight/></section></main>}
-function ProductsScreen({go,query,setQuery,category,setCategory,products,favorites,toggleFavorite,openProduct}){return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery}/><div className="filter-tabs">{['Todos','Ropa','Calzado','Tecnología','Hogar'].map(x=><button key={x} className={category===x?'active':''} onClick={()=>setCategory(x)}>{x}</button>)}</div><div className="result-line"><div><span>Productos destacados</span><b>{products.length} resultados</b></div><button><SlidersHorizontal size={13}/> Filtrar</button></div><div className="product-grid">{products.map(p=><ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={()=>toggleFavorite(p.id)} onOpen={()=>openProduct(p)}/>)}</div></main>}
-function ProductCard({product,favorite,onFav,onOpen,compact=false}){return <article className={`product-card ${compact?'compact':''}`} onClick={onOpen}><div className="product-image"><img src={product.image} alt=""/><span className="discount">{product.discount}</span><button className={`heart ${favorite?'liked':''}`} onClick={e=>{e.stopPropagation();onFav()}}><Heart size={15} fill={favorite?'currentColor':'none'}/></button></div><div className="product-info"><small>{product.category}</small><h3>{product.name}</h3><div className="rating"><Star size={10} fill="currentColor"/> {product.rating} <span>({product.reviews})</span></div><div className="price"><b>{formatPrice(product.price)}</b><del>{formatPrice(product.old)}</del></div></div></article>}
-function DetailScreen({go,product,addCart}){return <main className="detail-page"><Header go={go} simple/><div className="detail-image"><img src={product.image} alt=""/><span className="detail-discount">{product.discount}</span><div className="dots"><i/><i className="active"/><i/><i/></div></div><div className="detail-content"><span className="kicker">{product.category}</span><h1>{product.name}</h1><div className="detail-rating"><Star size={13} fill="currentColor"/><b>{product.rating}</b><span>({product.reviews} reseñas)</span></div><div className="detail-price"><b>{formatPrice(product.price)}</b><del>{formatPrice(product.old)}</del></div><div className="option"><b>Color: Blanco</b><div><i className="swatch white active"/><i className="swatch lilac"/><i className="swatch black"/><i className="swatch gray"/></div></div><div className="option"><div><b>Talla:</b><button>Guía de tallas</button></div><div className="sizes">{['25','26','27','28','29','30'].map(s=><button key={s}>{s}</button>)}</div></div><button className="add-button" onClick={()=>addCart(product)}><ShoppingBag size={16}/> Agregar al carrito <span>{formatPrice(product.price)}</span></button><div className="benefits"><span><Package/><b>Envío gratis</b><small>en compras<br/>mayores a $799</small></span><span><Package/><b>Devolución fácil</b><small>hasta 15 días</small></span><span><CreditCard/><b>Pago seguro</b><small>con cifrado SSL</small></span></div></div></main>}
-function ProfileScreen({go}){const rows=[[Package,'Mis pedidos'],[MapPin,'Direcciones de envío'],[CreditCard,'Métodos de pago'],[Heart,'Favoritos'],[Bell,'Notificaciones'],[HelpCircle,'Ayuda y soporte'],[LogOut,'Cerrar sesión']];return <main className="scroll-page profile-page"><div className="profile-head"><button className="icon-btn" onClick={()=>go('home')}><ChevronLeft size={18}/></button><button className="icon-btn"><Settings size={17}/></button></div><div className="profile-card"><div className="avatar">V</div><div><h1>Mi cuenta</h1><p>Tu espacio personal en VaniDaxi</p></div></div><div className="profile-list">{rows.map(([Icon,label],i)=><button key={label} onClick={()=>i===0&&go('cart')}><Icon size={17}/><span>{label}</span>{label==='Notificaciones'&&<i className="notif">3</i>}<ChevronRight size={15}/></button>)}</div></main>}
-function CartScreen({go,cart}){const total=cart.reduce((s,p)=>s+p.price,0);return <main className="scroll-page"><Header go={go} simple/><div className="page-heading"><span>VaniDaxi</span><h1>Mi carrito</h1></div>{cart.length===0?<div className="empty"><ShoppingBag size={42}/><h2>Tu carrito está vacío</h2><p>Agrega tus productos favoritos para verlos aquí.</p><button onClick={()=>go('products')}>Explorar productos</button></div>:<><div className="cart-items">{cart.map((p,i)=><div className="cart-item" key={`${p.id}-${i}`}><img src={p.image} alt=""/><div><b>{p.name}</b><small>{p.category}</small><strong>{formatPrice(p.price)}</strong></div><span>×1</span></div>)}</div><div className="cart-total"><span>Total</span><b>{formatPrice(total)}</b><button>Continuar</button></div></>}</main>}
-function BottomNav({screen,go,cartCount}){const items=[[Home,'Inicio','home'],[Grid2X2,'Categorías','categories'],[Heart,'Favoritos','products'],[UserRound,'Perfil','profile']];return <nav className="bottom-nav">{items.map(([Icon,label,target])=><button key={label} className={screen===target?'active':''} onClick={()=>go(target)}><Icon size={18}/><span>{label}</span></button>)}<button className="floating-bag" onClick={()=>go('cart')}><ShoppingBag size={19}/>{cartCount>0&&<i>{cartCount}</i>}</button></nav>}
+
+function Header({ go, query = '', setQuery, simple = false, favorite = false, onFavorite }) {
+  return <header className="header"><div className="header-row">
+    {simple ? <button className="icon-btn" onClick={() => go('home')} aria-label="Volver"><ChevronLeft size={18} /></button> : <button className="logo" onClick={() => go('home')} aria-label="VaniDaxi inicio"><span className="logo-v">V</span><b>VaniDaxi</b></button>}
+    {!simple ? <div className="header-actions"><button className="icon-btn" aria-label="Notificaciones"><Bell size={17} /><i /></button><button className="icon-btn" onClick={() => go('cart')} aria-label="Carrito"><ShoppingBag size={17} /></button></div> : <div className="header-actions"><button className={`icon-btn ${favorite ? 'is-liked' : ''}`} onClick={onFavorite} aria-label="Favorito"><Heart size={17} fill={favorite ? 'currentColor' : 'none'} /></button><button className="icon-btn" onClick={() => navigator.share?.({ title: 'VaniDaxi', text: 'Mira este producto en VaniDaxi' }).catch(() => {})} aria-label="Compartir"><Share2 size={16} /></button></div>}
+  </div>
+  {!simple && <div className="search"><Search size={15} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar productos, marcas..." aria-label="Buscar productos" /><SlidersHorizontal size={15} /></div>}
+  </header>
+}
+
+function HomeScreen({ go, query, setQuery, favorites, toggleFavorite, openProduct, exploreCategory }) {
+  return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery} />
+    <section className="hero home-hero"><div><span className="hero-label">HASTA 50% OFF</span><h1>Tu estilo,<br /><em>sin límites.</em></h1><p>Moda, tecnología, hogar<br />y mucho más.</p><button onClick={() => go('offers')}>Ver ofertas <ChevronRight size={13} /></button></div><div className="hero-photo"><img src={products[0].image} alt="Tenis VaniDaxi" /><span>✦</span></div></section>
+    <SectionTitle title="Categorías" action="Ver todo" onClick={() => go('categories')} />
+    <div className="icon-categories">{categories.slice(0, 5).map(c => <button key={c.name} onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div>
+    <SectionTitle title="Ofertas del día" action="Ver todo" onClick={() => go('offers')} />
+    <div className="product-row">{products.slice(0, 3).map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} compact />)}</div>
+    <section className="promo-card"><div><b>Para él</b><strong>Estilo, tecnología<br />y rendimiento.</strong><button onClick={() => exploreCategory('Hombre')}>Ver productos <ChevronRight size={12} /></button></div><img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=700&q=85" alt="Moda masculina" /></section>
+    <SectionTitle title="Categorías destacadas" action="Ver todo" onClick={() => go('categories')} />
+    <div className="mini-category-grid">{categories.slice(5, 9).map(c => <button key={c.name} onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div>
+  </main>
+}
+
+function OffersScreen({ go, favorites, toggleFavorite, openProduct }) {
+  const [offerCategory, setOfferCategory] = useState('Todos')
+  const offerProducts = useMemo(() => products.filter(p => offerCategory === 'Todos' || p.category === offerCategory || (offerCategory === 'Moda' && ['Mujer', 'Hombre', 'Ropa', 'Calzado'].includes(p.category))), [offerCategory])
+  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Para ti</span><h1>Ofertas relámpago</h1><p>Descuentos especiales por tiempo limitado.</p></div>
+    <div className="offer-hero"><Zap size={18} /><div><b>Hasta 50% OFF</b><span>Las mejores ofertas de hoy</span></div><strong>02:18:42</strong></div>
+    <div className="chip-row">{['Todos', 'Tecnología', 'Moda', 'Hogar'].map(x => <button key={x} className={offerCategory === x ? 'active' : ''} onClick={() => setOfferCategory(x)}>{x}</button>)}</div>
+    <div className="product-grid">{offerProducts.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div>
+  </main>
+}
+
+function CategoriesScreen({ go, exploreCategory }) {
+  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Descubre</span><h1>Categorías</h1><p>Todo lo que necesitas, organizado para ti.</p></div>
+    <div className="category-grid">{categories.map(c => <button key={c.name} className="category-tile" onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><b>{c.name}</b><small>Explorar <ChevronRight size={11} /></small></button>)}</div>
+    <section className="brands"><SectionTitle title="Marcas destacadas" action="Ver todas" /><div>{['NIKE', 'adidas', 'PUMA', 'SAMSUNG', 'Apple', 'ZARA', 'H&M', 'LEVI’S'].map(x => <b key={x}>{x}</b>)}</div></section>
+    <section className="solo-banner"><div><b>Lo mejor<br />en un solo lugar.</b><small>Moda, tecnología, hogar<br />y mucho más.</small></div><ChevronRight /></section>
+  </main>
+}
+
+function ProductsScreen({ go, query, setQuery, category, setCategory, products, favorites, toggleFavorite, openProduct }) {
+  return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery} />
+    <div className="filter-tabs">{['Todos', 'Ropa', 'Calzado', 'Tecnología', 'Hogar'].map(x => <button key={x} className={category === x ? 'active' : ''} onClick={() => setCategory(x)}>{x}</button>)}</div>
+    <div className="result-line"><div><span>Productos destacados</span><b>{products.length} resultados</b></div><button onClick={() => setCategory('Todos')}><SlidersHorizontal size={13} /> Limpiar</button></div>
+    {products.length ? <div className="product-grid">{products.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div> : <EmptyState title="No encontramos productos" text="Prueba otra búsqueda o categoría." action="Ver todo" onClick={() => { setCategory('Todos'); setQuery('') }} />}
+  </main>
+}
+
+function FavoritesScreen({ go, products, favorites, toggleFavorite, openProduct }) {
+  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Tu selección</span><h1>Favoritos</h1><p>Guarda lo que te encanta y vuelve cuando quieras.</p></div>
+    {products.length ? <div className="product-grid">{products.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div> : <EmptyState title="Aún no tienes favoritos" text="Toca el corazón de cualquier producto para guardarlo aquí." action="Explorar productos" onClick={() => go('products')} />}
+  </main>
+}
+
+function ProductCard({ product, favorite, onFav, onOpen, compact = false }) {
+  return <article className={`product-card ${compact ? 'compact' : ''}`} onClick={onOpen}>
+    <div className="product-image"><img src={product.image} alt={product.name} loading="lazy" /><span className="discount">{product.discount}</span><button className={`heart ${favorite ? 'liked' : ''}`} onClick={e => { e.stopPropagation(); onFav() }} aria-label={favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}><Heart size={15} fill={favorite ? 'currentColor' : 'none'} /></button></div>
+    <div className="product-info"><small>{product.category}</small><h3>{product.name}</h3><div className="rating"><Star size={10} fill="currentColor" /> {product.rating} <span>({product.reviews})</span></div><div className="price"><b>{money(product.price)}</b><del>{money(product.old)}</del></div></div>
+  </article>
+}
+
+function DetailScreen({ go, product, favorite, toggleFavorite, addCart, cartCount }) {
+  const [color, setColor] = useState('Blanco')
+  const [size, setSize] = useState('Única')
+  const [qty, setQty] = useState(1)
+  const hasSizes = product.category === 'Calzado' || product.category === 'Ropa' || product.category === 'Hombre' || product.category === 'Mujer'
+  const sizes = hasSizes ? ['25', '26', '27', '28', '29', '30'] : ['Única']
+  return <main className="detail-page"><Header go={go} simple favorite={favorite} onFavorite={() => toggleFavorite(product.id)} />
+    <div className="detail-image"><img src={product.image} alt={product.name} /><span className="detail-discount">{product.discount}</span><div className="dots"><i /><i className="active" /><i /><i /></div></div>
+    <div className="detail-content"><span className="kicker">{product.category}</span><h1>{product.name}</h1><div className="detail-rating"><Star size={13} fill="currentColor" /><b>{product.rating}</b><span>({product.reviews} reseñas)</span></div><div className="detail-price"><b>{money(product.price * qty)}</b><del>{money(product.old * qty)}</del></div>
+      <p>Diseño pensado para tu día a día, con materiales seleccionados y un acabado cuidado. Compra con seguridad y consulta el estado de tu pedido desde tu cuenta.</p>
+      <div className="option"><b>Color: {color}</b><div><button aria-label="Blanco" className="swatch white active" onClick={() => setColor('Blanco')} /><button aria-label="Lila" className={`swatch lilac ${color === 'Lila' ? 'selected' : ''}`} onClick={() => setColor('Lila')} /><button aria-label="Negro" className={`swatch black ${color === 'Negro' ? 'selected' : ''}`} onClick={() => setColor('Negro')} /><button aria-label="Gris" className={`swatch gray ${color === 'Gris' ? 'selected' : ''}`} onClick={() => setColor('Gris')} /></div></div>
+      <div className="option"><div><b>{hasSizes ? 'Talla:' : 'Presentación:'}</b>{hasSizes && <button>Guía de tallas</button>}</div><div className="sizes">{sizes.map(s => <button key={s} className={size === s ? 'active' : ''} onClick={() => setSize(s)}>{s}</button>)}</div></div>
+      <div className="qty-row"><span>Cantidad</span><div><button onClick={() => setQty(q => Math.max(1, q - 1))}><Minus size={14} /></button><b>{qty}</b><button onClick={() => setQty(q => q + 1)}><Plus size={14} /></button></div></div>
+      <button className="add-button" onClick={() => addCart(product, { color, size, qty })}><ShoppingBag size={16} /> Agregar al carrito <span>{money(product.price * qty)}</span></button><button className="cart-link" onClick={() => go('cart')}>Ver carrito {cartCount ? `(${cartCount})` : ''}</button>
+      <div className="benefits"><span><Package /><b>Envío gratis</b><small>en compras<br />mayores a $799</small></span><span><Package /><b>Devolución fácil</b><small>hasta 15 días</small></span><span><CreditCard /><b>Pago seguro</b><small>con cifrado SSL</small></span></div>
+    </div>
+  </main>
+}
+
+function ProfileScreen({ go, favoritesCount, cartCount }) {
+  const rows = [[Package, 'Mis pedidos', () => go('cart')], [MapPin, 'Direcciones de envío'], [CreditCard, 'Métodos de pago'], [Heart, `Favoritos${favoritesCount ? ` (${favoritesCount})` : ''}`, () => go('favorites')], [Bell, 'Notificaciones'], [HelpCircle, 'Ayuda y soporte'], [LogOut, 'Cerrar sesión']]
+  return <main className="scroll-page profile-page"><div className="profile-head"><button className="icon-btn" onClick={() => go('home')}><ChevronLeft size={18} /></button><button className="icon-btn"><Settings size={17} /></button></div><div className="profile-card"><div className="avatar">V</div><div><h1>Mi cuenta</h1><p>Tu espacio personal en VaniDaxi</p></div></div><div className="profile-list">{rows.map(([Icon, label, action], i) => <button key={i} onClick={action || (() => {})}><Icon size={17} /><span>{label}</span>{label === 'Notificaciones' && <i className="notif">3</i>}<ChevronRight size={15} /></button>)}</div><div className="profile-summary"><span><b>{favoritesCount}</b><small>Favoritos</small></span><span><b>{cartCount}</b><small>En carrito</small></span><span><b>24/7</b><small>Soporte</small></span></div></main>
+}
+
+function CartScreen({ go, cart, updateQty, removeCart, checkout }) {
+  const total = cart.reduce((s, item) => s + item.product.price * item.qty, 0)
+  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>VaniDaxi</span><h1>Mi carrito</h1></div>
+    {cart.length === 0 ? <EmptyState title="Tu carrito está vacío" text="Agrega tus productos favoritos para verlos aquí." action="Explorar productos" onClick={() => go('products')} /> : <><div className="cart-items">{cart.map((item, i) => <div className="cart-item" key={`${item.product.id}-${item.color}-${item.size}`}><img src={item.product.image} alt={item.product.name} /><div><b>{item.product.name}</b><small>{item.color} · {item.size}</small><strong>{money(item.product.price * item.qty)}</strong><div className="qty-mini"><button onClick={() => updateQty(i, -1)}><Minus size={12} /></button><span>{item.qty}</span><button onClick={() => updateQty(i, 1)}><Plus size={12} /></button></div></div><button className="remove" onClick={() => removeCart(i)} aria-label="Eliminar"><Trash2 size={15} /></button></div>)}</div><div className="cart-total"><div><span>Subtotal</span><b>{money(total)}</b></div><small>Impuestos calculados al confirmar.</small><button onClick={checkout}>Continuar con la compra <ChevronRight size={15} /></button></div></>}
+  </main>
+}
+
+function EmptyState({ title, text, action, onClick }) { return <div className="empty"><ShoppingBag size={42} /><h2>{title}</h2><p>{text}</p><button onClick={onClick}>{action}</button></div> }
+function SectionTitle({ title, action, onClick }) { return <div className="section-title"><h2>{title}</h2>{action && <button onClick={onClick}>{action} <ChevronRight size={12} /></button>}</div> }
+
+function BottomNav({ screen, go, cartCount }) {
+  const items = [[Home, 'Inicio', 'home'], [Grid2X2, 'Categorías', 'categories'], [Heart, 'Favoritos', 'favorites'], [UserRound, 'Perfil', 'profile']]
+  return <nav className="bottom-nav">{items.map(([Icon, label, target]) => <button key={label} className={screen === target ? 'active' : ''} onClick={() => go(target)}><Icon size={18} /><span>{label}</span></button>)}<button className="floating-bag" onClick={() => go('cart')} aria-label="Carrito"><ShoppingBag size={19} />{cartCount > 0 && <i>{cartCount}</i>}</button></nav>
+}
