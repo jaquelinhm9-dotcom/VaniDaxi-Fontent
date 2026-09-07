@@ -2948,7 +2948,7 @@ function App() {
           }
         />
 
-        <Route path="/perfil" element={<ProtectedRoute user={user}><ProfilePage user={user} /></ProtectedRoute>} />
+        <Route path="/perfil" element={<ProtectedRoute user={user} authReady={authReady}><ProfilePage user={user} /></ProtectedRoute>} />
 
         <Route
           path="/favoritos"
