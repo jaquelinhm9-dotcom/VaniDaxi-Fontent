@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import ReferenceMobileNav from "./ReferenceMobileNav.jsx";
 import "./styles.css";
 import "./reference-mobile.css";
+import "./reference-mobile-final.css";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const redirectPath = new URLSearchParams(window.location.search).get("p");
