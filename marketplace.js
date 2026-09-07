@@ -240,12 +240,17 @@ export async function createOrder({
   }
 
   const validCart = Array.isArray(cart)
-    ? cart.filter(
-        (item) =>
-          item &&
-          isUuid(item.id) &&
-          Number(item.quantity || 0) > 0
-      )
+    ? cart
+        .filter(
+          (item) =>
+            item &&
+            isUuid(item.id) &&
+            Number(item.quantity || 0) > 0
+        )
+        .map((item) => ({
+          id: item.id,
+          quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
+        }))
     : [];
 
   if (validCart.length === 0) {
@@ -255,11 +260,50 @@ export async function createOrder({
     };
   }
 
+  const productIds = [...new Set(validCart.map((item) => item.id))];
+  const productsResult = await supabase
+    .from("products")
+    .select("id, price, stock, active")
+    .in("id", productIds);
+
+  if (productsResult.error) {
+    return productsResult;
+  }
+
+  const productsById = new Map(
+    (productsResult.data || []).map((product) => [product.id, product])
+  );
+
+  for (const item of validCart) {
+    const product = productsById.get(item.id);
+
+    if (!product || product.active !== true) {
+      return {
+        data: null,
+        error: new Error("Uno de los productos del carrito ya no está disponible."),
+      };
+    }
+
+    if (Number(product.stock) < item.quantity) {
+      return {
+        data: null,
+        error: new Error("La cantidad solicitada supera el inventario disponible."),
+      };
+    }
+  }
+
+  // El total enviado por el navegador no se considera confiable.
+  // El importe del pedido se recalcula con los precios actuales de Supabase.
+  const calculatedTotal = validCart.reduce((sum, item) => {
+    const product = productsById.get(item.id);
+    return sum + Number(product?.price || 0) * item.quantity;
+  }, 0);
+
   const orderResult = await supabase
     .from("orders")
     .insert({
       user_id: userId,
-      total: Number(total || 0),
+      total: calculatedTotal,
       payment_method: paymentMethod || null,
       customer_name: customer?.name || null,
       customer_phone: customer?.phone || null,
@@ -276,8 +320,8 @@ export async function createOrder({
   const items = validCart.map((item) => ({
     order_id: orderResult.data.id,
     product_id: item.id,
-    quantity: Math.max(1, Number(item.quantity || 1)),
-    price: Number(item.price || 0),
+    quantity: item.quantity,
+    price: Number(productsById.get(item.id)?.price || 0),
   }));
 
   const itemsResult = await supabase
@@ -294,5 +338,6 @@ export async function createOrder({
   return {
     data: orderResult.data,
     error: null,
+    total: calculatedTotal,
   };
 }
