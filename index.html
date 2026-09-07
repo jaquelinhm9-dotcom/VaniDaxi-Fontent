@@ -18,9 +18,12 @@
             data.name = 'Mi cuenta'
             localStorage.setItem('vanidaxi-address', JSON.stringify(data))
           }
+        } else {
+          localStorage.setItem('vanidaxi-address', JSON.stringify({ name: 'Mi cuenta', street: '', city: '', zip: '' }))
         }
       } catch (_) {}
     </script>
+    <script src="./runtime-fixes.js"></script>
   </head>
   <body>
     <div id="root"></div>
