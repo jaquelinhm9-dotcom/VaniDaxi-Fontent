@@ -7,7 +7,20 @@
     <meta name="description" content="VaniDaxi — moda, tecnología, hogar y mucho más." />
     <link rel="icon" type="image/svg+xml" href="./logo.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./polish.css" />
     <title>VaniDaxi</title>
+    <script>
+      try {
+        const raw = localStorage.getItem('vanidaxi-address')
+        if (raw) {
+          const data = JSON.parse(raw)
+          if (data && typeof data === 'object') {
+            data.name = 'Mi cuenta'
+            localStorage.setItem('vanidaxi-address', JSON.stringify(data))
+          }
+        }
+      } catch (_) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
