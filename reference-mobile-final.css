@@ -1,0 +1,114 @@
+/* Final mobile reference overrides. These rules intentionally remove the legacy
+   application bars; Android system status/navigation areas are outside the web app. */
+@media (max-width: 720px) {
+  /* Do not keep the desktop application header pinned while scrolling. */
+  .top-header {
+    position: relative !important;
+    top: auto !important;
+    z-index: 10 !important;
+    background: #f5eff9 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* The old promotional/footer block is not part of the supplied mobile reference. */
+  .footer {
+    display: none !important;
+  }
+
+  /* The old 5-item implementation is replaced by ReferenceMobileNav. */
+  .mobile-bottom {
+    display: none !important;
+  }
+
+  /* Keep the reference navigation fixed to the viewport bottom. */
+  .reference-mobile-nav {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 1000 !important;
+  }
+
+  /* Reference uses a compact 4-column category row. */
+  .home-category-strip {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    overflow: visible !important;
+  }
+
+  .home-category-item {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 5px 3px !important;
+    border-radius: 10px !important;
+  }
+
+  .home-category-icon {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / .82 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+  }
+
+  .home-category-icon img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* Home product rows match the compact reference cards. */
+  .home-page .product-strip,
+  .home-page .product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .home-page .product-card {
+    min-width: 0 !important;
+    border-radius: 11px !important;
+    overflow: hidden !important;
+  }
+
+  .home-page .product-image-wrap {
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .home-page .product-info {
+    padding: 7px !important;
+  }
+
+  .home-page .product-name {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+  }
+
+  .home-page .price {
+    font-size: 12px !important;
+  }
+
+  .home-page .product-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .home-page .view-button {
+    display: none !important;
+  }
+
+  .home-page .add-button {
+    height: 28px !important;
+    border-radius: 8px !important;
+    font-size: 8px !important;
+  }
+
+  /* Remove the seller promo block from the buyer home on mobile, as in reference. */
+  .home-page .promo,
+  .home-page .promo-wide {
+    display: none !important;
+  }
+}
