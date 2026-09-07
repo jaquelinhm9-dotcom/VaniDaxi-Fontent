@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Bell, Heart, Home, Grid2X2, UserRound, ShoppingBag, Search, ChevronRight, ChevronLeft, SlidersHorizontal, MapPin, CreditCard, Package, HelpCircle, LogOut, Settings, Share2, Star, Zap, Minus, Plus, Trash2, Check } from 'lucide-react'
+import { Bell, Heart, Home, Grid2X2, UserRound, ShoppingBag, Search, ChevronRight, ChevronLeft, SlidersHorizontal, MapPin, CreditCard, Package, HelpCircle, LogOut, Settings, Share2, Star, Zap, Minus, Plus, Trash2, Check, X, Truck, ShieldCheck, CircleUserRound } from 'lucide-react'
 
 const categories = [
   { name: 'Moda', icon: '👕' }, { name: 'Hombre', icon: '🧥' }, { name: 'Mujer', icon: '👗' }, { name: 'Tecnología', icon: '📱' }, { name: 'Hogar', icon: '🏠' },
@@ -37,6 +37,12 @@ function readSet(key) {
 function readCart() {
   try { return JSON.parse(localStorage.getItem('vanidaxi-cart') || '[]') } catch { return [] }
 }
+function readOrders() {
+  try { return JSON.parse(localStorage.getItem('vanidaxi-orders') || '[]') } catch { return [] }
+}
+function readObject(key, fallback = {}) {
+  try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback }
+}
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -44,20 +50,40 @@ export default function App() {
   const [selected, setSelected] = useState(products[5])
   const [favorites, setFavorites] = useState(() => readSet('vanidaxi-favorites'))
   const [cart, setCart] = useState(() => readCart())
+  const [orders, setOrders] = useState(() => readOrders())
+  const [address, setAddress] = useState(() => readObject('vanidaxi-address', { name: 'Jaquelin Medina', street: '', city: '', zip: '' }))
+  const [payment, setPayment] = useState(() => readObject('vanidaxi-payment', { method: 'Tarjeta', detail: '' }))
   const [toast, setToast] = useState('')
   const [category, setCategory] = useState('Todos')
+  const [accountModal, setAccountModal] = useState(null)
+  const [notificationCount, setNotificationCount] = useState(3)
 
   useEffect(() => { localStorage.setItem('vanidaxi-favorites', JSON.stringify([...favorites])) }, [favorites])
   useEffect(() => { localStorage.setItem('vanidaxi-cart', JSON.stringify(cart)) }, [cart])
+  useEffect(() => { localStorage.setItem('vanidaxi-orders', JSON.stringify(orders)) }, [orders])
+  useEffect(() => { localStorage.setItem('vanidaxi-address', JSON.stringify(address)) }, [address])
+  useEffect(() => { localStorage.setItem('vanidaxi-payment', JSON.stringify(payment)) }, [payment])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return products.filter(p => categoryMatches(p, category) && (!q || `${p.name} ${p.category}`.toLowerCase().includes(q)))
   }, [query, category])
 
-  const go = name => { setScreen(name); window.scrollTo?.(0, 0) }
-  const notify = message => { setToast(message); window.clearTimeout(window.__vanidaxiToast); window.__vanidaxiToast = window.setTimeout(() => setToast(''), 1800) }
-  const toggleFavorite = id => setFavorites(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
+  const go = name => {
+    setScreen(name)
+    setAccountModal(null)
+    window.scrollTo?.(0, 0)
+  }
+  const notify = message => {
+    setToast(message)
+    window.clearTimeout(window.__vanidaxiToast)
+    window.__vanidaxiToast = window.setTimeout(() => setToast(''), 1800)
+  }
+  const toggleFavorite = id => setFavorites(prev => {
+    const next = new Set(prev)
+    next.has(id) ? next.delete(id) : next.add(id)
+    return next
+  })
   const openProduct = product => { setSelected(product); go('detail') }
   const exploreCategory = name => { setCategory(name === 'Moda' ? 'Moda' : name); setQuery(''); go('products') }
 
@@ -70,10 +96,16 @@ export default function App() {
     })
     notify('Producto agregado al carrito')
   }
-
   const updateCartQty = (index, delta) => setCart(prev => prev.map((item, i) => i !== index ? item : ({ ...item, qty: Math.max(1, item.qty + delta) })))
   const removeCart = index => { setCart(prev => prev.filter((_, i) => i !== index)); notify('Producto eliminado') }
-  const checkout = () => { setCart([]); notify('Pedido creado correctamente'); go('home') }
+  const placeOrder = shippingData => {
+    if (!cart.length) return
+    const total = cart.reduce((s, item) => s + item.product.price * item.qty, 0)
+    const order = { id: `VD-${Math.floor(10000 + Math.random() * 89999)}`, date: new Date().toLocaleDateString('es-MX'), status: 'Confirmado', total, items: cart, address: shippingData.address, payment: shippingData.payment }
+    setOrders(prev => [order, ...prev]); setCart([]); notify(`Pedido ${order.id} confirmado`); go('orders')
+  }
+  const logout = () => { setAccountModal(null); setScreen('home'); notify('Sesión cerrada') }
+  const cartCount = cart.reduce((s, item) => s + item.qty, 0)
 
   return <div className="app"><div className="device">
     {screen === 'home' && <HomeScreen go={go} query={query} setQuery={setQuery} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} exploreCategory={exploreCategory} />}
@@ -81,110 +113,89 @@ export default function App() {
     {screen === 'categories' && <CategoriesScreen go={go} exploreCategory={exploreCategory} />}
     {screen === 'products' && <ProductsScreen go={go} query={query} setQuery={setQuery} category={category} setCategory={setCategory} products={filtered} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} />}
     {screen === 'favorites' && <FavoritesScreen go={go} products={products.filter(p => favorites.has(p.id))} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} />}
-    {screen === 'detail' && <DetailScreen go={go} product={selected} favorite={favorites.has(selected.id)} toggleFavorite={toggleFavorite} addCart={addCart} cartCount={cart.reduce((s, x) => s + x.qty, 0)} />}
-    {screen === 'profile' && <ProfileScreen go={go} favoritesCount={favorites.size} cartCount={cart.reduce((s, x) => s + x.qty, 0)} />}
-    {screen === 'cart' && <CartScreen go={go} cart={cart} updateQty={updateCartQty} removeCart={removeCart} checkout={checkout} />}
-    {screen !== 'detail' && <BottomNav screen={screen} go={go} cartCount={cart.reduce((s, x) => s + x.qty, 0)} />}
+    {screen === 'detail' && <DetailScreen go={go} product={selected} favorite={favorites.has(selected.id)} toggleFavorite={toggleFavorite} addCart={addCart} cartCount={cartCount} />}
+    {screen === 'profile' && <ProfileScreen go={go} favoritesCount={favorites.size} cartCount={cartCount} notificationCount={notificationCount} setNotificationCount={setNotificationCount} ordersCount={orders.length} setAccountModal={setAccountModal} logout={logout} />}
+    {screen === 'orders' && <OrdersScreen go={go} orders={orders} />}
+    {screen === 'checkout' && <CheckoutScreen go={go} cart={cart} address={address} setAddress={setAddress} payment={payment} setPayment={setPayment} placeOrder={placeOrder} />}
+    {screen === 'cart' && <CartScreen go={go} cart={cart} updateQty={updateCartQty} removeCart={removeCart} checkout={() => go('checkout')} />}
+    {accountModal && <AccountModal type={accountModal} onClose={() => setAccountModal(null)} address={address} setAddress={setAddress} payment={payment} setPayment={setPayment} notificationCount={notificationCount} setNotificationCount={setNotificationCount} notify={notify} />}
+    {screen !== 'detail' && !accountModal && <BottomNav screen={screen} go={go} cartCount={cartCount} />}
     {toast && <div className="toast"><Check size={15} /> {toast}</div>}
   </div></div>
 }
 
-function Header({ go, query = '', setQuery, simple = false, favorite = false, onFavorite }) {
+function BrandMark() {
+  return <svg className="brand-svg" viewBox="0 0 32 32" aria-hidden="true">
+    <defs><linearGradient id="vaniLogo" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stopColor="#6b3f98"/><stop offset="0.55" stopColor="#9b4faf"/><stop offset="1" stopColor="#e04999"/></linearGradient></defs>
+    <path d="M4 6h5l7 15 7-15h5L16 28 4 6Z" fill="url(#vaniLogo)"/><path d="M10 6h5l7 15-3 5L10 6Z" fill="#fff" opacity=".34"/>
+  </svg>
+}
+
+function Header({ go, query = '', setQuery, simple = false, favorite = false, onFavorite, onSubmitSearch }) {
+  const submitSearch = e => { e?.preventDefault?.(); const value = query?.trim(); if (value) onSubmitSearch?.(value) }
   return <header className="header"><div className="header-row">
-    {simple ? <button className="icon-btn" onClick={() => go('home')} aria-label="Volver"><ChevronLeft size={18} /></button> : <button className="logo" onClick={() => go('home')} aria-label="VaniDaxi inicio"><span className="logo-v">V</span><b>VaniDaxi</b></button>}
-    {!simple ? <div className="header-actions"><button className="icon-btn" aria-label="Notificaciones"><Bell size={17} /><i /></button><button className="icon-btn" onClick={() => go('cart')} aria-label="Carrito"><ShoppingBag size={17} /></button></div> : <div className="header-actions"><button className={`icon-btn ${favorite ? 'is-liked' : ''}`} onClick={onFavorite} aria-label="Favorito"><Heart size={17} fill={favorite ? 'currentColor' : 'none'} /></button><button className="icon-btn" onClick={() => navigator.share?.({ title: 'VaniDaxi', text: 'Mira este producto en VaniDaxi' }).catch(() => {})} aria-label="Compartir"><Share2 size={16} /></button></div>}
-  </div>
-  {!simple && <div className="search"><Search size={15} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar productos, marcas..." aria-label="Buscar productos" /><SlidersHorizontal size={15} /></div>}
-  </header>
+    {simple ? <button className="icon-btn" onClick={() => go('home')} aria-label="Volver"><ChevronLeft size={18} /></button> : <button className="logo" onClick={() => go('home')} aria-label="VaniDaxi inicio"><BrandMark /><b>VaniDaxi</b></button>}
+    {!simple ? <div className="header-actions"><button className="icon-btn" onClick={() => go('profile')} aria-label="Notificaciones y cuenta"><Bell size={17} /><i /></button><button className="icon-btn" onClick={() => go('cart')} aria-label="Carrito"><ShoppingBag size={17} /></button></div> : <div className="header-actions"><button className={`icon-btn ${favorite ? 'is-liked' : ''}`} onClick={onFavorite} aria-label="Favorito"><Heart size={17} fill={favorite ? 'currentColor' : 'none'} /></button><button className="icon-btn" onClick={() => navigator.share?.({ title: 'VaniDaxi', text: 'Mira este producto en VaniDaxi' }).catch(() => {})} aria-label="Compartir"><Share2 size={16} /></button></div>}
+  </div>{!simple && <form className="search" onSubmit={submitSearch}><Search size={15} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar productos, marcas..." aria-label="Buscar productos"/><button type="button" onClick={submitSearch} className="search-filter" aria-label="Buscar"><SlidersHorizontal size={15} /></button></form>}</header>
 }
 
 function HomeScreen({ go, query, setQuery, favorites, toggleFavorite, openProduct, exploreCategory }) {
-  return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery} />
+  return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery} onSubmitSearch={value => { setQuery(value); go('products') }} />
     <section className="hero home-hero"><div><span className="hero-label">HASTA 50% OFF</span><h1>Tu estilo,<br /><em>sin límites.</em></h1><p>Moda, tecnología, hogar<br />y mucho más.</p><button onClick={() => go('offers')}>Ver ofertas <ChevronRight size={13} /></button></div><div className="hero-photo"><img src={products[0].image} alt="Tenis VaniDaxi" /><span>✦</span></div></section>
     <SectionTitle title="Categorías" action="Ver todo" onClick={() => go('categories')} />
     <div className="icon-categories">{categories.slice(0, 5).map(c => <button key={c.name} onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div>
     <SectionTitle title="Ofertas del día" action="Ver todo" onClick={() => go('offers')} />
     <div className="product-row">{products.slice(0, 3).map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} compact />)}</div>
     <section className="promo-card"><div><b>Para él</b><strong>Estilo, tecnología<br />y rendimiento.</strong><button onClick={() => exploreCategory('Hombre')}>Ver productos <ChevronRight size={12} /></button></div><img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=700&q=85" alt="Moda masculina" /></section>
-    <SectionTitle title="Categorías destacadas" action="Ver todo" onClick={() => go('categories')} />
-    <div className="mini-category-grid">{categories.slice(5, 9).map(c => <button key={c.name} onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div>
+    <SectionTitle title="Categorías destacadas" action="Ver todo" onClick={() => go('categories')} /><div className="mini-category-grid">{categories.slice(5, 9).map(c => <button key={c.name} onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><small>{c.name}</small></button>)}</div>
   </main>
 }
 
 function OffersScreen({ go, favorites, toggleFavorite, openProduct }) {
   const [offerCategory, setOfferCategory] = useState('Todos')
-  const offerProducts = useMemo(() => products.filter(p => offerCategory === 'Todos' || p.category === offerCategory || (offerCategory === 'Moda' && ['Mujer', 'Hombre', 'Ropa', 'Calzado'].includes(p.category))), [offerCategory])
-  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Para ti</span><h1>Ofertas relámpago</h1><p>Descuentos especiales por tiempo limitado.</p></div>
-    <div className="offer-hero"><Zap size={18} /><div><b>Hasta 50% OFF</b><span>Las mejores ofertas de hoy</span></div><strong>02:18:42</strong></div>
-    <div className="chip-row">{['Todos', 'Tecnología', 'Moda', 'Hogar'].map(x => <button key={x} className={offerCategory === x ? 'active' : ''} onClick={() => setOfferCategory(x)}>{x}</button>)}</div>
-    <div className="product-grid">{offerProducts.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div>
-  </main>
+  const offerProducts = useMemo(() => products.filter(p => offerCategory === 'Todos' || p.category === offerCategory || (offerCategory === 'Moda' && ['Mujer', 'Hombre', 'Ropa', 'Calzado', 'Accesorios'].includes(p.category))), [offerCategory])
+  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Para ti</span><h1>Ofertas relámpago</h1><p>Descuentos especiales por tiempo limitado.</p></div><div className="offer-hero"><Zap size={18} /><div><b>Hasta 50% OFF</b><span>Las mejores ofertas de hoy</span></div><strong>02:18:42</strong></div><div className="chip-row">{['Todos', 'Tecnología', 'Moda', 'Hogar'].map(x => <button key={x} className={offerCategory === x ? 'active' : ''} onClick={() => setOfferCategory(x)}>{x}</button>)}</div><div className="product-grid">{offerProducts.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div></main>
 }
 
-function CategoriesScreen({ go, exploreCategory }) {
-  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Descubre</span><h1>Categorías</h1><p>Todo lo que necesitas, organizado para ti.</p></div>
-    <div className="category-grid">{categories.map(c => <button key={c.name} className="category-tile" onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><b>{c.name}</b><small>Explorar <ChevronRight size={11} /></small></button>)}</div>
-    <section className="brands"><SectionTitle title="Marcas destacadas" action="Ver todas" /><div>{['NIKE', 'adidas', 'PUMA', 'SAMSUNG', 'Apple', 'ZARA', 'H&M', 'LEVI’S'].map(x => <b key={x}>{x}</b>)}</div></section>
-    <section className="solo-banner"><div><b>Lo mejor<br />en un solo lugar.</b><small>Moda, tecnología, hogar<br />y mucho más.</small></div><ChevronRight /></section>
-  </main>
-}
+function CategoriesScreen({ go, exploreCategory }) { return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Descubre</span><h1>Categorías</h1><p>Todo lo que necesitas, organizado para ti.</p></div><div className="category-grid">{categories.map(c => <button key={c.name} className="category-tile" onClick={() => exploreCategory(c.name)}><span>{c.icon}</span><b>{c.name}</b><small>Explorar <ChevronRight size={11} /></small></button>)}</div><section className="brands"><SectionTitle title="Marcas destacadas" action="Ver todas" /><div>{['NIKE', 'adidas', 'PUMA', 'SAMSUNG', 'Apple', 'ZARA', 'H&M', 'LEVI’S'].map(x => <b key={x}>{x}</b>)}</div></section><section className="solo-banner"><div><b>Lo mejor<br />en un solo lugar.</b><small>Moda, tecnología, hogar<br />y mucho más.</small></div><ChevronRight /></section></main> }
 
-function ProductsScreen({ go, query, setQuery, category, setCategory, products, favorites, toggleFavorite, openProduct }) {
-  return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery} />
-    <div className="filter-tabs">{['Todos', 'Ropa', 'Calzado', 'Tecnología', 'Hogar'].map(x => <button key={x} className={category === x ? 'active' : ''} onClick={() => setCategory(x)}>{x}</button>)}</div>
-    <div className="result-line"><div><span>Productos destacados</span><b>{products.length} resultados</b></div><button onClick={() => setCategory('Todos')}><SlidersHorizontal size={13} /> Limpiar</button></div>
-    {products.length ? <div className="product-grid">{products.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div> : <EmptyState title="No encontramos productos" text="Prueba otra búsqueda o categoría." action="Ver todo" onClick={() => { setCategory('Todos'); setQuery('') }} />}
-  </main>
-}
+function ProductsScreen({ go, query, setQuery, category, setCategory, products: list, favorites, toggleFavorite, openProduct }) { return <main className="scroll-page"><Header go={go} query={query} setQuery={setQuery} onSubmitSearch={() => {}} /><div className="filter-tabs">{['Todos', 'Ropa', 'Calzado', 'Tecnología', 'Hogar'].map(x => <button key={x} className={category === x ? 'active' : ''} onClick={() => setCategory(x)}>{x}</button>)}</div><div className="result-line"><div><span>Productos destacados</span><b>{list.length} resultados</b></div><button onClick={() => { setCategory('Todos'); setQuery('') }}><SlidersHorizontal size={13} /> Limpiar</button></div>{list.length ? <div className="product-grid">{list.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div> : <EmptyState title="No encontramos productos" text="Prueba otra búsqueda o categoría." action="Ver todo" onClick={() => { setCategory('Todos'); setQuery('') }} />}</main> }
 
-function FavoritesScreen({ go, products, favorites, toggleFavorite, openProduct }) {
-  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Tu selección</span><h1>Favoritos</h1><p>Guarda lo que te encanta y vuelve cuando quieras.</p></div>
-    {products.length ? <div className="product-grid">{products.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div> : <EmptyState title="Aún no tienes favoritos" text="Toca el corazón de cualquier producto para guardarlo aquí." action="Explorar productos" onClick={() => go('products')} />}
-  </main>
-}
+function FavoritesScreen({ go, products: list, favorites, toggleFavorite, openProduct }) { return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Tu selección</span><h1>Favoritos</h1><p>Guarda lo que te encanta y vuelve cuando quieras.</p></div>{list.length ? <div className="product-grid">{list.map(p => <ProductCard key={p.id} product={p} favorite={favorites.has(p.id)} onFav={() => toggleFavorite(p.id)} onOpen={() => openProduct(p)} />)}</div> : <EmptyState title="Aún no tienes favoritos" text="Toca el corazón de cualquier producto para guardarlo aquí." action="Explorar productos" onClick={() => go('products')} />}</main> }
 
-function ProductCard({ product, favorite, onFav, onOpen, compact = false }) {
-  return <article className={`product-card ${compact ? 'compact' : ''}`} onClick={onOpen}>
-    <div className="product-image"><img src={product.image} alt={product.name} loading="lazy" /><span className="discount">{product.discount}</span><button className={`heart ${favorite ? 'liked' : ''}`} onClick={e => { e.stopPropagation(); onFav() }} aria-label={favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}><Heart size={15} fill={favorite ? 'currentColor' : 'none'} /></button></div>
-    <div className="product-info"><small>{product.category}</small><h3>{product.name}</h3><div className="rating"><Star size={10} fill="currentColor" /> {product.rating} <span>({product.reviews})</span></div><div className="price"><b>{money(product.price)}</b><del>{money(product.old)}</del></div></div>
-  </article>
-}
+function ProductCard({ product, favorite, onFav, onOpen, compact = false }) { return <article className={`product-card ${compact ? 'compact' : ''}`} onClick={onOpen}><div className="product-image"><img src={product.image} alt={product.name} loading="lazy" /><span className="discount">{product.discount}</span><button className={`heart ${favorite ? 'liked' : ''}`} onClick={e => { e.stopPropagation(); onFav() }} aria-label={favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}><Heart size={15} fill={favorite ? 'currentColor' : 'none'} /></button></div><div className="product-info"><small>{product.category}</small><h3>{product.name}</h3><div className="rating"><Star size={10} fill="currentColor" /> {product.rating} <span>({product.reviews})</span></div><div className="price"><b>{money(product.price)}</b><del>{money(product.old)}</del></div></div></article> }
 
 function DetailScreen({ go, product, favorite, toggleFavorite, addCart, cartCount }) {
-  const [color, setColor] = useState('Blanco')
-  const [size, setSize] = useState('Única')
-  const [qty, setQty] = useState(1)
-  const hasSizes = product.category === 'Calzado' || product.category === 'Ropa' || product.category === 'Hombre' || product.category === 'Mujer'
-  const sizes = hasSizes ? ['25', '26', '27', '28', '29', '30'] : ['Única']
-  return <main className="detail-page"><Header go={go} simple favorite={favorite} onFavorite={() => toggleFavorite(product.id)} />
-    <div className="detail-image"><img src={product.image} alt={product.name} /><span className="detail-discount">{product.discount}</span><div className="dots"><i /><i className="active" /><i /><i /></div></div>
-    <div className="detail-content"><span className="kicker">{product.category}</span><h1>{product.name}</h1><div className="detail-rating"><Star size={13} fill="currentColor" /><b>{product.rating}</b><span>({product.reviews} reseñas)</span></div><div className="detail-price"><b>{money(product.price * qty)}</b><del>{money(product.old * qty)}</del></div>
-      <p>Diseño pensado para tu día a día, con materiales seleccionados y un acabado cuidado. Compra con seguridad y consulta el estado de tu pedido desde tu cuenta.</p>
-      <div className="option"><b>Color: {color}</b><div><button aria-label="Blanco" className="swatch white active" onClick={() => setColor('Blanco')} /><button aria-label="Lila" className={`swatch lilac ${color === 'Lila' ? 'selected' : ''}`} onClick={() => setColor('Lila')} /><button aria-label="Negro" className={`swatch black ${color === 'Negro' ? 'selected' : ''}`} onClick={() => setColor('Negro')} /><button aria-label="Gris" className={`swatch gray ${color === 'Gris' ? 'selected' : ''}`} onClick={() => setColor('Gris')} /></div></div>
-      <div className="option"><div><b>{hasSizes ? 'Talla:' : 'Presentación:'}</b>{hasSizes && <button>Guía de tallas</button>}</div><div className="sizes">{sizes.map(s => <button key={s} className={size === s ? 'active' : ''} onClick={() => setSize(s)}>{s}</button>)}</div></div>
-      <div className="qty-row"><span>Cantidad</span><div><button onClick={() => setQty(q => Math.max(1, q - 1))}><Minus size={14} /></button><b>{qty}</b><button onClick={() => setQty(q => q + 1)}><Plus size={14} /></button></div></div>
-      <button className="add-button" onClick={() => addCart(product, { color, size, qty })}><ShoppingBag size={16} /> Agregar al carrito <span>{money(product.price * qty)}</span></button><button className="cart-link" onClick={() => go('cart')}>Ver carrito {cartCount ? `(${cartCount})` : ''}</button>
-      <div className="benefits"><span><Package /><b>Envío gratis</b><small>en compras<br />mayores a $799</small></span><span><Package /><b>Devolución fácil</b><small>hasta 15 días</small></span><span><CreditCard /><b>Pago seguro</b><small>con cifrado SSL</small></span></div>
-    </div>
-  </main>
+  const [color, setColor] = useState('Blanco'); const [size, setSize] = useState('Única'); const [qty, setQty] = useState(1)
+  const hasSizes = ['Calzado', 'Ropa', 'Hombre', 'Mujer'].includes(product.category); const sizes = hasSizes ? ['25', '26', '27', '28', '29', '30'] : ['Única']
+  return <main className="detail-page"><Header go={go} simple favorite={favorite} onFavorite={() => toggleFavorite(product.id)} /><div className="detail-image"><img src={product.image} alt={product.name} /><span className="detail-discount">{product.discount}</span><div className="dots"><i /><i className="active" /><i /><i /></div></div><div className="detail-content"><span className="kicker">{product.category}</span><h1>{product.name}</h1><div className="detail-rating"><Star size={13} fill="currentColor" /><b>{product.rating}</b><span>({product.reviews} reseñas)</span></div><div className="detail-price"><b>{money(product.price * qty)}</b><del>{money(product.old * qty)}</del></div><p>Diseño pensado para tu día a día, con materiales seleccionados y un acabado cuidado. Compra con seguridad y consulta el estado de tu pedido desde tu cuenta.</p><div className="option"><b>Color: {color}</b><div><button aria-label="Blanco" className={`swatch white ${color === 'Blanco' ? 'active' : ''}`} onClick={() => setColor('Blanco')} /><button aria-label="Lila" className={`swatch lilac ${color === 'Lila' ? 'active' : ''}`} onClick={() => setColor('Lila')} /><button aria-label="Negro" className={`swatch black ${color === 'Negro' ? 'active' : ''}`} onClick={() => setColor('Negro')} /><button aria-label="Gris" className={`swatch gray ${color === 'Gris' ? 'active' : ''}`} onClick={() => setColor('Gris')} /></div></div><div className="option"><div><b>{hasSizes ? 'Talla:' : 'Presentación:'}</b>{hasSizes && <button>Guía de tallas</button>}</div><div className="sizes">{sizes.map(s => <button key={s} className={size === s ? 'active' : ''} onClick={() => setSize(s)}>{s}</button>)}</div></div><div className="qty-row"><span>Cantidad</span><div><button onClick={() => setQty(q => Math.max(1, q - 1))}><Minus size={14} /></button><b>{qty}</b><button onClick={() => setQty(q => q + 1)}><Plus size={14} /></button></div></div><button className="add-button" onClick={() => addCart(product, { color, size, qty })}><ShoppingBag size={16} /> Agregar al carrito <span>{money(product.price * qty)}</span></button><button className="cart-link" onClick={() => go('cart')}>Ver carrito {cartCount ? `(${cartCount})` : ''}</button><div className="benefits"><span><Truck /><b>Envío gratis</b><small>en compras<br />mayores a $799</small></span><span><Package /><b>Devolución fácil</b><small>hasta 15 días</small></span><span><ShieldCheck /><b>Pago seguro</b><small>con cifrado SSL</small></span></div></div></main>
 }
 
-function ProfileScreen({ go, favoritesCount, cartCount }) {
-  const rows = [[Package, 'Mis pedidos', () => go('cart')], [MapPin, 'Direcciones de envío'], [CreditCard, 'Métodos de pago'], [Heart, `Favoritos${favoritesCount ? ` (${favoritesCount})` : ''}`, () => go('favorites')], [Bell, 'Notificaciones'], [HelpCircle, 'Ayuda y soporte'], [LogOut, 'Cerrar sesión']]
-  return <main className="scroll-page profile-page"><div className="profile-head"><button className="icon-btn" onClick={() => go('home')}><ChevronLeft size={18} /></button><button className="icon-btn"><Settings size={17} /></button></div><div className="profile-card"><div className="avatar">V</div><div><h1>Mi cuenta</h1><p>Tu espacio personal en VaniDaxi</p></div></div><div className="profile-list">{rows.map(([Icon, label, action], i) => <button key={i} onClick={action || (() => {})}><Icon size={17} /><span>{label}</span>{label === 'Notificaciones' && <i className="notif">3</i>}<ChevronRight size={15} /></button>)}</div><div className="profile-summary"><span><b>{favoritesCount}</b><small>Favoritos</small></span><span><b>{cartCount}</b><small>En carrito</small></span><span><b>24/7</b><small>Soporte</small></span></div></main>
+function ProfileScreen({ go, favoritesCount, cartCount, notificationCount, setNotificationCount, ordersCount, setAccountModal, logout }) {
+  const rows = [[Package, `Mis pedidos${ordersCount ? ` (${ordersCount})` : ''}`, () => go('orders')], [MapPin, 'Direcciones de envío', () => setAccountModal('address')], [CreditCard, 'Métodos de pago', () => setAccountModal('payment')], [Heart, `Favoritos${favoritesCount ? ` (${favoritesCount})` : ''}`, () => go('favorites')], [Bell, 'Notificaciones', () => { setNotificationCount(0); setAccountModal('notifications') }], [HelpCircle, 'Ayuda y soporte', () => setAccountModal('help')], [LogOut, 'Cerrar sesión', logout]]
+  return <main className="scroll-page profile-page"><div className="profile-head"><button className="icon-btn" onClick={() => go('home')}><ChevronLeft size={18} /></button><button className="icon-btn" onClick={() => setAccountModal('settings')}><Settings size={17} /></button></div><div className="profile-card"><div className="avatar"><BrandMark /></div><div><h1>Jaquelin Medina</h1><p>jaquelin@vani... · Cliente VaniDaxi</p></div><CircleUserRound size={18} className="profile-user" /></div><div className="profile-list">{rows.map(([Icon, label, action], i) => <button key={i} onClick={action}><Icon size={17} /><span>{label}</span>{label === 'Notificaciones' && notificationCount > 0 && <i className="notif">{notificationCount}</i>}<ChevronRight size={15} /></button>)}</div><div className="profile-summary"><span><b>{ordersCount}</b><small>Pedidos</small></span><span><b>{favoritesCount}</b><small>Favoritos</small></span><span><b>{cartCount}</b><small>En carrito</small></span></div></main>
 }
 
-function CartScreen({ go, cart, updateQty, removeCart, checkout }) {
-  const total = cart.reduce((s, item) => s + item.product.price * item.qty, 0)
-  return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>VaniDaxi</span><h1>Mi carrito</h1></div>
-    {cart.length === 0 ? <EmptyState title="Tu carrito está vacío" text="Agrega tus productos favoritos para verlos aquí." action="Explorar productos" onClick={() => go('products')} /> : <><div className="cart-items">{cart.map((item, i) => <div className="cart-item" key={`${item.product.id}-${item.color}-${item.size}`}><img src={item.product.image} alt={item.product.name} /><div><b>{item.product.name}</b><small>{item.color} · {item.size}</small><strong>{money(item.product.price * item.qty)}</strong><div className="qty-mini"><button onClick={() => updateQty(i, -1)}><Minus size={12} /></button><span>{item.qty}</span><button onClick={() => updateQty(i, 1)}><Plus size={12} /></button></div></div><button className="remove" onClick={() => removeCart(i)} aria-label="Eliminar"><Trash2 size={15} /></button></div>)}</div><div className="cart-total"><div><span>Subtotal</span><b>{money(total)}</b></div><small>Impuestos calculados al confirmar.</small><button onClick={checkout}>Continuar con la compra <ChevronRight size={15} /></button></div></>}
-  </main>
+function OrdersScreen({ go, orders }) { return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>Tu historial</span><h1>Mis pedidos</h1><p>Consulta el estado de cada compra.</p></div>{orders.length ? <div className="orders-list">{orders.map(order => <article className="order-card" key={order.id}><div className="order-top"><div><b>#{order.id}</b><small>{order.date}</small></div><span className="status-pill">{order.status}</span></div><div className="order-items">{order.items.slice(0, 3).map((item, i) => <div key={i}><img src={item.product.image} alt={item.product.name} /><span>{item.product.name}<small>{item.qty} × {money(item.product.price)}</small></span></div>)}</div><div className="order-bottom"><span>{order.items.reduce((s, x) => s + x.qty, 0)} artículos</span><b>{money(order.total)}</b></div></article>)}</div> : <EmptyState title="Aún no tienes pedidos" text="Cuando completes una compra, aparecerá aquí." action="Explorar productos" onClick={() => go('products')} />}</main> }
+
+function CheckoutScreen({ go, cart, address, setAddress, payment, setPayment, placeOrder }) {
+  const subtotal = cart.reduce((s, item) => s + item.product.price * item.qty, 0); const shipping = subtotal >= 799 ? 0 : 79; const total = subtotal + shipping; const ready = cart.length > 0 && address.street && address.city && address.zip
+  return <main className="scroll-page checkout-page"><Header go={go} simple /><div className="page-heading"><span>Compra segura</span><h1>Finalizar pedido</h1><p>Confirma tus datos antes de pagar.</p></div><section className="checkout-section"><div className="checkout-title"><MapPin size={15} /><b>Dirección de entrega</b></div><input value={address.name} onChange={e => setAddress({ ...address, name: e.target.value })} placeholder="Nombre completo"/><input value={address.street} onChange={e => setAddress({ ...address, street: e.target.value })} placeholder="Calle y número"/><div className="two-fields"><input value={address.city} onChange={e => setAddress({ ...address, city: e.target.value })} placeholder="Ciudad"/><input value={address.zip} onChange={e => setAddress({ ...address, zip: e.target.value })} placeholder="C.P." inputMode="numeric" /></div></section><section className="checkout-section"><div className="checkout-title"><CreditCard size={15} /><b>Método de pago</b></div><div className="payment-options">{['Tarjeta', 'Contra entrega'].map(method => <button key={method} className={payment.method === method ? 'active' : ''} onClick={() => setPayment({ ...payment, method })}>{method}</button>)}</div>{payment.method === 'Tarjeta' && <input value={payment.detail} onChange={e => setPayment({ ...payment, detail: e.target.value })} placeholder="Últimos 4 dígitos (ej. 4242)" inputMode="numeric" />}</section><section className="checkout-summary"><div><span>Subtotal</span><b>{money(subtotal)}</b></div><div><span>Envío</span><b>{shipping ? money(shipping) : 'Gratis'}</b></div><div className="total-line"><span>Total</span><b>{money(total)}</b></div><button disabled={!ready} onClick={() => placeOrder({ address, payment })}>Confirmar pedido <Check size={15} /></button>{!ready && <small>Completa la dirección para continuar.</small>}</section></main>
+}
+
+function CartScreen({ go, cart, updateQty, removeCart, checkout }) { const total = cart.reduce((s, item) => s + item.product.price * item.qty, 0); return <main className="scroll-page"><Header go={go} simple /><div className="page-heading"><span>VaniDaxi</span><h1>Mi carrito</h1><p>Revisa tus productos antes de continuar.</p></div>{cart.length === 0 ? <EmptyState title="Tu carrito está vacío" text="Agrega tus productos favoritos para verlos aquí." action="Explorar productos" onClick={() => go('products')} /> : <><div className="cart-items">{cart.map((item, i) => <div className="cart-item" key={`${item.product.id}-${item.color}-${item.size}`}><img src={item.product.image} alt={item.product.name} /><div><b>{item.product.name}</b><small>{item.color} · {item.size}</small><strong>{money(item.product.price * item.qty)}</strong><div className="qty-mini"><button onClick={() => updateQty(i, -1)}><Minus size={12} /></button><span>{item.qty}</span><button onClick={() => updateQty(i, 1)}><Plus size={12} /></button></div></div><button className="remove" onClick={() => removeCart(i)} aria-label="Eliminar"><Trash2 size={15} /></button></div>)}</div><div className="cart-total"><div><span>Subtotal</span><b>{money(total)}</b></div><small>El envío se calcula al confirmar la dirección.</small><button onClick={checkout}>Continuar con la compra <ChevronRight size={15} /></button></div></>}</main> }
+
+function AccountModal({ type, onClose, address, setAddress, payment, setPayment, notificationCount, setNotificationCount, notify }) {
+  const titles = { address: 'Direcciones de envío', payment: 'Métodos de pago', notifications: 'Notificaciones', help: 'Ayuda y soporte', settings: 'Configuración' }
+  return <div className="modal-backdrop" onClick={onClose}><section className="account-modal" onClick={e => e.stopPropagation()}><div className="modal-head"><h2>{titles[type]}</h2><button onClick={onClose} aria-label="Cerrar"><X size={18} /></button></div>
+    {type === 'address' && <div className="modal-body"><label>Nombre<input value={address.name} onChange={e => setAddress({ ...address, name: e.target.value })} /></label><label>Calle y número<input value={address.street} onChange={e => setAddress({ ...address, street: e.target.value })} placeholder="Ej. Av. Principal 123" /></label><div className="two-fields"><label>Ciudad<input value={address.city} onChange={e => setAddress({ ...address, city: e.target.value })} /></label><label>C.P.<input value={address.zip} onChange={e => setAddress({ ...address, zip: e.target.value })} /></label></div><button className="modal-primary" onClick={() => { notify('Dirección guardada'); onClose() }}>Guardar dirección</button></div>}
+    {type === 'payment' && <div className="modal-body"><div className="saved-payment"><CreditCard size={18} /><div><b>{payment.method}</b><small>{payment.detail || 'Sin método guardado'}</small></div></div><div className="payment-options">{['Tarjeta', 'Contra entrega'].map(method => <button key={method} className={payment.method === method ? 'active' : ''} onClick={() => setPayment({ ...payment, method })}>{method}</button>)}</div>{payment.method === 'Tarjeta' && <label>Últimos 4 dígitos<input value={payment.detail} onChange={e => setPayment({ ...payment, detail: e.target.value })} placeholder="4242" inputMode="numeric" /></label>}<button className="modal-primary" onClick={() => { notify('Método de pago guardado'); onClose() }}>Guardar método</button></div>}
+    {type === 'notifications' && <div className="modal-body"><div className="notification-item"><Bell size={18} /><div><b>Ofertas y novedades</b><small>Tienes {notificationCount} notificaciones pendientes.</small></div></div><button className="modal-primary" onClick={() => { setNotificationCount(0); notify('Notificaciones marcadas como leídas'); onClose() }}>Marcar como leídas</button></div>}
+    {type === 'help' && <div className="modal-body help-content"><div><HelpCircle size={22} /><b>Centro de ayuda</b><p>Consulta preguntas frecuentes, envíos, devoluciones y pagos.</p></div><button className="modal-primary" onClick={() => notify('Solicitud enviada a soporte')}>Contactar soporte</button></div>}
+    {type === 'settings' && <div className="modal-body settings-list"><button><span>Privacidad</span><ChevronRight size={15} /></button><button><span>Preferencias</span><ChevronRight size={15} /></button><button><span>Términos y condiciones</span><ChevronRight size={15} /></button></div>}
+  </section></div>
 }
 
 function EmptyState({ title, text, action, onClick }) { return <div className="empty"><ShoppingBag size={42} /><h2>{title}</h2><p>{text}</p><button onClick={onClick}>{action}</button></div> }
 function SectionTitle({ title, action, onClick }) { return <div className="section-title"><h2>{title}</h2>{action && <button onClick={onClick}>{action} <ChevronRight size={12} /></button>}</div> }
-
-function BottomNav({ screen, go, cartCount }) {
-  const items = [[Home, 'Inicio', 'home'], [Grid2X2, 'Categorías', 'categories'], [Heart, 'Favoritos', 'favorites'], [UserRound, 'Perfil', 'profile']]
-  return <nav className="bottom-nav">{items.map(([Icon, label, target]) => <button key={label} className={screen === target ? 'active' : ''} onClick={() => go(target)}><Icon size={18} /><span>{label}</span></button>)}<button className="floating-bag" onClick={() => go('cart')} aria-label="Carrito"><ShoppingBag size={19} />{cartCount > 0 && <i>{cartCount}</i>}</button></nav>
-}
+function BottomNav({ screen, go, cartCount }) { const items = [[Home, 'Inicio', 'home'], [Grid2X2, 'Categorías', 'categories'], [Heart, 'Favoritos', 'favorites'], [UserRound, 'Perfil', 'profile']]; return <nav className="bottom-nav">{items.map(([Icon, label, target]) => <button key={label} className={screen === target ? 'active' : ''} onClick={() => go(target)}><Icon size={18} /><span>{label}</span></button>)}<button className="floating-bag" onClick={() => go('cart')} aria-label="Carrito"><ShoppingBag size={19} />{cartCount > 0 && <i>{cartCount}</i>}</button></nav> }
