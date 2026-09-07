@@ -5,7 +5,6 @@ import App from "./App.jsx";
 import "./styles.css";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-
 const redirectPath = new URLSearchParams(window.location.search).get("p");
 
 if (redirectPath) {
