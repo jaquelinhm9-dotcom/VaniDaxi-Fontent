@@ -2203,7 +2203,7 @@ function AuthPage({ onSuccess }) {
       if (forgotMode) {
         if (!email) throw new Error("Escribe tu correo electrónico.");
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/VaniDaxi-frontend/perfil`,
+          redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}perfil`,
         });
         if (resetError) throw resetError;
         setNotice("Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.");
@@ -2649,9 +2649,25 @@ function SellerDashboard({ user, products }) {
   );
 }
 
-function ProtectedRoute({ user, children }) {
+function ProtectedRoute({ user, authReady, children }) {
   const navigate = useNavigate();
-  useEffect(() => { if (!user) navigate("/login", { replace: true }); }, [user, navigate]);
+
+  useEffect(() => {
+    if (authReady && !user) {
+      navigate("/login", { replace: true });
+    }
+  }, [authReady, user, navigate]);
+
+  if (!authReady) {
+    return (
+      <main className="page-shell inner-page">
+        <div className="empty">
+          <p>Comprobando sesión...</p>
+        </div>
+      </main>
+    );
+  }
+
   if (!user) return null;
   return children;
 }
@@ -2667,6 +2683,7 @@ function App() {
   const [cart, setCart] = useState(() => readStorage(CART_KEY, []));
   const [favorites, setFavorites] = useState(() => readStorage(FAVORITES_KEY, []));
   const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
   const [search, setSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
 
@@ -2683,6 +2700,7 @@ function App() {
       if (!mounted) return;
       const sessionUser = sessionData?.session?.user || null;
       setUser(sessionUser);
+      setAuthReady(true);
       if (productResult?.data?.length) setProducts(productResult.data);
       if (sessionUser?.id) {
         const favoriteResult = await getFavorites(sessionUser.id);
@@ -2694,6 +2712,7 @@ function App() {
       if (!mounted) return;
       const nextUser = session?.user || null;
       setUser(nextUser);
+      setAuthReady(true);
       if (nextUser?.id) {
         const favoriteResult = await getFavorites(nextUser.id);
         if (mounted && favoriteResult?.data) setFavorites(favoriteResult.data);
@@ -2900,7 +2919,7 @@ function App() {
           }
         />
 
-        <Route path="/checkout" element={<ProtectedRoute user={user}><CheckoutPage cart={cart} user={user} onOrderCreated={() => { setCart([]); }} /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute user={user} authReady={authReady}><CheckoutPage cart={cart} user={user} onOrderCreated={() => { setCart([]); }} /></ProtectedRoute>} />
 
         <Route
           path="/notificaciones"
