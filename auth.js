@@ -32,8 +32,12 @@ export async function signUp(email, password, name = '', accountType = 'customer
   }
 }
 
-export async function signIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+export async function signIn(email, password, captchaToken = '') {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+    options: { captchaToken },
+  })
   if (error) throw new Error(error.message || 'Correo o contraseña incorrectos')
 
   const session = data?.session
