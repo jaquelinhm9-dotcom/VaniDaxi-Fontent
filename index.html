@@ -12,15 +12,7 @@
     <script>
       try {
         const raw = localStorage.getItem('vanidaxi-address')
-        if (raw) {
-          const data = JSON.parse(raw)
-          if (data && typeof data === 'object') {
-            data.name = 'Mi cuenta'
-            localStorage.setItem('vanidaxi-address', JSON.stringify(data))
-          }
-        } else {
-          localStorage.setItem('vanidaxi-address', JSON.stringify({ name: 'Mi cuenta', street: '', city: '', zip: '' }))
-        }
+        if (!raw) localStorage.setItem('vanidaxi-address', JSON.stringify({ name: '', street: '', city: '', zip: '' }))
       } catch (_) {}
     </script>
     <script src="./runtime-fixes.js"></script>
@@ -28,7 +20,6 @@
   <body>
     <div id="root"></div>
     <script type="module" src="./main.jsx"></script>
-    <script src="./auth-ui.js"></script>
     <script>
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {})
     </script>
