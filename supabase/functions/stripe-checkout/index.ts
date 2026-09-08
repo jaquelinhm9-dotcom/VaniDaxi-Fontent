@@ -6,7 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-
+const APP_ORIGIN = "https://jaquelinhm9-dotcom.github.io";
+const APP_PATH = "/VaniDaxi-Fontent/";
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const stripeSecret = Deno.env.get("STRIPE_SECRET_KEY");
@@ -14,6 +15,17 @@ const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession:
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+}
+
+function safeReturnUrl(value: unknown, fallback: string) {
+  if (typeof value !== "string" || !value.trim()) return fallback;
+  try {
+    const url = new URL(value);
+    if (url.origin !== APP_ORIGIN || url.pathname !== APP_PATH) return fallback;
+    return url.toString();
+  } catch {
+    return fallback;
+  }
 }
 
 Deno.serve(async (req) => {
@@ -61,8 +73,10 @@ Deno.serve(async (req) => {
   const rawSubtotalCents = rawItems.reduce((sum, item) => sum + item.cents * item.quantity, 0);
   if (rawSubtotalCents !== subtotalCents) return json({ error: "Order item total mismatch" }, 409);
 
-  const successUrl = body?.success_url || "https://jaquelinhm9-dotcom.github.io/VaniDaxi-Fontent/?payment=success&order=" + encodeURIComponent(orderId);
-  const cancelUrl = body?.cancel_url || "https://jaquelinhm9-dotcom.github.io/VaniDaxi-Fontent/?payment=cancelled&order=" + encodeURIComponent(orderId);
+  const successFallback = `${APP_ORIGIN}${APP_PATH}?payment=success&order=${encodeURIComponent(orderId)}`;
+  const cancelFallback = `${APP_ORIGIN}${APP_PATH}?payment=cancelled&order=${encodeURIComponent(orderId)}`;
+  const successUrl = safeReturnUrl(body?.success_url, successFallback);
+  const cancelUrl = safeReturnUrl(body?.cancel_url, cancelFallback);
 
   const params = new URLSearchParams();
   params.set("mode", "payment");
