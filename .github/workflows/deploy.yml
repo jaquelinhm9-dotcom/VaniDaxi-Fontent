@@ -16,6 +16,7 @@ concurrency:
 
 env:
   VITE_VANIDAXI_API_URL: https://oycwqpqoxgohzqivclzd.supabase.co/functions/v1/vanidaxi-api
+  VITE_HCAPTCHA_SITEKEY: ${{ secrets.VITE_HCAPTCHA_SITEKEY }}
 
 jobs:
   build:
