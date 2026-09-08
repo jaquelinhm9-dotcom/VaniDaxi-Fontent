@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://oycwqpqoxgohzqivclzd.supabase.co'
-// Vite env is preferred; the fallback is Supabase's public publishable key and is safe for browser use.
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
+// Vite env is preferred; the fallback is the project's active public publishable key.
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj'
 const STORAGE_KEY = 'vanidaxi-auth-session'
 
 function headers(extra = {}) {
