@@ -18,25 +18,32 @@ export async function fetchCatalog(){
 
 export async function loadCommercialState(){
   if(!uid())return null
+  const userId=encodeURIComponent(uid())
   const [favorites,addresses,cartRows,orders,profile]=await Promise.all([
-    rest(`favorites?select=product_id&user_id=eq.${encodeURIComponent(uid())}`),
-    rest(`addresses?select=*&user_id=eq.${encodeURIComponent(uid())}&order=is_default.desc,created_at.desc`),
-    rest(`carts?select=id,updated_at&user_id=eq.${encodeURIComponent(uid())}&limit=1`),
-    rest(`orders?select=id,order_number,status,subtotal,discount,shipping_cost,total,shipping_address,payment_provider,created_at&user_id=eq.${encodeURIComponent(uid())}&order=created_at.desc`),
-    rest(`profiles?select=id,full_name,username,avatar_url,phone,role,is_active&id=eq.${encodeURIComponent(uid())}&limit=1`)
+    rest(`favorites?select=product_id&user_id=eq.${userId}`),
+    rest(`addresses?select=*&user_id=eq.${userId}&order=is_default.desc,created_at.desc`),
+    rest(`carts?select=id,updated_at&user_id=eq.${userId}&limit=1`),
+    rest(`orders?select=id,order_number,status,subtotal,discount,shipping_cost,total,shipping_address,payment_provider,created_at&user_id=eq.${userId}&order=created_at.desc`),
+    rest(`profiles?select=id,full_name,username,avatar_url,phone,role,is_active&id=eq.${userId}&limit=1`)
   ])
   let cart=[]
   if(cartRows?.[0]?.id)cart=await rest(`cart_items?select=product_id,quantity,cart_id&cart_id=eq.${encodeURIComponent(cartRows[0].id)}`)||[]
-  return {favorites:(favorites||[]).map(x=>x.product_id),addresses:addresses||[],cart,orders:orders||[],profile:profile?.[0]||null}
+  const orderIds=(orders||[]).map(x=>x.id).filter(Boolean)
+  let orderItems=[]
+  if(orderIds.length)orderItems=await rest(`order_items?select=order_id,product_id,product_name,quantity,unit_price,total_price&order_id=in.(${orderIds.map(encodeURIComponent).join(',')})`)||[]
+  const grouped=new Map()
+  for(const x of orderItems){const a=grouped.get(x.order_id)||[];a.push(x);grouped.set(x.order_id,a)}
+  return {favorites:(favorites||[]).map(x=>x.product_id),addresses:addresses||[],cart,orders:(orders||[]).map(o=>({...o,items:grouped.get(o.id)||[]})),profile:profile?.[0]||null}
 }
 
 export async function syncProfile(){
   if(!uid())return false
-  const current=await rest(`profiles?select=id,full_name,username,phone& id=eq.${encodeURIComponent(uid())}&limit=1`.replace('?select=id,full_name,username,phone& id','?select=id,full_name,username,phone&id'))
+  const id=encodeURIComponent(uid())
+  const current=await rest(`profiles?select=id,full_name,username,phone&id=${id}&limit=1`)
   const u=session()?.user||{}
   const metadata=u.user_metadata||{}
   const row={id:uid(),full_name:metadata.name||metadata.full_name||u.email?.split('@')[0]||'Usuario'}
-  if(current?.[0])await rest(`profiles?id=eq.${encodeURIComponent(uid())}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
+  if(current?.[0])await rest(`profiles?id=${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
   else await rest('profiles',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
   return true
 }
@@ -76,7 +83,7 @@ export async function createCommercialOrder(order,catalog){
   if(!uid()||!order?.items?.length)return null
   const mapped=(order.items||[]).map(x=>{const p=(catalog||[]).find(p=>String(p.id)===String(x.product?.id)||p.slug===x.product?.slug);return p?{p,x}:null}).filter(Boolean)
   if(mapped.length!==order.items.length)return null
-  const subtotal=mapped.reduce((sum,{x})=>sum+Number(x.product?.price||0)*Number(x.qty||1),0)
+  const subtotal=mapped.reduce((sum,{x,p})=>sum+Number(p.price||x.product?.price||0)*Number(x.qty||1),0)
   const total=Number(order.total||subtotal)
   const shipping=Math.max(0,total-subtotal)
   const number=order.id||`VD-${Date.now()}`
