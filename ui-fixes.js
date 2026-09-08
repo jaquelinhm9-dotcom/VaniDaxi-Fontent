@@ -1,61 +1,70 @@
-/* VaniDaxi — barra de menú y ajuste visual coordinado */
-(() => {
-  const labels = {
-    home: ['Inicio','home'],
-    offers: ['Ofertas','offers'],
-    categories: ['Categorías','categories'],
-    favorites: ['Favoritos','favorites'],
-    profile: ['Perfil','profile']
-  }
-  const routeByExistingButton = route => {
-    const [label] = labels[route] || []
-    if (!label) return
-    const buttons = [...document.querySelectorAll('button')]
-    const candidates = buttons.filter(b => (b.textContent || '').trim().toLowerCase().includes(label.toLowerCase()))
-    const target = candidates.find(b => !b.closest('.vd-menu')) || candidates[0]
-    if (target) target.click()
-  }
-  const style = document.createElement('style')
-  style.textContent = `
-    .vd-menu{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:7px 0 4px;margin:0 0 5px;border-bottom:1px solid rgba(112,66,154,.08)}
-    .vd-menu::-webkit-scrollbar{display:none}
-    .vd-menu button{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:8px 11px;border:1px solid rgba(112,66,154,.10);border-radius:12px;background:rgba(255,255,255,.92);color:#6f6374;font:700 9px/1 system-ui,sans-serif;box-shadow:0 4px 12px rgba(83,48,104,.05);white-space:nowrap}
-    .vd-menu button.active{background:#70429a;color:#fff;border-color:#70429a}
-    .vd-menu button:active{transform:scale(.97)}
-    .header{padding-bottom:5px!important}
-    .home-hero{margin-top:6px!important}
-    .section-title{padding-top:11px!important;padding-bottom:7px!important}
-    .product-grid{gap:11px!important}
-    .product-row{gap:10px!important}
-    .category-grid{gap:10px!important}
-    .category-tile{height:124px!important}
-    .profile-page,.scroll-page{padding-bottom:94px!important}
-    .bottom-nav{left:9px!important;right:9px!important;bottom:7px!important;height:66px!important;border-radius:18px!important;box-shadow:0 10px 26px rgba(66,40,80,.14)!important}
-    .cart-item{margin-bottom:9px!important}
-    .cart-total{margin-top:10px!important}
-    @media(max-width:360px){.vd-menu{gap:5px}.vd-menu button{padding:7px 9px;font-size:8px}}
-  `
-  document.head.appendChild(style)
-  function mountMenu() {
-    document.querySelectorAll('.header').forEach(header => {
-      if (header.querySelector('.vd-menu')) return
-      const menu = document.createElement('nav')
-      menu.className = 'vd-menu'
-      menu.setAttribute('aria-label','Menú principal')
-      Object.entries(labels).forEach(([route,[label]]) => {
-        const b = document.createElement('button')
-        b.type = 'button'
-        b.textContent = label
-        b.dataset.route = route
-        b.addEventListener('click', () => routeByExistingButton(route))
-        menu.appendChild(b)
+/* VaniDaxi — navegación y compactación montadas después del render de React. */
+export function mountVaniDaxiUi(){
+  const root=document.getElementById('root')
+  if(!root)return
+
+  const headers=[...root.querySelectorAll('.header')].filter(h=>!h.closest('.detail-page'))
+  headers.forEach(header=>{
+    let menu=header.querySelector('.vd-main-menu')
+    if(!menu){
+      menu=document.createElement('nav')
+      menu.className='vd-main-menu'
+      menu.setAttribute('aria-label','Menú principal de VaniDaxi')
+      const items=[
+        ['home','Inicio','⌂'],
+        ['offers','Ofertas','✦'],
+        ['categories','Categorías','◈'],
+        ['favorites','Favoritos','♡'],
+        ['cart','Carrito','🛒'],
+        ['profile','Perfil','◉']
+      ]
+      items.forEach(([route,label,icon])=>{
+        const button=document.createElement('button')
+        button.type='button'
+        button.dataset.route=route
+        button.innerHTML=`<span class="vd-menu-icon" aria-hidden="true">${icon}</span><span>${label}</span>`
+        button.addEventListener('click',()=>activateRoute(route))
+        menu.appendChild(button)
       })
       header.appendChild(menu)
+    }
+    syncMenuState(menu)
+  })
+
+  document.querySelectorAll('.bottom-nav').forEach(nav=>{
+    nav.classList.add('vd-bottom-nav-ready')
+    nav.querySelectorAll('button').forEach(button=>{
+      const text=(button.textContent||'').trim().toLowerCase()
+      if(text.includes('carrito'))button.classList.add('vd-cart-action')
+      if(text.includes('perfil'))button.classList.add('vd-profile-action')
     })
-    const current = document.querySelector('.bottom-nav button.active')?.textContent?.trim().toLowerCase() || ''
-    document.querySelectorAll('.vd-menu button').forEach(b => b.classList.toggle('active',b.textContent.trim().toLowerCase()===current))
+  })
+
+  document.querySelectorAll('.scroll-page').forEach(page=>page.classList.add('vd-compact-page'))
+  document.querySelectorAll('.product-grid,.product-row,.icon-categories,.mini-category-grid').forEach(el=>el.classList.add('vd-compact-grid'))
+}
+
+function activateRoute(route){
+  if(route==='cart'){
+    const button=findBottomButton('carrito')
+    if(button){button.click();return}
   }
-  window.addEventListener('load', () => setTimeout(mountMenu, 250))
-  new MutationObserver(() => mountMenu()).observe(document.documentElement,{childList:true,subtree:true})
-  mountMenu()
-})()
+  const labels={home:'inicio',offers:'ofertas',categories:'categorías',favorites:'favoritos',profile:'perfil'}
+  const target=labels[route]
+  if(target){
+    const button=findBottomButton(target)
+    if(button){button.click();return}
+  }
+}
+
+function findBottomButton(label){
+  return [...document.querySelectorAll('.bottom-nav button')].find(button=>(button.textContent||'').trim().toLowerCase().includes(label))||null
+}
+
+function syncMenuState(menu){
+  const active=(document.querySelector('.bottom-nav button.active')?.textContent||'').trim().toLowerCase()
+  menu.querySelectorAll('button').forEach(button=>{
+    const label=(button.textContent||'').trim().toLowerCase()
+    button.classList.toggle('active',Boolean(active&&label.includes(active.split(' ')[0])))
+  })
+}
