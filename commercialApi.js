@@ -6,6 +6,7 @@ const session=()=>{try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null')
 const token=()=>session()?.access_token||''
 const uid=()=>session()?.user?.id||''
 async function rest(path,options={}){const r=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{...options,headers:{...headers(token()),...(options.headers||{})}});if(!r.ok){const e=await r.text().catch(()=> '');throw new Error(e||`Supabase ${r.status}`)}return r.status===204?null:r.json().catch(()=>null)}
+async function rpc(name,body){const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:'POST',headers:headers(token()),body:JSON.stringify(body||{})});if(!r.ok){const e=await r.text().catch(()=> '');throw new Error(e||`Supabase ${r.status}`)}return r.json().catch(()=>null)}
 function read(k,d){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}}
 
 export async function fetchCatalog(){
@@ -23,14 +24,14 @@ export async function loadCommercialState(){
     rest(`favorites?select=product_id&user_id=eq.${userId}`),
     rest(`addresses?select=*&user_id=eq.${userId}&order=is_default.desc,created_at.desc`),
     rest(`carts?select=id,updated_at&user_id=eq.${userId}&limit=1`),
-    rest(`orders?select=id,order_number,status,subtotal,discount,shipping_cost,total,shipping_address,payment_provider,created_at&user_id=eq.${userId}&order=created_at.desc`),
+    rest(`orders?select=id,order_number,status,subtotal,discount,shipping_cost,total,shipping_address,payment_provider,delivery_provider,delivery_status,delivery_tracking,delivery_notes,delivery_custody,delivery_updated_at,delivery_handoff_at,delivery_received_at,delivered_at,created_at&user_id=eq.${userId}&order=created_at.desc`),
     rest(`profiles?select=id,full_name,username,avatar_url,phone,role,is_active&id=eq.${userId}&limit=1`)
   ])
   let cart=[]
   if(cartRows?.[0]?.id)cart=await rest(`cart_items?select=product_id,quantity,cart_id&cart_id=eq.${encodeURIComponent(cartRows[0].id)}`)||[]
   const orderIds=(orders||[]).map(x=>x.id).filter(Boolean)
   let orderItems=[]
-  if(orderIds.length)orderItems=await rest(`order_items?select=order_id,product_id,product_name,quantity,unit_price,total_price&order_id=in.(${orderIds.map(encodeURIComponent).join(',')})`)||[]
+  if(orderIds.length)orderItems=await rest(`order_items?select=id,order_id,product_id,product_name,quantity,unit_price,total_price,seller_id&order_id=in.(${orderIds.map(encodeURIComponent).join(',')})`)||[]
   const grouped=new Map()
   for(const x of orderItems){const a=grouped.get(x.order_id)||[];a.push(x);grouped.set(x.order_id,a)}
   return {favorites:(favorites||[]).map(x=>x.product_id),addresses:addresses||[],cart,orders:(orders||[]).map(o=>({...o,items:grouped.get(o.id)||[]})),profile:profile?.[0]||null}
@@ -87,7 +88,7 @@ export async function createCommercialOrder(order,catalog){
   const total=Number(order.total||subtotal)
   const shipping=Math.max(0,total-subtotal)
   const number=order.id||`VD-${Date.now()}`
-  const existing=await rest(`orders?select=id,order_number&user_id=eq.${encodeURIComponent(uid())}&order_number=eq.${encodeURIComponent(number)}&limit=1`)
+  const existing=await rest(`orders?select=id,order_number,delivery_provider,delivery_status&user_id=eq.${encodeURIComponent(uid())}&order_number=eq.${encodeURIComponent(number)}&limit=1`)
   if(existing?.[0])return existing[0]
   const created=await rest('orders',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({user_id:uid(),order_number:number,status:'pending',subtotal,discount:0,shipping_cost:shipping,total,shipping_address:order.address||null,payment_provider:order.payment?.method||null})})
   const row=created?.[0]
@@ -97,14 +98,34 @@ export async function createCommercialOrder(order,catalog){
   return row
 }
 
+export async function updateOrderDelivery(orderId,status,tracking=null,notes=null){
+  if(!uid()||!orderId)return null
+  return await rpc('update_order_delivery',{p_order_id:orderId,p_status:status,p_tracking:tracking,p_notes:notes})
+}
+
+export async function loadOrderDeliveryEvents(orderId){
+  if(!uid()||!orderId)return []
+  return await rest(`order_delivery_events?select=id,order_id,status,custody,actor_id,notes,tracking,created_at&order_id=eq.${encodeURIComponent(orderId)}&order=created_at.asc`)||[]
+}
+
+export async function createReturnRequest(payload){
+  if(!uid()||!payload?.order_id||!payload?.order_item_id||!payload?.reason)return null
+  const rows=await rest('returns',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({order_id:payload.order_id,order_item_id:payload.order_item_id,user_id:uid(),seller_id:payload.seller_id||null,reason:payload.reason,details:payload.details||null,refund_amount:Number(payload.refund_amount||0)})})
+  return rows?.[0]||null
+}
+export async function loadMyReturns(){
+  if(!uid())return []
+  return await rest(`returns?select=id,order_id,order_item_id,seller_id,reason,details,status,refund_amount,resolution_notes,requested_at,resolved_at,created_at,updated_at&user_id=eq.${encodeURIComponent(uid())}&order=created_at.desc`)||[]
+}
+
 export async function loadProductReviews(productId){
   if(!productId)return []
   return await rest(`reviews?select=id,product_id,user_id,order_id,rating,title,comment,created_at&product_id=eq.${encodeURIComponent(productId)}&is_approved=eq.true&order=created_at.desc`)||[]
 }
 
 export async function createReview(review){
-  if(!uid()||!review?.product_id||!review?.rating)return null
-  const rows=await rest('reviews',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({product_id:review.product_id,user_id:uid(),order_id:review.order_id||null,rating:Math.min(5,Math.max(1,Number(review.rating))),title:review.title||null,comment:review.comment||null})})
+  if(!uid()||!review?.product_id||!review?.rating||!review?.order_id)return null
+  const rows=await rest('reviews',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({product_id:review.product_id,user_id:uid(),order_id:review.order_id,rating:Math.min(5,Math.max(1,Number(review.rating))),title:review.title||null,comment:review.comment||null})})
   return rows?.[0]||null
 }
 
