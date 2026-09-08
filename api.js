@@ -27,7 +27,6 @@ function readState() {
   for (const key of stateKeys) {
     try { state[key] = JSON.parse(localStorage.getItem(key) || 'null') } catch { state[key] = null }
   }
-  // Never send raw payment details to a guest persistence endpoint.
   if (state['vanidaxi-payment'] && typeof state['vanidaxi-payment'] === 'object') {
     state['vanidaxi-payment'] = { method: state['vanidaxi-payment'].method || 'Tarjeta' }
   }
@@ -36,16 +35,23 @@ function readState() {
 
 async function request(path, options = {}) {
   if (!API_URL) return null
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-VaniDaxi-Device': deviceId(),
-      ...(options.headers || {}),
-    },
-  })
-  if (!response.ok) throw new Error(`VaniDaxi API ${response.status}`)
-  return response.status === 204 ? null : response.json()
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), 9000)
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-VaniDaxi-Device': deviceId(),
+        ...(options.headers || {}),
+      },
+    })
+    if (!response.ok) throw new Error(`VaniDaxi API ${response.status}`)
+    return response.status === 204 ? null : response.json()
+  } finally {
+    window.clearTimeout(timeout)
+  }
 }
 
 export async function hydrateVaniDaxi() {
@@ -68,13 +74,14 @@ export function syncVaniDaxiState() {
   if (!API_URL) return
   window.clearTimeout(syncTimer)
   syncTimer = window.setTimeout(async () => {
-    try { await request('/state', { method: 'PUT', body: JSON.stringify({ state: readState() }) }) }
+    try { await request('/state', { method: 'PUT', body: JSON.stringify(readState()) }) }
     catch (error) { console.warn('[VaniDaxi] state sync failed:', error) }
   }, 350)
 }
 
 export function startVaniDaxiSync() {
-  if (!API_URL) return
+  if (!API_URL || startVaniDaxiSync.started) return
+  startVaniDaxiSync.started = true
   const original = localStorage.setItem.bind(localStorage)
   localStorage.setItem = (key, value) => {
     original(key, value)
@@ -88,5 +95,5 @@ export const vanidaxiApi = {
   enabled: Boolean(API_URL),
   deviceId,
   getState: () => request('/state'),
-  saveState: state => request('/state', { method: 'PUT', body: JSON.stringify({ state }) }),
+  saveState: state => request('/state', { method: 'PUT', body: JSON.stringify(state) }),
 }
