@@ -6,17 +6,18 @@ const session=()=>{try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null')
 const token=()=>session()?.access_token||''
 const uid=()=>session()?.user?.id||''
 async function rest(path,options={}){const r=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{...options,headers:{...headers(token()),...(options.headers||{})}});if(!r.ok){const e=await r.text().catch(()=> '');throw new Error(e||`Supabase ${r.status}`)}return r.status===204?null:r.json().catch(()=>null)}
+function read(k,d){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}}
 
 export async function fetchCatalog(){
   const [categories,items]=await Promise.all([
     rest('categories?select=id,name,slug,description,image_url,is_active&is_active=eq.true&order=name'),
-    rest('products?select=id,category_id,name,slug,description,price,compare_at_price,stock,image_url,images,status&status=eq.approved&order=created_at.desc')
+    rest('products?select=id,seller_id,category_id,name,slug,description,price,compare_at_price,stock,sku,image_url,images,status,created_at&status=eq.approved&order=created_at.desc')
   ])
   return {categories:categories||[],products:items||[]}
 }
 
 export async function loadCommercialState(){
-  if(!uid()) return null
+  if(!uid())return null
   const [favorites,addresses,cartRows,orders,profile]=await Promise.all([
     rest(`favorites?select=product_id&user_id=eq.${encodeURIComponent(uid())}`),
     rest(`addresses?select=*&user_id=eq.${encodeURIComponent(uid())}&order=is_default.desc,created_at.desc`),
@@ -25,64 +26,103 @@ export async function loadCommercialState(){
     rest(`profiles?select=id,full_name,username,avatar_url,phone,role,is_active&id=eq.${encodeURIComponent(uid())}&limit=1`)
   ])
   let cart=[]
-  if(cartRows?.[0]?.id){
-    const rows=await rest(`cart_items?select=product_id,quantity,cart_id&cart_id=eq.${encodeURIComponent(cartRows[0].id)}`)
-    cart=rows||[]
-  }
+  if(cartRows?.[0]?.id)cart=await rest(`cart_items?select=product_id,quantity,cart_id&cart_id=eq.${encodeURIComponent(cartRows[0].id)}`)||[]
   return {favorites:(favorites||[]).map(x=>x.product_id),addresses:addresses||[],cart,orders:orders||[],profile:profile?.[0]||null}
 }
 
+export async function syncProfile(){
+  if(!uid())return false
+  const current=await rest(`profiles?select=id,full_name,username,phone& id=eq.${encodeURIComponent(uid())}&limit=1`.replace('?select=id,full_name,username,phone& id','?select=id,full_name,username,phone&id'))
+  const u=session()?.user||{}
+  const metadata=u.user_metadata||{}
+  const row={id:uid(),full_name:metadata.name||metadata.full_name||u.email?.split('@')[0]||'Usuario'}
+  if(current?.[0])await rest(`profiles?id=eq.${encodeURIComponent(uid())}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
+  else await rest('profiles',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
+  return true
+}
+
 export async function syncFavorites(productIds){
-  if(!uid()) return false
+  if(!uid())return false
+  const ids=(productIds||[]).filter(x=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(x)))
   const existing=await rest(`favorites?select=id,product_id&user_id=eq.${encodeURIComponent(uid())}`)||[]
-  const want=new Set(productIds.map(String));const have=new Map(existing.map(x=>[String(x.product_id),x]))
-  const remove=existing.filter(x=>!want.has(String(x.product_id))).map(x=>rest(`favorites?id=eq.${encodeURIComponent(x.id)}&user_id=eq.${encodeURIComponent(uid())}`,{method:'DELETE'}))
-  const add=productIds.filter(id=>!have.has(String(id))).map(product_id=>rest('favorites',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({user_id:uid(),product_id})}))
-  await Promise.all([...remove,...add]);return true
+  const want=new Set(ids.map(String));const have=new Map(existing.map(x=>[String(x.product_id),x]))
+  await Promise.all(existing.filter(x=>!want.has(String(x.product_id))).map(x=>rest(`favorites?id=eq.${encodeURIComponent(x.id)}&user_id=eq.${encodeURIComponent(uid())}`,{method:'DELETE'})))
+  await Promise.all(ids.filter(id=>!have.has(String(id))).map(product_id=>rest('favorites',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({user_id:uid(),product_id})})))
+  return true
 }
 
 export async function syncAddress(address){
-  if(!uid()||!address?.street||!address?.city||!address?.zip) return false
+  if(!uid()||!address?.street||!address?.city||!address?.zip)return false
   const current=await rest(`addresses?select=id&user_id=eq.${encodeURIComponent(uid())}&is_default=eq.true&limit=1`)
   const row={user_id:uid(),full_name:address.name||'Mi cuenta',phone:address.phone||null,address_line1:address.street,address_line2:address.line2||null,city:address.city,state:address.state||'',postal_code:address.zip,country:address.country||'México',is_default:true}
-  if(current?.[0]?.id) await rest(`addresses?id=eq.${encodeURIComponent(current[0].id)}&user_id=eq.${encodeURIComponent(uid())}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
+  if(current?.[0]?.id)await rest(`addresses?id=eq.${encodeURIComponent(current[0].id)}&user_id=eq.${encodeURIComponent(uid())}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
   else await rest('addresses',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)})
   return true
 }
 
-export async function syncCart(cart, catalog){
-  if(!uid()) return false
+export async function syncCart(cart,catalog){
+  if(!uid())return false
   const remote=await rest(`carts?select=id&user_id=eq.${encodeURIComponent(uid())}&limit=1`)
   let cartId=remote?.[0]?.id
   if(!cartId){const made=await rest('carts',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({user_id:uid()})});cartId=made?.[0]?.id}
   if(!cartId)return false
   await rest(`cart_items?cart_id=eq.${encodeURIComponent(cartId)}`,{method:'DELETE'})
   const rows=(cart||[]).map(x=>{const p=(catalog||[]).find(p=>String(p.id)===String(x.product?.id)||p.slug===x.product?.slug);return p?.id?{cart_id:cartId,product_id:p.id,quantity:Math.max(1,Number(x.qty||1))}:null}).filter(Boolean)
-  if(rows.length) await rest('cart_items',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(rows)})
+  if(rows.length)await rest('cart_items',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(rows)})
   return true
 }
 
 export async function createCommercialOrder(order,catalog){
   if(!uid()||!order?.items?.length)return null
-  const subtotal=order.items.reduce((sum,x)=>sum+Number(x.product?.price||0)*Number(x.qty||1),0)
-  const shipping=0;const discount=Math.max(0,subtotal-Number(order.total||subtotal));const number=order.id||`VD-${Date.now()}`
-  const created=await rest('orders',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({user_id:uid(),order_number:number,status:'pending',subtotal,discount,shipping_cost:shipping,total:Number(order.total||subtotal),shipping_address:order.address||null,payment_provider:order.payment?.method||null})})
-  return created?.[0]||null
+  const mapped=(order.items||[]).map(x=>{const p=(catalog||[]).find(p=>String(p.id)===String(x.product?.id)||p.slug===x.product?.slug);return p?{p,x}:null}).filter(Boolean)
+  if(mapped.length!==order.items.length)return null
+  const subtotal=mapped.reduce((sum,{x})=>sum+Number(x.product?.price||0)*Number(x.qty||1),0)
+  const total=Number(order.total||subtotal)
+  const shipping=Math.max(0,total-subtotal)
+  const number=order.id||`VD-${Date.now()}`
+  const existing=await rest(`orders?select=id,order_number&user_id=eq.${encodeURIComponent(uid())}&order_number=eq.${encodeURIComponent(number)}&limit=1`)
+  if(existing?.[0])return existing[0]
+  const created=await rest('orders',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({user_id:uid(),order_number:number,status:'pending',subtotal,discount:0,shipping_cost:shipping,total,shipping_address:order.address||null,payment_provider:order.payment?.method||null})})
+  const row=created?.[0]
+  if(!row)return null
+  const items=mapped.map(({p,x})=>({order_id:row.id,product_id:p.id,seller_id:p.seller_id||null,product_name:p.name,quantity:Math.max(1,Number(x.qty||1)),unit_price:Number(p.price||0),total_price:Number(p.price||0)*Math.max(1,Number(x.qty||1))}))
+  if(items.length)await rest('order_items',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(items)})
+  return row
+}
+
+export async function loadProductReviews(productId){
+  if(!productId)return []
+  return await rest(`reviews?select=id,product_id,user_id,order_id,rating,title,comment,created_at&product_id=eq.${encodeURIComponent(productId)}&is_approved=eq.true&order=created_at.desc`)||[]
+}
+
+export async function createReview(review){
+  if(!uid()||!review?.product_id||!review?.rating)return null
+  const rows=await rest('reviews',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({product_id:review.product_id,user_id:uid(),order_id:review.order_id||null,rating:Math.min(5,Math.max(1,Number(review.rating))),title:review.title||null,comment:review.comment||null})})
+  return rows?.[0]||null
+}
+
+export async function loadPromotions(){
+  return await rest('promotions?select=id,name,description,registration_message,promotion_type,discount_value,promo_code,automatic,registration_promotion,start_at,end_at,usage_limit,usage_count,is_active&is_active=eq.true&registration_promotion=eq.true&order=created_at.desc')||[]
 }
 
 export function startCommercialSync(catalogProvider=()=>[]){
   let timer
   const run=async()=>{
     if(!uid())return
-    const fav=read('vanidaxi-favorites',[]),cart=read('vanidaxi-cart',[]),addr=read('vanidaxi-address',null)
-    try{await syncFavorites(fav);await syncCart(cart,catalogProvider());if(addr)await syncAddress(addr)}catch(e){console.warn('[VaniDaxi commercial sync]',e.message)}
+    const catalog=catalogProvider()||[]
+    const fav=read('vanidaxi-favorites',[]),cart=read('vanidaxi-cart',[]),orders=read('vanidaxi-orders',[]),addr=read('vanidaxi-address',null)
+    try{
+      await syncProfile()
+      await Promise.all([syncFavorites(fav),syncCart(cart,catalog),addr?syncAddress(addr):Promise.resolve()])
+      for(const order of orders||[])await createCommercialOrder(order,catalog)
+      localStorage.setItem('vanidaxi-commercial-catalog',JSON.stringify(catalog))
+    }catch(e){console.warn('[VaniDaxi commercial sync]',e.message)}
   }
   const schedule=()=>{clearTimeout(timer);timer=setTimeout(run,700)}
-  const original=localStorage.setItem.bind(localStorage)
   if(!window.__vaniCommercialPatched){
-    localStorage.setItem=(k,v)=>{original(k,v);if(['vanidaxi-favorites','vanidaxi-cart','vanidaxi-address'].includes(k))schedule()}
+    const original=localStorage.setItem.bind(localStorage)
+    localStorage.setItem=(k,v)=>{original(k,v);if(['vanidaxi-favorites','vanidaxi-cart','vanidaxi-orders','vanidaxi-address'].includes(k))schedule()}
     window.__vaniCommercialPatched=true
   }
   run();return()=>clearTimeout(timer)
 }
-function read(k,d){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}}
