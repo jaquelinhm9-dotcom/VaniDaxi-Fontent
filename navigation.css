@@ -1,0 +1,21 @@
+.vd-main-menu{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:8px 0 4px;padding:5px;border:1px solid rgba(112,66,154,.10);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(250,246,252,.96));box-shadow:0 7px 20px rgba(74,43,91,.07);overflow:hidden}
+.vd-main-menu button{min-width:0;border:0;border-radius:11px;background:transparent;color:#766b7d;padding:7px 3px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:700 8px/1.05 Manrope,system-ui,sans-serif;cursor:pointer;transition:transform .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease}
+.vd-main-menu button:hover{transform:translateY(-1px);background:rgba(112,66,154,.055);color:#70429a}
+.vd-main-menu button:active{transform:scale(.96)}
+.vd-main-menu button.active{background:linear-gradient(135deg,#70429a,#9252a9);color:#fff;box-shadow:0 5px 14px rgba(112,66,154,.20)}
+.vd-menu-icon{font-size:14px;line-height:1}
+.header{gap:0!important}
+.header-row{margin-bottom:2px!important}
+.search{margin-top:5px!important}
+.vd-compact-page{padding-bottom:86px!important}
+.vd-compact-grid{gap:10px!important}
+.vd-bottom-nav-ready{left:10px!important;right:10px!important;bottom:7px!important;height:64px!important;border-radius:18px!important}
+.vd-bottom-nav-ready .vd-cart-action{order:5}
+.vd-bottom-nav-ready .vd-profile-action{order:4}
+.profile-list button,.cart-item{border-radius:15px!important;margin-bottom:8px!important}
+.cart-total{margin-top:9px!important}
+.checkout-card{margin-bottom:10px!important}
+.payment-options{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important;margin:9px 0!important}
+.payment-options button{min-height:58px!important;border-radius:14px!important;padding:8px 6px!important;font-size:9px!important;line-height:1.2!important;white-space:normal!important}
+@media(max-width:420px){.vd-main-menu{gap:4px;padding:4px}.vd-main-menu button{font-size:7.5px;padding:7px 2px}.vd-menu-icon{font-size:13px}.payment-options{gap:6px!important}.payment-options button{font-size:8px!important}}
+@media(max-width:350px){.vd-main-menu button{font-size:7px}.vd-main-menu{margin-top:6px}}
