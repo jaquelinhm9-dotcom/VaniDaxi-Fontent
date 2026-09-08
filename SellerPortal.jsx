@@ -7,7 +7,7 @@ const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-ses
 
 export default function SellerPortal({children}){
  const[role,setRole]=useState(''),[open,setOpen]=useState(false);
- useEffect(()=>{let alive=true;const check=async()=>{const s=session(),id=s?.user?.id;if(!id){if(alive)setRole('');return}try{const r=await fetch(`${URL}/rest/v1/profiles?select=role&id=eq.${encodeURIComponent(id)}&limit=1`,{headers:{apikey:KEY,Authorization:`Bearer ${s.access_token||KEY}`}});const rows=await r.json();if(alive)setRole(rows?.[0]?.role||'')}catch{if(alive)setRole('')}};check();const on=()=>check();window.addEventListener('vani-auth-changed',on);return()=>{alive=false;window.removeEventListener('vani-auth-changed',on)}},[]);
+ useEffect(()=>{let alive=true;const check=async()=>{const s=session(),id=s?.user?.id;if(!id){if(alive)setRole('');return}try{const r=await fetch(`${URL}/rest/v1/profiles?select=role&id=eq.${encodeURIComponent(id)}&limit=1`,{headers:{apikey:KEY,Authorization:`Bearer ${s.access_token||KEY}`}});const rows=await r.json();if(alive)setRole(rows?.[0]?.role||'')}catch{if(alive)setRole('')}};check();const timer=setInterval(check,2500);return()=>{alive=false;clearInterval(timer)}},[]);
  if(open)return <div className="seller-portal-overlay"><SellerDashboard go={()=>setOpen(false)}/></div>;
  return <>{children}{role==='seller'&&<button className="seller-launcher" onClick={()=>setOpen(true)}><span>▣</span> Panel de vendedor</button>}</>;
 }
