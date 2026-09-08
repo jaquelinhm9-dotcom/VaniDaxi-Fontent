@@ -11,7 +11,7 @@ const repairAppFixed = () => ({
     next = next.replace('import React,{useEffect', "import ProductReviews from './ProductReviews.jsx';import ReturnsPage from './ReturnsPage.jsx';import DeliveryOrders from './DeliveryOrders.jsx';import AuthChoice from './AuthChoice.jsx';import React,{useEffect")
     next = next.replace(/<Auth type=\{auth\} close=\{\(\)=>setAuth\(null\)\} done=\{logged\}\/>/g, '<AuthChoice type={auth} close={()=>setAuth(null)} done={logged}/>')
     next = next.replace(/<Orders go=\{go\} orders=\{orders\}\/>/g, '<DeliveryOrders go={go} orders={orders}/>')
-    next = next.replace(/<Detail go=\{go\} p=\{sel\} liked=\{fav\.has\(sel\.id\)\} toggle=\{\(\)=>toggle\(sel\.id\)\} add=\{add\} count=\{count\}/g, '<Detail go={go} p={sel} liked={fav.has(sel.id)} toggle={()=>toggle(sel.id)} add={add} count={count}/><ProductReviews product={sel} orders={orders}/><span data-vd-review-anchor="true"')
+    next = next.replace(/(<Detail[^>]*count=\{count\}\/>)/, '$1<ProductReviews product={sel} orders={orders}/>')
     next = next.replace(/\{s==='orders'&&<DeliveryOrders go=\{go\} orders=\{orders\}\/ >\}/g, "{s==='orders'&&<DeliveryOrders go={go} orders={orders}/>}{s==='returns'&&<ReturnsPage go={go}/>}")
     if (!next.includes("s==='returns'&&<ReturnsPage go={go}/>") && next.includes("s==='orders'&&<DeliveryOrders go={go} orders={orders}/>") ) next=next.replace("{s==='orders'&&<DeliveryOrders go={go} orders={orders}/>","{s==='orders'&&<DeliveryOrders go={go} orders={orders}/>}{s==='returns'&&<ReturnsPage go={go}/>")
     if (next === code) return null
