@@ -14,6 +14,9 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  VITE_VANIDAXI_API_URL: https://oycwqpqoxgohzqivclzd.supabase.co/functions/v1/vanidaxi-api
+
 jobs:
   build:
     runs-on: ubuntu-latest
