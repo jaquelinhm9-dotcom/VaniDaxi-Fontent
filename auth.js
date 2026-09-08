@@ -1,23 +1,35 @@
+import { supabase } from './supabaseClient.js'
+
 const SUPABASE_URL = 'https://oycwqpqoxgohzqivclzd.supabase.co'
 // Vite env is preferred; the fallback is the project's active public publishable key.
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj'
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
 const STORAGE_KEY = 'vanidaxi-auth-session'
 
 function headers(extra = {}) {
   return { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', ...extra }
 }
 
-export async function signUp(email, password, name = '', accountType = 'customer') {
+export async function signUp(email, password, name = '', accountType = 'customer', captchaToken = '') {
   const safeType = accountType === 'seller' ? 'seller' : 'customer'
-  const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({ email, password, data: { name, account_type: safeType } })
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { name, account_type: safeType },
+      captchaToken,
+      emailRedirectTo: window.location.origin + window.location.pathname,
+    },
   })
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(data.msg || data.message || data.error_description || 'No se pudo crear la cuenta')
-  if (data.access_token) saveSession(data)
-  return data
+  if (error) throw new Error(error.message || 'No se pudo crear la cuenta')
+
+  const session = data?.session
+  if (session?.access_token) saveSession(session)
+
+  return {
+    ...data,
+    access_token: session?.access_token || null,
+    refresh_token: session?.refresh_token || null,
+  }
 }
 
 export async function signIn(email, password) {
@@ -35,6 +47,7 @@ export async function signOut() {
   if (session?.access_token) {
     await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }).catch(() => {})
   }
+  await supabase.auth.signOut().catch(() => {})
   localStorage.removeItem(STORAGE_KEY)
 }
 
