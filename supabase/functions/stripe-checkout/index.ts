@@ -28,6 +28,13 @@ function safeReturnUrl(value: unknown, fallback: string) {
   }
 }
 
+function normalizePaymentMethod(value: unknown) {
+  const v = String(value || "Tarjeta").trim().toLowerCase();
+  if (v.includes("oxxo")) return "oxxo";
+  if (v.includes("transfer")) return "transferencia";
+  return "tarjeta";
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -40,8 +47,9 @@ Deno.serve(async (req) => {
   const { data: { user }, error: userError } = await userClient.auth.getUser(token);
   if (userError || !user) return json({ error: "Invalid authentication" }, 401);
 
-  const body = await req.json().catch(() => null) as { order_id?: string; success_url?: string; cancel_url?: string } | null;
+  const body = await req.json().catch(() => null) as { order_id?: string; success_url?: string; cancel_url?: string; payment_method?: string } | null;
   const orderId = body?.order_id;
+  const paymentMethod = normalizePaymentMethod(body?.payment_method);
   if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) return json({ error: "Invalid order_id" }, 400);
 
   const { data: order, error: orderError } = await supabase.from("orders")
@@ -85,6 +93,18 @@ Deno.serve(async (req) => {
   params.set("client_reference_id", orderId);
   params.set("metadata[order_id]", orderId);
   params.set("metadata[order_number]", String(order.order_number));
+  params.set("metadata[payment_method]", paymentMethod);
+  params.set("integration_identifier", "vanidaxi");
+
+  if (paymentMethod === "oxxo") {
+    params.set("payment_method_types[0]", "oxxo");
+  } else if (paymentMethod === "transferencia") {
+    params.set("payment_method_types[0]", "customer_balance");
+    params.set("payment_method_options[customer_balance][funding_type]", "bank_transfer");
+    params.set("payment_method_options[customer_balance][bank_transfer][type]", "mx_bank_transfer");
+  } else {
+    params.set("payment_method_types[0]", "card");
+  }
 
   rawItems.forEach((item, i) => {
     params.set(`line_items[${i}][quantity]`, String(item.quantity));
@@ -127,5 +147,5 @@ Deno.serve(async (req) => {
 
   const { error: updateError } = await supabase.from("orders").update({ payment_provider: "stripe" }).eq("id", orderId).eq("user_id", user.id);
   if (updateError) return json({ error: "Could not update payment provider" }, 500);
-  return json({ checkout_url: stripeData.url, session_id: stripeData.id, order_id: orderId });
+  return json({ checkout_url: stripeData.url, session_id: stripeData.id, order_id: orderId, payment_method: paymentMethod });
 });
