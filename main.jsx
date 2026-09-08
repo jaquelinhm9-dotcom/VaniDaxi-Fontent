@@ -8,6 +8,7 @@ import { fetchCatalog, startCommercialSync } from './commercialApi.js'
 import { observeWelcome } from './welcome-enhancer.js'
 import SellerPortal from './SellerPortal.jsx'
 import AdminPortal from './AdminPortal.jsx'
+import App from './App.jsx'
 
 function renderFatalError(error) {
   const root = document.getElementById('root')
@@ -22,15 +23,10 @@ async function bootstrap() {
     const catalog = await fetchCatalog().catch(() => ({ categories: [], products: [] }))
     window.__VANI_COMMERCIAL_CATALOG__ = catalog.products || []
     window.__VANI_COMMERCIAL_CATEGORIES__ = catalog.categories || []
-
-    const module = await import('./AppFixed.jsx')
-    const App = module.default
-    if (typeof App !== 'function') throw new Error('AppFixed no exporta un componente válido')
-
+    if (typeof App !== 'function') throw new Error('La aplicación no exporta un componente válido')
     startVaniDaxiSync()
     const root = document.getElementById('root')
     if (!root) throw new Error('No se encontró el contenedor #root')
-
     createRoot(root).render(
       <React.StrictMode>
         <AdminPortal>
