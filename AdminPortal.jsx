@@ -1,5 +1,6 @@
 import React,{useEffect,useState}from'react';
 import AdminDashboard from'./AdminDashboard.jsx';
+import'./admin-dashboard.css';
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co';
 const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'...publishable fallback...';
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}};
