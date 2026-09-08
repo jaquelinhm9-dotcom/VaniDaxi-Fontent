@@ -7,9 +7,12 @@ function headers(extra = {}) {
   return { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', ...extra }
 }
 
-export async function signUp(email, password, name = '') {
+export async function signUp(email, password, name = '', accountType = 'customer') {
+  const safeType = accountType === 'seller' ? 'seller' : 'customer'
   const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-    method: 'POST', headers: headers(), body: JSON.stringify({ email, password, data: { name } })
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ email, password, data: { name, account_type: safeType } })
   })
   const data = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(data.msg || data.message || data.error_description || 'No se pudo crear la cuenta')
