@@ -1,0 +1,68 @@
+name: Fix VaniDaxi UI
+on:
+  push:
+    branches: [main]
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply coordinated UI fixes
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('App.jsx')
+          s=p.read_text()
+          if 'function QuickMenu' not in s:
+              marker='function Mark(){'
+              quick="""function QuickMenu({go}){return <nav className=\"quick-menu\" aria-label=\"Menú principal\"><button onClick={()=>go('home')}><HomeIcon size={14}/>Inicio</button><button onClick={()=>go('offers')}><Zap size={14}/>Ofertas</button><button onClick={()=>go('categories')}><Grid2X2 size={14}/>Categorías</button><button onClick={()=>go('favorites')}><Heart size={14}/>Favoritos</button><button onClick={()=>go('profile')}><UserRound size={14}/>Perfil</button></nav>}\n"""
+              s=s.replace(marker,quick+marker,1)
+              old='<form className="search" onSubmit={submit}><Search size={15}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar productos, marcas..."/><button type="submit" className="search-filter"><SlidersHorizontal size={15}/></button></form>}</header>}'
+              new='<form className="search" onSubmit={submit}><Search size={15}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar productos, marcas..."/><button type="submit" className="search-filter"><SlidersHorizontal size={15}/></button></form>}{!simple&&<QuickMenu go={go}/>}</header>}'
+              if old not in s:
+                  raise SystemExit('Header insertion target not found')
+              s=s.replace(old,new,1)
+          p.write_text(s)
+      - name: Strengthen storefront styling
+        run: |
+          cat >> dynamic-ui.css <<'EOF'
+
+/* VaniDaxi storefront pass: compact navigation, balanced density and clearer hierarchy. */
+.quick-menu{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
+.quick-menu::-webkit-scrollbar{display:none}
+.quick-menu button{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid rgba(112,66,154,.10);border-radius:10px;background:rgba(255,255,255,.88);color:#6f6374;font-size:8px;font-weight:700;box-shadow:0 4px 12px rgba(83,48,104,.045)}
+.quick-menu button:first-child{background:#70429a;color:#fff;border-color:#70429a}
+.quick-menu button:active{transform:scale(.97)}
+.header{padding-bottom:7px!important}
+.home-hero{margin-top:8px!important;height:184px!important}
+.icon-categories{gap:8px!important}
+.icon-categories span{width:48px!important;height:48px!important}
+.section-title{padding-top:14px!important;padding-bottom:8px!important}
+.product-grid{gap:13px!important;padding-bottom:14px!important}
+.product-image{height:158px!important}
+.product-row{grid-auto-columns:136px!important;gap:11px!important}
+.promo-card{margin-top:13px!important}
+.category-grid{gap:12px!important}
+.category-tile{height:132px!important}
+.profile-page{padding-bottom:108px!important}
+.scroll-page{padding-bottom:108px!important}
+.bottom-nav{height:70px!important;left:8px!important;right:8px!important;bottom:8px!important;border-radius:18px!important;border:1px solid rgba(112,66,154,.10)!important;box-shadow:0 12px 30px rgba(66,40,80,.14)!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:2px!important;padding:7px 5px calc(7px + env(safe-area-inset-bottom))!important}
+.bottom-nav>*{min-width:0!important;display:flex!important;justify-content:center!important;align-items:center!important}
+@media(max-width:360px){.quick-menu button{padding:7px 8px;font-size:7px}.product-image{height:145px!important}}
+EOF
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add App.jsx dynamic-ui.css
+          git diff --cached --quiet && exit 0
+          git commit -m "improve VaniDaxi menu layout and visual density"
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          git rm .github/workflows/ui-layout-fix.yml
+          git commit -m "remove temporary UI fix workflow"
+          git push
