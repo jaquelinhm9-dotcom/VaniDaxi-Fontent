@@ -4,7 +4,9 @@ import HCaptcha from'@hcaptcha/react-hcaptcha'
 import{signIn,signUp}from'./auth.js'
 import'./auth-choice.css'
 
-const HCAPTCHA_SITEKEY=import.meta.env.VITE_HCAPTCHA_SITEKEY||''
+// The hCaptcha sitekey is public. Keep the Vite variable as the preferred source,
+// with the generated public sitekey as a safe fallback for GitHub Pages builds.
+const HCAPTCHA_SITEKEY=import.meta.env.VITE_HCAPTCHA_SITEKEY||'390a44ec-b452-47d4-8514-5e6aeeece0ee'
 
 export default function AuthChoice({type='login',close,done}){
  const[mode,setMode]=useState(type==='signup'?'signup':'login')
