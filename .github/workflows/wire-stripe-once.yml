@@ -1,0 +1,36 @@
+name: One-time wire Stripe checkout
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  wire:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Wire Stripe into checkout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('App.jsx')
+          s=p.read_text()
+          if "./stripeCheckout.js" not in s:
+              s=s.replace("import{loadCommercialState,syncFavorites,syncCart,syncAddress,createCommercialOrder}from'./commercialApi.js';", "import{loadCommercialState,syncFavorites,syncCart,syncAddress,createCommercialOrder}from'./commercialApi.js';import{createStripeCheckout}from'./stripeCheckout.js';")
+          pattern=r"const placeOrder=async\(\{address,payment\}\)=>\{.*?\};const logout="
+          replacement="const placeOrder=async({address,payment})=>{if(!cart.length)return;if(!user){msg('Inicia sesión para continuar con el pago');return}const saved=await createCommercialOrder({items:cart,address,payment},products).catch(()=>null);if(!saved){msg('No se pudo crear el pedido');return}const orderId=typeof saved==='string'?saved:(saved?.id||saved?.order_id||saved);try{const checkout=await createStripeCheckout(orderId);if(checkout?.checkout_url){location.href=checkout.checkout_url;return}}catch(e){console.error('[VaniDaxi] Stripe checkout',e);msg(e?.message||'No se pudo iniciar el pago con Stripe')} };const logout="
+          s2,n=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          if n!=1: raise SystemExit('No se encontró placeOrder para actualizar')
+          p.write_text(s2)
+          PY
+          rm -f .github/workflows/wire-stripe-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add App.jsx .github/workflows/wire-stripe-once.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'feat: connect customer checkout to Stripe'
+          git push
