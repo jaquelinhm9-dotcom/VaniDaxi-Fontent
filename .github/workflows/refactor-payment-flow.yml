@@ -1,0 +1,44 @@
+name: Refactor VaniDaxi payment state
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  refactor:
+    if: github.actor == 'jaquelinhm9-dotcom'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refactor App payment state
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('App.jsx')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("const uuid=x=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(x));const money=", "const normalizePayment=v=>{const x=String(v?.method||v||'Tarjeta').toLowerCase();if(x.includes('oxxo'))return'OXXO';if(x.includes('transfer'))return'Transferencia';return'Tarjeta'};const paymentInfo=m=>({Tarjeta:{text:'Serás enviado a Stripe Checkout para introducir los datos de tu tarjeta de forma segura. VaniDaxi no guarda los datos de la tarjeta.',button:'Continuar a pago con tarjeta'},OXXO:{text:'Serás enviado a Stripe Checkout para generar tu referencia de pago OXXO. Completarás el pago en un establecimiento OXXO.',button:'Continuar a pago OXXO'},Transferencia:{text:'Serás enviado a Stripe Checkout para seleccionar la opción de transferencia bancaria y completar las instrucciones de pago.',button:'Continuar a transferencia'}}[normalizePayment(m)]);const uuid=x=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(x));const money=")
+          s=s.replace("[pay,setPay]=useState(()=>read('vanidaxi-payment',{method:'Tarjeta',detail:''}))", "[pay,setPay]=useState(()=>normalizePayment(read('vanidaxi-payment-method',read('vanidaxi-payment',{method:'Tarjeta'}))))")
+          s=s.replace("if(x.payment)setPay({method:'Stripe',detail:''})", "if(x.payment)setPay(normalizePayment(x.payment))")
+          s=s.replace("if(x.payment)setPay({method:'Stripe',detail:''})", "if(x.payment)setPay(normalizePayment(x.payment))")
+          s=s.replace("useEffect(()=>localStorage.setItem('vanidaxi-payment',JSON.stringify(pay)),[pay])", "useEffect(()=>{const method=normalizePayment(pay);localStorage.setItem('vanidaxi-payment-method',method);localStorage.setItem('vanidaxi-payment',JSON.stringify({method,detail:''}))},[pay])")
+          s=s.replace("payment:{method:'stripe'}", "payment:{method:normalizePayment(payment)}")
+          s=s.replace("const checkout=await createStripeCheckout(orderId)", "setPay(normalizePayment(payment));localStorage.setItem('vanidaxi-payment-method',normalizePayment(payment));const checkout=await createStripeCheckout(orderId)")
+          s=s.replace("<div className=\"payment-options\"><button className=\"active\" onClick={()=>setPay({method:'Stripe',detail:''})}>Tarjeta</button></div><small>Serás enviado a Stripe Checkout para introducir los datos de tu tarjeta de forma segura. VaniDaxi no guarda los datos de la tarjeta.</small>", "<div className=\"payment-options\">{['Tarjeta','OXXO','Transferencia'].map(m=><button key={m} className={normalizePayment(pay)===m?'active':''} onClick={()=>setPay(m)}>{m==='Tarjeta'?'💳':m==='OXXO'?'🧾':'🏦'} {m==='Transferencia'?'Transferencia bancaria':m}</button>)}</div><small>{paymentInfo(pay).text}</small>")
+          s=s.replace("onClick={()=>order({address:addr,payment:{method:'stripe'}})}>Continuar a pago seguro <CreditCard size={15}/>", "onClick={()=>order({address:addr,payment:{method:normalizePayment(pay)}})}>{paymentInfo(pay).button} <CreditCard size={15}/>")
+          old="<div className=\"modal-body\"><div className=\"saved-payment\"><CreditCard size={18}/><div><b>Stripe · Tarjeta</b><small>El pago se completa de forma segura en Stripe Checkout.</small></div></div><button className=\"modal-primary\" onClick={()=>{setPay({method:'Stripe',detail:''});msg('Pago con Stripe seleccionado');close()}}>Usar Stripe para mis pagos</button></div>"
+          new="<div className=\"modal-body\"><div className=\"saved-payment\"><CreditCard size={18}/><div><b>Formas de pago</b><small>Selecciona cómo quieres pagar en Stripe Checkout.</small></div></div><div className=\"payment-options\">{['Tarjeta','OXXO','Transferencia'].map(m=><button key={m} className={normalizePayment(pay)===m?'active':''} onClick={()=>setPay(m)}>{m==='Tarjeta'?'💳':m==='OXXO'?'🧾':'🏦'} {m==='Transferencia'?'Transferencia bancaria':m}</button>)}</div><button className=\"modal-primary\" onClick={()=>{setPay(normalizePayment(pay));msg('Forma de pago seleccionada');close()}}>Guardar forma de pago</button></div>"
+          s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+      - name: Remove temporary payment workflow
+        shell: bash
+        run: |
+          rm .github/workflows/refactor-payment-flow.yml
+      - name: Commit refactor
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add App.jsx .github/workflows/refactor-payment-flow.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'consolidate payment state in App'
+          git push
