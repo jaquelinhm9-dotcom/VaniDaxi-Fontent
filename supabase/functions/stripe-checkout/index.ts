@@ -94,16 +94,17 @@ Deno.serve(async (req) => {
   params.set("metadata[order_id]", orderId);
   params.set("metadata[order_number]", String(order.order_number));
   params.set("metadata[payment_method]", paymentMethod);
-  params.set("integration_identifier", "vanidaxi");
+  params.set("integration_identifier", "vanidaxiQmNwRtPk");
 
   if (paymentMethod === "oxxo") {
-    params.set("payment_method_types[0]", "oxxo");
+    params.append("excluded_payment_method_types[]", "card");
+    params.append("excluded_payment_method_types[]", "customer_balance");
   } else if (paymentMethod === "transferencia") {
-    params.set("payment_method_types[0]", "customer_balance");
-    params.set("payment_method_options[customer_balance][funding_type]", "bank_transfer");
-    params.set("payment_method_options[customer_balance][bank_transfer][type]", "mx_bank_transfer");
+    params.append("excluded_payment_method_types[]", "card");
+    params.append("excluded_payment_method_types[]", "oxxo");
   } else {
-    params.set("payment_method_types[0]", "card");
+    params.append("excluded_payment_method_types[]", "oxxo");
+    params.append("excluded_payment_method_types[]", "customer_balance");
   }
 
   rawItems.forEach((item, i) => {
