@@ -20,20 +20,21 @@ export default function AuthChoice({type='login',close,done}){
  const[message,setMessage]=useState('')
  const[captchaToken,setCaptchaToken]=useState('')
  const captchaRef=useRef(null)
+ const resetCaptcha=()=>{setCaptchaToken('');captchaRef.current?.reset()}
  const submit=async e=>{
   e.preventDefault();setBusy(true);setErr('');setMessage('')
   try{
+   if(!TURNSTILE_SITEKEY)throw new Error('Falta configurar Turnstile en VaniDaxi.')
+   if(!captchaToken)throw new Error('Completa la verificación de seguridad antes de continuar.')
    if(mode==='signup'){
     if(!name.trim())throw new Error('Escribe tu nombre.')
-    if(!TURNSTILE_SITEKEY)throw new Error('Falta configurar Turnstile en VaniDaxi.')
-    if(!captchaToken)throw new Error('Completa la verificación de seguridad antes de crear tu cuenta.')
     const r=await signUp(email.trim(),pw,name.trim(),accountType,captchaToken)
-    captchaRef.current?.reset();setCaptchaToken('')
+    resetCaptcha()
     if(r?.access_token){done(r)}else{setMessage(accountType==='seller'?'Cuenta de vendedor creada. Confirma tu correo si se solicita y después inicia sesión.':'Cuenta de comprador creada. Confirma tu correo si se solicita y después inicia sesión.');setMode('login')}
    }else{
-    const r=await signIn(email.trim(),pw);done(r)
+    const r=await signIn(email.trim(),pw,captchaToken);resetCaptcha();done(r)
    }
-  }catch(e){captchaRef.current?.reset();setCaptchaToken('');setErr(e?.message||'No se pudo completar la operación.')}finally{setBusy(false)}
+  }catch(e){resetCaptcha();setErr(e?.message||'No se pudo completar la operación.')}finally{setBusy(false)}
  }
  return <div className="vd-auth-backdrop" role="dialog" aria-modal="true">
   <div className="vd-auth-card">
@@ -48,12 +49,12 @@ export default function AuthChoice({type='login',close,done}){
     {mode==='signup'&&<input value={name} onChange={e=>setName(e.target.value)} placeholder="Nombre completo" autoComplete="name" required/>}
     <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Correo electrónico" type="email" autoComplete="email" required/>
     <div className="vd-pass"><input value={pw} onChange={e=>setPw(e.target.value)} placeholder="Contraseña" type={show?'text':'password'} minLength={6} autoComplete={mode==='signup'?'new-password':'current-password'} required/><button type="button" onClick={()=>setShow(v=>!v)} aria-label={show?'Ocultar contraseña':'Mostrar contraseña'}>{show?<EyeOff size={17}/>:<Eye size={17}/>}</button></div>
-    {mode==='signup'&&<div className="vd-captcha"><Turnstile ref={captchaRef} siteKey={TURNSTILE_SITEKEY} onSuccess={token=>setCaptchaToken(token)} onExpire={()=>setCaptchaToken('')} onError={()=>setCaptchaToken('')}/></div>}
+    <div className="vd-captcha"><Turnstile ref={captchaRef} siteKey={TURNSTILE_SITEKEY} onSuccess={token=>setCaptchaToken(token)} onExpire={()=>setCaptchaToken('')} onError={()=>setCaptchaToken('')}/></div>
     <button className="vd-auth-submit" disabled={busy}>{busy?'Procesando…':mode==='signup'?(accountType==='seller'?'Crear cuenta de vendedor':'Crear cuenta de comprador'):'Iniciar sesión'} <LogIn size={16}/></button>
    </form>
    {message&&<div className="vd-auth-message">{message}</div>}
    {err&&<div className="vd-auth-error">{err}</div>}
-   <button className="vd-auth-switch" onClick={()=>{setMode(v=>v==='signup'?'login':'signup');setErr('');setMessage('');setCaptchaToken('');captchaRef.current?.reset()}}>{mode==='signup'?'Ya tengo una cuenta':'Crear una cuenta nueva'}</button>
+   <button className="vd-auth-switch" onClick={()=>{setMode(v=>v==='signup'?'login':'signup');setErr('');setMessage('');resetCaptcha()}}>{mode==='signup'?'Ya tengo una cuenta':'Crear una cuenta nueva'}</button>
   </div>
  </div>
 }
