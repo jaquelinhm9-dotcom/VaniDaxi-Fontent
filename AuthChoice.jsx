@@ -1,6 +1,7 @@
 import React,{useState}from'react'
 import{Eye,EyeOff,UserPlus,Store,LogIn,X,Check}from'lucide-react'
 import{signIn,signUp}from'./auth.js'
+import'./auth-choice.css'
 
 export default function AuthChoice({type='login',close,done}){
  const[mode,setMode]=useState(type==='signup'?'signup':'login')
