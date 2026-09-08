@@ -7,7 +7,6 @@
     <meta name="description" content="VaniDaxi — moda, tecnología, hogar y mucho más." />
     <link rel="icon" type="image/svg+xml" href="./logo.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="stylesheet" href="./polish.css?v=4" />
     <title>VaniDaxi</title>
     <script>
       try {
@@ -18,10 +17,11 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./main.jsx?v=4"></script>
+    <script type="module" src="./main.jsx?v=5"></script>
+    <link rel="stylesheet" href="./hero-ad.css?v=1" />
     <script src="./checkout-fixes.js?v=4"></script>
     <script>
-      if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=4', { updateViaCache: 'none' }).catch(() => {})
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=5', { updateViaCache: 'none' }).catch(() => {})
     </script>
   </body>
 </html>
