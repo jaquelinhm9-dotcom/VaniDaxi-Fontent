@@ -14,31 +14,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Update checkout to Stripe-only
+      - name: Force Stripe-only payment UI
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('App.jsx')
-          s=p.read_text()
-          s=s.replace("const[pay,setPay]=useState(()=>read('vanidaxi-payment',{method:'Tarjeta',detail:''}))", "const[pay,setPay]=useState(()=>({method:'Stripe',detail:''}))")
-          s=s.replace("if(x.payment)setPay(x.payment)", "if(x.payment)setPay({method:'Stripe',detail:''})")
-          s=s.replace("createCommercialOrder({items:cart,address,payment},products)", "createCommercialOrder({items:cart,address,payment:{method:'stripe'}},products)")
-          old="""function Checkout({go,cart,addr,setAddr,pay,setPay,order}){const sub=cart.reduce((a,x)=>a+x.product.price*x.qty,0),ship=sub>=799?0:79,total=sub+ship,ok=cart.length&&addr.name?.trim()&&addr.street?.trim()&&addr.city?.trim()&&addr.zip?.trim()&&(pay.method==='Contra entrega'||/^\\d{4}$/.test(pay.detail||''));return <main className=\"scroll-page checkout-page\"><Header go={go} simple/><div className=\"page-heading\"><span>Compra segura</span><h1>Finalizar pedido</h1><p>Confirma tus datos antes de pagar.</p></div>{!cart.length?<Empty title=\"No hay productos para comprar\" text=\"Agrega productos al carrito y vuelve aquí.\" action=\"Explorar productos\" f={()=>go('products')}/>:<><section className=\"checkout-section\"><div className=\"checkout-title\"><MapPin size={15}/><b>Dirección de entrega</b></div><input value={addr.name} onChange={e=>setAddr({...addr,name:e.target.value})} placeholder=\"Nombre completo\"/><input value={addr.street} onChange={e=>setAddr({...addr,street:e.target.value})} placeholder=\"Calle y número\"/><div className=\"two-fields\"><input value={addr.city} onChange={e=>setAddr({...addr,city:e.target.value})} placeholder=\"Ciudad\"/><input value={addr.zip} onChange={e=>setAddr({...addr,zip:e.target.value.replace(/\\D/g,'').slice(0,5)})} placeholder=\"C.P.\" inputMode=\"numeric\"/></div></section><section className=\"checkout-section\"><div className=\"checkout-title\"><CreditCard size={15}/><b>Método de pago</b></div><div className=\"payment-options\">{['Tarjeta','Contra entrega'].map(m=><button key={m} className={pay.method===m?'active':''} onClick={()=>setPay({...pay,method:m})}>{m}</button>)}</div>{pay.method==='Tarjeta'&&<input value={pay.detail} onChange={e=>setPay({...pay,detail:e.target.value.replace(/\\D/g,'').slice(0,4)})} placeholder=\"Últimos 4 dígitos\" inputMode=\"numeric\" maxLength={4}/>}</section><section className=\"checkout-summary\"><div><span>Subtotal</span><b>{money(sub)}</b></div><div><span>Envío</span><b>{ship?money(ship):'Gratis'}</b></div><div className=\"total-line\"><span>Total</span><b>{money(total)}</b></div><button disabled={!ok} onClick={()=>order({address:addr,payment:pay})}>Confirmar pedido <Check size={15}/></button>{!ok&&<small>Completa la dirección y el método de pago para continuar.</small>}</section></>}</main>}"""
-          new="""function Checkout({go,cart,addr,setAddr,pay,setPay,order}){const sub=cart.reduce((a,x)=>a+x.product.price*x.qty,0),ship=sub>=799?0:79,total=sub+ship,ok=cart.length&&addr.name?.trim()&&addr.street?.trim()&&addr.city?.trim()&&addr.zip?.trim();return <main className=\"scroll-page checkout-page\"><Header go={go} simple/><div className=\"page-heading\"><span>Compra segura</span><h1>Finalizar pedido</h1><p>Confirma tus datos antes de pagar.</p></div>{!cart.length?<Empty title=\"No hay productos para comprar\" text=\"Agrega productos al carrito y vuelve aquí.\" action=\"Explorar productos\" f={()=>go('products')}/>:<><section className=\"checkout-section\"><div className=\"checkout-title\"><MapPin size={15}/><b>Dirección de entrega</b></div><input value={addr.name} onChange={e=>setAddr({...addr,name:e.target.value})} placeholder=\"Nombre completo\"/><input value={addr.street} onChange={e=>setAddr({...addr,street:e.target.value})} placeholder=\"Calle y número\"/><div className=\"two-fields\"><input value={addr.city} onChange={e=>setAddr({...addr,city:e.target.value})} placeholder=\"Ciudad\"/><input value={addr.zip} onChange={e=>setAddr({...addr,zip:e.target.value.replace(/\\D/g,'').slice(0,5)})} placeholder=\"C.P.\" inputMode=\"numeric\"/></div></section><section className=\"checkout-section\"><div className=\"checkout-title\"><CreditCard size={15}/><b>Método de pago</b></div><div className=\"payment-options\"><button className=\"active\" onClick={()=>setPay({method:'Stripe',detail:''})}>Tarjeta</button></div><small>Serás enviado a Stripe Checkout para introducir los datos de tu tarjeta de forma segura. VaniDaxi no guarda los datos de la tarjeta.</small></section><section className=\"checkout-summary\"><div><span>Subtotal</span><b>{money(sub)}</b></div><div><span>Envío</span><b>{ship?money(ship):'Gratis'}</b></div><div className=\"total-line\"><span>Total</span><b>{money(total)}</b></div><button disabled={!ok} onClick={()=>order({address:addr,payment:{method:'stripe'}})}>Continuar a pago seguro <CreditCard size={15}/></button>{!ok&&<small>Completa la dirección de entrega para continuar.</small>}</section></>}</main>}"""
-          if old not in s:
-            raise SystemExit('Checkout block not found')
-          s=s.replace(old,new)
-          old_pay="""{type==='payment'&&<div className=\"modal-body\"><div className=\"saved-payment\"><CreditCard size={18}/><div><b>{pay.method}</b><small>{pay.detail?`•••• ${pay.detail}`:'Sin método guardado'}</small></div></div><div className=\"payment-options\">{['Tarjeta','Contra entrega'].map(m=><button key={m} className={pay.method===m?'active':''} onClick={()=>setPay({...pay,method:m})}>{m}</button>)}</div>{pay.method==='Tarjeta'&&<label>Últimos 4 dígitos<input value={pay.detail} onChange={e=>setPay({...pay,detail:e.target.value.replace(/\\D/g,'').slice(0,4)})} maxLength={4}/></label>}<button className=\"modal-primary\" onClick={()=>{msg('Método de pago guardado');close()}}>Guardar método</button></div>}"""
-          new_pay="""{type==='payment'&&<div className=\"modal-body\"><div className=\"saved-payment\"><CreditCard size={18}/><div><b>Stripe · Tarjeta</b><small>El pago se completa de forma segura en Stripe Checkout.</small></div></div><button className=\"modal-primary\" onClick={()=>{setPay({method:'Stripe',detail:''});msg('Pago con Stripe seleccionado');close()}}>Usar Stripe para mis pagos</button></div>}"""
-          if old_pay not in s:
-            raise SystemExit('Account payment block not found')
-          s=s.replace(old_pay,new_pay)
+          import re
+          p = Path('App.jsx')
+          s = p.read_text()
+          s = s.replace("const[pay,setPay]=useState(()=>read('vanidaxi-payment',{method:'Tarjeta',detail:''}))", "const[pay,setPay]=useState(()=>({method:'Stripe',detail:''}))")
+          s = s.replace("if(x.payment)setPay(x.payment)", "if(x.payment)setPay({method:'Stripe',detail:''})")
+          s = s.replace("if(x.payment)setPay({method:'Stripe',detail:''})", "if(x.payment)setPay({method:'Stripe',detail:''})")
+          s = s.replace("createCommercialOrder({items:cart,address,payment},products)", "createCommercialOrder({items:cart,address,payment:{method:'stripe'}},products)")
+          s = s.replace("['Tarjeta','Contra entrega']", "['Tarjeta']")
+          s = s.replace("pay.method==='Contra entrega'||/^\\d{4}$/.test(pay.detail||'')", "true")
+          s = re.sub(r"\{pay\.method==='Tarjeta'&&<input value=\{pay\.detail\} onChange=\{e=>setPay\(\{\.\.\.pay,method:m\}\)\}[^}]*\/>\}", "", s)
+          s = re.sub(r"\{pay\.method==='Tarjeta'&&<input value=\{pay\.detail\} onChange=\{e=>setPay\(\{\.\.\.pay,detail:e\.target\.value\.replace\(/\\\\D/g,''\)\.slice\(0,4\)\}\)\} placeholder=\"Últimos 4 dígitos\" inputMode=\"numeric\" maxLength=\{4\}/>\}", "", s)
+          s = re.sub(r"\{pay\.method==='Tarjeta'&&<label>Últimos 4 dígitos<input[^>]*/></label>\}", "", s)
+          s = s.replace("<b>{pay.method}</b><small>{pay.detail?`•••• ${pay.detail}`:'Sin método guardado'}</small>", "<b>Stripe · Tarjeta</b><small>El pago se completa de forma segura en Stripe Checkout.</small>")
+          s = s.replace("<button disabled={!ok} onClick={()=>order({address:addr,payment:pay})}>Confirmar pedido <Check size={15}/>", "<button disabled={!ok} onClick={()=>order({address:addr,payment:{method:'stripe'}})}>Continuar a pago seguro <CreditCard size={15}/>")
+          s = s.replace("{!ok&&<small>Completa la dirección y el método de pago para continuar.</small>}", "{!ok&&<small>Completa la dirección de entrega para continuar.</small>}")
           p.write_text(s)
+          if 'Contra entrega' in s:
+              raise SystemExit('ERROR: Contra entrega still present')
+          if 'Últimos 4 dígitos' in s:
+              raise SystemExit('ERROR: last-4 card field still present')
           PY
       - name: Commit changes
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add App.jsx
-          git diff --cached --quiet || git commit -m 'use Stripe-only checkout payment flow'
+          git diff --cached --quiet || git commit -m 'remove legacy payment method UI'
           git push
