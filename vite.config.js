@@ -61,5 +61,5 @@ const repairAppFixed = () => ({
 
 export default defineConfig({
   plugins: [repairAppFixed(), react()],
-  base: './',
+  base: '/VaniDaxi-Fontent/',
 })
