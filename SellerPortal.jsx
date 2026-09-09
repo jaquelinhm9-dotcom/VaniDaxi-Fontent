@@ -3,7 +3,7 @@ import SellerDashboard from'./SellerDashboard.jsx';
 import SellerStoreSetup from'./SellerStoreSetup.jsx';
 
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co';
-const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY';
+const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj';
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}};
 
 export default function SellerPortal({children}){
