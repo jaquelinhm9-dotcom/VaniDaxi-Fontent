@@ -1,7 +1,8 @@
 /* VaniDaxi API bridge
- * Keeps the existing UI functional while moving persistence behind an API.
- * The browser only uses the public API URL; no server secret belongs here.
+ * Keeps persistence behind the API. The browser never receives a server secret.
  */
+import { supabase } from './supabaseClient.js'
+
 const API_URL = (import.meta.env.VITE_VANIDAXI_API_URL || '').replace(/\/$/, '')
 const DEVICE_KEY = 'vanidaxi-device-id'
 
@@ -33,6 +34,16 @@ function readState() {
   return state
 }
 
+async function authHeaders() {
+  try {
+    const { data } = await supabase.auth.getSession()
+    const token = data?.session?.access_token
+    return token ? { Authorization: `Bearer ${token}` } : {}
+  } catch {
+    return {}
+  }
+}
+
 async function request(path, options = {}) {
   if (!API_URL) return null
   const controller = new AbortController()
@@ -44,6 +55,7 @@ async function request(path, options = {}) {
       headers: {
         'Content-Type': 'application/json',
         'X-VaniDaxi-Device': deviceId(),
+        ...(await authHeaders()),
         ...(options.headers || {}),
       },
     })
@@ -74,8 +86,11 @@ export function syncVaniDaxiState() {
   if (!API_URL) return
   window.clearTimeout(syncTimer)
   syncTimer = window.setTimeout(async () => {
-    try { await request('/state', { method: 'PUT', body: JSON.stringify(readState()) }) }
-    catch (error) { console.warn('[VaniDaxi] state sync failed:', error) }
+    try {
+      await request('/state', { method: 'PUT', body: JSON.stringify({ state: readState() }) })
+    } catch (error) {
+      console.warn('[VaniDaxi] state sync failed:', error)
+    }
   }, 350)
 }
 
@@ -95,5 +110,5 @@ export const vanidaxiApi = {
   enabled: Boolean(API_URL),
   deviceId,
   getState: () => request('/state'),
-  saveState: state => request('/state', { method: 'PUT', body: JSON.stringify(state) }),
+  saveState: state => request('/state', { method: 'PUT', body: JSON.stringify({ state }) }),
 }
