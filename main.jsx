@@ -3,6 +3,7 @@ import{createRoot}from'react-dom/client'
 import VaniDaxiShell from'./VaniDaxiShell.jsx'
 import'./vanidaxi-new.css'
 import'./accountEnhancer.js'
+import'./profileEnhancer.js'
 import'./seller-customer-enhancer.js'
 import'./admin-returns-enhancer.js'
 const root=document.getElementById('root')
