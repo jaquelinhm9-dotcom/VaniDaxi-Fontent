@@ -13,7 +13,7 @@ import CustomerNotificationBell from'./CustomerNotificationBell.jsx'
 import{fetchCatalog}from'./commercialApi.js'
 import{supabase}from'./supabaseClient.js'
 import{saveSession}from'./auth.js'
-const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
+const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj'
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}}
 const hasSession=()=>!!session()?.user?.id&&!!session()?.access_token
 const lockKey='vanidaxi-app-lock'
