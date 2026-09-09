@@ -8,6 +8,7 @@ import ReputationDashboard from'./ReputationDashboard.jsx'
 import CatalogAdvanced from'./CatalogAdvanced.jsx'
 import DeliveryOrders from'./DeliveryOrders.jsx'
 import ReturnsPage from'./ReturnsPage.jsx'
+import CustomerNotificationBell from'./CustomerNotificationBell.jsx'
 import{fetchCatalog}from'./commercialApi.js'
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}}
@@ -23,5 +24,5 @@ export default function VaniDaxiShell(){
  if(route==='#/products')return <CatalogAdvanced back={()=>{location.hash='#/home';setRoute('#/home')}}/>
  if(route==='#/orders')return <DeliveryOrders go={n=>{location.hash=`#/${n}`;setRoute(`#/${n}`)}}/>
  if(route==='#/returns')return <ReturnsPage go={n=>{location.hash=`#/${n}`;setRoute(`#/${n}`)}}/>
- return <App/>
+ return <><App/><CustomerNotificationBell/></>
 }
