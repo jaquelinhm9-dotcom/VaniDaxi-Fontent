@@ -35,6 +35,11 @@ function normalizePaymentMethod(value: unknown) {
   return "tarjeta";
 }
 
+function idempotencyKey(prefix: string, orderId: string, paymentMethod?: string) {
+  const suffix = paymentMethod ? `-${paymentMethod}` : "";
+  return `vanidaxi-${prefix}-${orderId}${suffix}`.slice(0, 255);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -95,7 +100,11 @@ Deno.serve(async (req) => {
   params.set("metadata[order_number]", String(order.order_number));
   params.set("metadata[payment_method]", paymentMethod);
   params.set("integration_identifier", "vanidaxiQmNwRtPk");
+  if (user.email) params.set("customer_email", user.email);
 
+  // Keep Stripe's dynamic payment-method behavior. The selector expresses the
+  // customer's preference by excluding the alternatives rather than hard-coding
+  // payment_method_types, so Stripe can still enforce account/country eligibility.
   if (paymentMethod === "oxxo") {
     params.append("excluded_payment_method_types[]", "card");
     params.append("excluded_payment_method_types[]", "customer_balance");
@@ -125,7 +134,11 @@ Deno.serve(async (req) => {
   if (discountCents > 0) {
     const couponResponse = await fetch("https://api.stripe.com/v1/coupons", {
       method: "POST",
-      headers: { Authorization: `Bearer ${stripeSecret}`, "Content-Type": "application/x-www-form-urlencoded" },
+      headers: {
+        Authorization: `Bearer ${stripeSecret}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Idempotency-Key": idempotencyKey("coupon", orderId),
+      },
       body: new URLSearchParams({
         amount_off: String(discountCents),
         currency: "mxn",
@@ -140,7 +153,11 @@ Deno.serve(async (req) => {
 
   const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${stripeSecret}`, "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      Authorization: `Bearer ${stripeSecret}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Idempotency-Key": idempotencyKey("checkout", orderId, paymentMethod),
+    },
     body: params,
   });
   const stripeData = await stripeResponse.json();
