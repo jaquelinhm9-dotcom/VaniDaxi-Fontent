@@ -2,7 +2,7 @@ import React,{useEffect,useState}from'react'
 import App from'./App.jsx'
 import WelcomeGate from'./WelcomeGate.jsx'
 import SellerDashboardNew from'./SellerDashboardNew.jsx'
-import AdminDashboard from'./AdminDashboard.jsx'
+import AdminPortal from'./AdminPortal.jsx'
 import LogisticsDashboard from'./LogisticsDashboard.jsx'
 import PostPurchaseDashboard from'./PostPurchaseDashboard.jsx'
 import ReputationDashboard from'./ReputationDashboard.jsx'
@@ -24,7 +24,7 @@ export default function VaniDaxiShell(){
  if(!authenticated)return <WelcomeGate/>
  if(locked)return <WelcomeGate locked onUnlock={unlock}/>
  if(route==='#/seller')return role==='seller'?<SellerDashboardNew back={()=>{location.hash='#/home';setRoute('#/home')}} categories={categories}/>:<App/>
- if(route==='#/admin')return role==='admin'?<AdminDashboard go={()=>{location.hash='#/home';setRoute('#/home')}}/>:<App/>
+ if(route==='#/admin')return role==='admin'?<AdminPortal/>:<App/>
  if(route==='#/logistics')return role==='admin'||role==='seller'?<LogisticsDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>:<App/>
  if(route==='#/postventa')return <PostPurchaseDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>
  if(route==='#/reputacion')return <ReputationDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>
