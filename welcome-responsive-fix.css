@@ -1,0 +1,11 @@
+/* Preserve the approved 1312x1199 welcome artwork ratio on narrow screens. */
+@media (max-width:900px){
+  .vd-welcome-art{background-size:auto 100%;}
+  .vd-welcome-panel-buyer .vd-welcome-art{background-position:left center;}
+  .vd-welcome-panel-seller .vd-welcome-art{background-position:right center;}
+}
+
+@media (max-width:560px){
+  .vd-welcome-carousel{height:100svh;height:100dvh;}
+  .vd-welcome-panel{height:100svh;height:100dvh;}
+}
