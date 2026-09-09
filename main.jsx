@@ -1,7 +1,7 @@
 import React from'react'
 import{createRoot}from'react-dom/client'
-import App from'./App.jsx'
+import VaniDaxiShell from'./VaniDaxiShell.jsx'
 import'./vanidaxi-new.css'
 const root=document.getElementById('root')
 if(!root)throw new Error('No se encontró #root')
-createRoot(root).render(<React.StrictMode><App/></React.StrictMode>)
+createRoot(root).render(<React.StrictMode><VaniDaxiShell/></React.StrictMode>)
