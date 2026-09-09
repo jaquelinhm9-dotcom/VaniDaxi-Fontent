@@ -4,7 +4,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import{signIn,signUp,signInWithProvider}from'./auth.js'
 import'./auth-choice.css'
 
-const HCAPTCHA_SITEKEY=import.meta.env.VITE_HCAPTCHA_SITEKEY||''
+const HCAPTCHA_SITEKEY=import.meta.env.VITE_HCAPTCHA_SITEKEY||'390a44ec-b452-47d4-8514-5e6aeeece0ee'
 
 export default function AuthChoice({type='login',close,done}){
  const[mode,setMode]=useState(type==='signup'?'signup':'login'),[accountType,setAccountType]=useState('customer'),[name,setName]=useState(''),[email,setEmail]=useState(''),[pw,setPw]=useState(''),[show,setShow]=useState(false),[busy,setBusy]=useState(false),[socialBusy,setSocialBusy]=useState(''),[err,setErr]=useState(''),[message,setMessage]=useState(''),[captchaToken,setCaptchaToken]=useState('');const captchaRef=useRef(null)
