@@ -1,5 +1,5 @@
 const SUPABASE_URL='https://oycwqpqoxgohzqivclzd.supabase.co'
-const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
+const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj'
 const AUTH_KEY='vanidaxi-auth-session'
 const headers=(token)=>({apikey:KEY,'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})})
 const session=()=>{try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null')}catch{return null}}
