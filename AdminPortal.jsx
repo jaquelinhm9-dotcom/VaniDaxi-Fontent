@@ -3,7 +3,7 @@ import AdminDashboard from'./AdminDashboard.jsx';
 import AdminReviewModeration from'./AdminReviewModeration.jsx';
 import'./admin-dashboard.css';
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co';
-const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY';
+const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj';
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}};
 export default function AdminPortal({children}){
  const[role,setRole]=useState(''),[open,setOpen]=useState('');
