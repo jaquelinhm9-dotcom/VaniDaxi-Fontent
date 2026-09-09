@@ -5,6 +5,7 @@ import AuthChoice from'./AuthChoice.jsx'
 import{supabase}from'./supabaseClient.js'
 import{saveSession}from'./auth.js'
 import'./welcome-gate.css'
+import'./welcome-responsive-fix.css'
 
 const HCAPTCHA_SITEKEY=import.meta.env.VITE_HCAPTCHA_SITEKEY||'390a44ec-b452-47d4-8514-5e6aeeece0ee'
 const passkeySupported=()=>typeof window!=='undefined'&&window.isSecureContext&&'PublicKeyCredential'in window
