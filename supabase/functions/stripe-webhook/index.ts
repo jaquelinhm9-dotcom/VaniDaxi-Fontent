@@ -46,35 +46,24 @@ Deno.serve(async req => {
   if (!(await verifySignature(payload, signature, webhookSecret))) return new Response("Invalid signature", { status: 400 });
 
   let event: any;
-  try {
-    event = JSON.parse(payload);
-  } catch {
-    return new Response("Invalid JSON", { status: 400 });
-  }
+  try { event = JSON.parse(payload); } catch { return new Response("Invalid JSON", { status: 400 }); }
 
   const type = String(event?.type || "");
   const session = event?.data?.object;
   const orderId = session?.metadata?.order_id || session?.client_reference_id;
   if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) return json({ received: true });
 
-  if (type === "checkout.session.completed" && session.payment_status === "paid") {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "paid", payment_provider: "stripe", payment_id: session.payment_intent || session.id, updated_at: new Date().toISOString() })
-      .eq("id", orderId)
-      .eq("status", "pending");
+  if ((type === "checkout.session.completed" && session.payment_status === "paid") || type === "checkout.session.async_payment_succeeded") {
+    const paymentId = session.payment_intent || session.id;
+    const { data, error } = await supabase.rpc("mark_commercial_order_paid", { p_order_id: orderId, p_payment_id: paymentId });
     if (error) return json({ error: "Could not mark order paid" }, 500);
-  } else if (type === "checkout.session.async_payment_succeeded") {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "paid", payment_provider: "stripe", payment_id: session.payment_intent || session.id, updated_at: new Date().toISOString() })
-      .eq("id", orderId)
-      .eq("status", "pending");
-    if (error) return json({ error: "Could not mark order paid" }, 500);
-  } else if (type === "checkout.session.expired") {
+    return json({ received: true, status: data?.status || "paid" });
+  }
+
+  if (type === "checkout.session.expired") {
     const { data, error } = await supabase.rpc("release_expired_commercial_order", { p_order_id: orderId });
     if (error) return json({ error: "Could not release expired checkout inventory" }, 500);
-    if (data === false) return json({ received: true, released: false });
+    return json({ received: true, released: data === true });
   }
 
   return json({ received: true });
