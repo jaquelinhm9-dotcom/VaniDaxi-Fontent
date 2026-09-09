@@ -5,6 +5,7 @@ import AdminDashboard from'./AdminDashboard.jsx'
 import LogisticsDashboard from'./LogisticsDashboard.jsx'
 import PostPurchaseDashboard from'./PostPurchaseDashboard.jsx'
 import ReputationDashboard from'./ReputationDashboard.jsx'
+import CatalogAdvanced from'./CatalogAdvanced.jsx'
 import{fetchCatalog}from'./commercialApi.js'
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}}
@@ -17,5 +18,6 @@ export default function VaniDaxiShell(){
  if(route==='#/logistics')return role==='admin'||role==='seller'?<LogisticsDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>:<App/>
  if(route==='#/postventa')return <PostPurchaseDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>
  if(route==='#/reputacion')return <ReputationDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>
+ if(route==='#/products')return <CatalogAdvanced back={()=>{location.hash='#/home';setRoute('#/home')}}/>
  return <App/>
 }
