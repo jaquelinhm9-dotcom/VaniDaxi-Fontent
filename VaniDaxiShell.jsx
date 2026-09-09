@@ -3,11 +3,10 @@ import App from'./App.jsx'
 import SellerDashboardNew from'./SellerDashboardNew.jsx'
 import AdminDashboard from'./AdminDashboard.jsx'
 import LogisticsDashboard from'./LogisticsDashboard.jsx'
+import PostPurchaseDashboard from'./PostPurchaseDashboard.jsx'
 import{fetchCatalog}from'./commercialApi.js'
-
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}}
-
 export default function VaniDaxiShell(){
  const[route,setRoute]=useState(()=>location.hash||'#/home'),[role,setRole]=useState(''),[categories,setCategories]=useState([])
  useEffect(()=>{const onHash=()=>setRoute(location.hash||'#/home');addEventListener('hashchange',onHash);addEventListener('popstate',onHash);return()=>{removeEventListener('hashchange',onHash);removeEventListener('popstate',onHash)}},[])
@@ -15,5 +14,6 @@ export default function VaniDaxiShell(){
  if(route==='#/seller')return role==='seller'?<SellerDashboardNew back={()=>{location.hash='#/home';setRoute('#/home')}} categories={categories}/>:<App/>
  if(route==='#/admin')return role==='admin'?<AdminDashboard go={()=>{location.hash='#/home';setRoute('#/home')}}/>:<App/>
  if(route==='#/logistics')return <LogisticsDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>
+ if(route==='#/postventa')return <PostPurchaseDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>
  return <App/>
 }
