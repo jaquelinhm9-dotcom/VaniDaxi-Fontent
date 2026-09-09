@@ -1,7 +1,7 @@
 import './seller-new.css'
 
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co'
-const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
+const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj'
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}}
 const headers=()=>{const s=session();return{apikey:KEY,Authorization:`Bearer ${s?.access_token||KEY}`}}
 async function rest(path){const r=await fetch(`${URL}/rest/v1/${path}`,{headers:headers()});if(!r.ok)throw Error(`Supabase ${r.status}`);return r.json()}
