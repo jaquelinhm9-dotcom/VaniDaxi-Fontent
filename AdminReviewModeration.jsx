@@ -2,6 +2,7 @@ import React,{useEffect,useState}from'react'
 import{Check,RefreshCw,XCircle,ArrowLeft,Star}from'lucide-react'
 import{moderateReview}from'./adminReviewApi.js'
 import'./admin-dashboard.css'
+import'./admin-review-moderation.css'
 
 const URL='https://oycwqpqoxgohzqivclzd.supabase.co'
 const KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
