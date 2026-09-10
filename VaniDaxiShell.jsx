@@ -1,6 +1,5 @@
 import React,{useEffect,useState}from'react'
 import App from'./App.jsx'
-import WelcomeGate from'./WelcomeGate.jsx'
 import SellerDashboardNew from'./SellerDashboardNew.jsx'
 import AdminPortal from'./AdminPortal.jsx'
 import LogisticsDashboard from'./LogisticsDashboard.jsx'
@@ -23,8 +22,8 @@ export default function VaniDaxiShell(){
  useEffect(()=>{const onHash=()=>{setRoute(location.hash||'#/home')};addEventListener('hashchange',onHash);addEventListener('popstate',onHash);return()=>{removeEventListener('hashchange',onHash);removeEventListener('popstate',onHash)}},[])
  useEffect(()=>{let alive=true;const applySession=s=>{if(s){saveSession(s);if(alive){setAuthenticated(!!s.user?.id&&!!s.access_token);setLocked(!!s.user?.id&&!!s.access_token&&hasAppLock())}}else if(alive){setAuthenticated(false);setLocked(false)}};const{data:{subscription}}=supabase.auth.onAuthStateChange((event,s)=>{if(s)applySession(s);else if(event==='SIGNED_OUT'){localStorage.removeItem(lockKey);localStorage.removeItem('vanidaxi-auth-session');applySession(null)}});const check=async()=>{const authResult=await supabase.auth.getSession().catch(()=>null),sbSession=authResult?.data?.session||null;if(sbSession)applySession(sbSession);const s=sbSession||session(),id=s?.user?.id,ok=!!s?.user?.id&&!!s?.access_token;if(!sbSession&&ok&&alive){setAuthenticated(true);setLocked(hasAppLock())}if(!id){localStorage.removeItem(lockKey);if(alive){setLocked(false);setRole('');setCategories([])}}else{if(alive)setLocked(hasAppLock());try{const[r,c]=await Promise.all([fetch(`${URL}/rest/v1/profiles?select=role,is_active&id=eq.${encodeURIComponent(id)}&limit=1`,{headers:{apikey:KEY,Authorization:`Bearer ${s.access_token||KEY}`}}),fetchCatalog()]);const rows=await r.json();if(alive){setRole(rows?.[0]?.is_active?rows?.[0]?.role||'':'');setCategories(c?.categories||[])}}catch{if(alive)setRole('')}}};check();const onStorage=e=>{if(e.key==='vanidaxi-auth-session'||e.key===lockKey){setAuthenticated(hasSession());setLocked(hasSession()&&hasAppLock())}};const onVisibility=()=>{if(document.visibilityState==='hidden'&&hasSession()){localStorage.setItem(lockKey,'1');setLocked(true)}};const onPageHide=()=>{if(hasSession())localStorage.setItem(lockKey,'1')};addEventListener('storage',onStorage);document.addEventListener('visibilitychange',onVisibility);addEventListener('pagehide',onPageHide);return()=>{alive=false;subscription.unsubscribe();removeEventListener('storage',onStorage);document.removeEventListener('visibilitychange',onVisibility);removeEventListener('pagehide',onPageHide)}},[])
  const unlock=()=>{localStorage.removeItem(lockKey);setLocked(false);setAuthenticated(hasSession())}
- if(!authenticated)return <WelcomeGate/>
- if(locked)return <WelcomeGate locked onUnlock={unlock}/>
+ if(!authenticated)return <App/>
+ if(locked)return <App/>
  if(route==='#/seller')return role==='seller'?<SellerDashboardNew back={()=>{location.hash='#/home';setRoute('#/home')}} categories={categories}/>:<App/>
  if(route==='#/admin')return role==='admin'?<AdminPortal/>:<App/>
  if(route==='#/logistics')return role==='admin'||role==='seller'?<LogisticsDashboard back={()=>{location.hash='#/home';setRoute('#/home')}}/>:<App/>
