@@ -4,7 +4,8 @@
 .vd-welcome-carousel{width:100%;height:100dvh;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
 .vd-welcome-carousel::-webkit-scrollbar{display:none}
 .vd-welcome-panel{position:relative;flex:0 0 50%;min-width:50%;height:100%;scroll-snap-align:start;overflow:hidden;background:#07091d}
-.vd-welcome-art{position:absolute;inset:0;background-image:url('/VaniDaxi-Fontent/welcome-vandaxi-1.webp');background-repeat:no-repeat;background-size:200% 100%;background-position:left center;background-color:#07091d;user-select:none;-webkit-user-drag:none}
+/* The artwork is stored at the repository root. A relative URL is intentional: Vite then fingerprints and copies it into dist during build. */
+.vd-welcome-art{position:absolute;inset:0;background-image:url('./welcome-vandaxi-1.webp');background-repeat:no-repeat;background-size:200% 100%;background-position:left center;background-color:#07091d;user-select:none;-webkit-user-drag:none}
 .vd-welcome-panel-buyer .vd-welcome-art{background-position:left center}
 .vd-welcome-panel-seller .vd-welcome-art{background-position:right center}
 .vd-welcome-ui{position:absolute;z-index:4;left:8%;right:8%;bottom:7.2%;display:grid;grid-template-columns:1fr 1fr;gap:10px;pointer-events:auto}
@@ -19,7 +20,7 @@
 .vd-welcome-dots button.active{width:12px;height:12px;background:#f6a0c7;border-color:#f6a0c7;box-shadow:0 0 10px rgba(246,160,199,.32)}
 
 /* Locked screen: same VaniDaxi approved artwork; no external Angel image. */
-.vd-welcome-locked .vd-welcome-scene{position:absolute;inset:0;background-image:url('/VaniDaxi-Fontent/welcome-vandaxi-1.webp');background-size:cover;background-position:left center;background-repeat:no-repeat;transform:none}
+.vd-welcome-locked .vd-welcome-scene{position:absolute;inset:0;background-image:url('./welcome-vandaxi-1.webp');background-size:cover;background-position:left center;background-repeat:no-repeat;transform:none}
 .vd-welcome-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,8,27,0) 0%,rgba(5,7,25,.01) 42%,rgba(5,7,25,.07) 58%,rgba(7,7,29,.24) 78%,rgba(7,9,29,.48) 91%,rgba(7,9,29,.64) 100%)}
 .vd-welcome-brand{position:relative;z-index:2;text-align:center;padding:clamp(22px,5vh,54px) 20px 0;display:grid;justify-items:center}
 .vd-welcome-brand b{display:flex;align-items:center;gap:10px;font-size:clamp(35px,9vw,64px);letter-spacing:-2.5px;line-height:1;font-weight:800}
