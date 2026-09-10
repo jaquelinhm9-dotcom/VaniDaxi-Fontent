@@ -1,39 +1,22 @@
-/* Final welcome layout override: the public gate is its own full-screen surface. */
+/* VaniDaxi welcome: approved reference artwork as the actual visual surface. */
 .vd-welcome-approved{background:#08071a!important}
 .vd-welcome-carousel{height:100dvh!important}
-.vd-welcome-panel{background:#08071a;isolation:isolate}
-.vd-welcome-panel-buyer{background:radial-gradient(circle at 76% 28%,rgba(237,76,190,.25),transparent 30%),radial-gradient(circle at 18% 72%,rgba(112,57,255,.3),transparent 34%),linear-gradient(145deg,#11102a 0%,#17102e 46%,#0a0920 100%)}
-.vd-welcome-panel-seller{background:radial-gradient(circle at 24% 28%,rgba(112,57,255,.3),transparent 31%),radial-gradient(circle at 82% 72%,rgba(237,76,190,.24),transparent 34%),linear-gradient(215deg,#11102a 0%,#17102e 46%,#0a0920 100%)}
-.vd-welcome-art{background:none!important;pointer-events:none;z-index:0}
-.vd-welcome-art:before{content:"";position:absolute;width:min(72vw,760px);height:min(72vw,760px);border-radius:50%;left:50%;top:43%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.1),rgba(255,255,255,0) 66%);filter:blur(2px)}
-.vd-welcome-glow{position:absolute;width:55%;height:42%;left:23%;top:34%;border-radius:50%;background:radial-gradient(ellipse,rgba(217,76,157,.2),transparent 68%);filter:blur(18px)}
-.vd-welcome-bag{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%) rotate(-4deg);width:min(46vw,250px);height:min(38vw,210px);border-radius:18px 18px 28px 28px;background:linear-gradient(145deg,#fff,#eadff6);box-shadow:0 35px 80px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.9);display:grid;place-items:center}
-.vd-welcome-bag:before{content:"";position:absolute;left:22%;right:22%;top:-19%;height:42%;border:9px solid #e7d9f1;border-bottom:0;border-radius:55px 55px 0 0}
-.vd-welcome-bag span{font:900 clamp(72px,16vw,128px)/1 Outfit;background:linear-gradient(135deg,#7434ff,#e735c0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 7px 12px rgba(116,52,255,.16))}
-.vd-welcome-bag i{position:absolute;width:58%;height:8px;bottom:28px;border-radius:99px;background:linear-gradient(90deg,#7434ff,#e735c0);opacity:.16}
-.vd-welcome-store{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:min(48vw,290px);height:min(32vw,190px);border:1px solid rgba(255,255,255,.18);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.17),rgba(255,255,255,.06));backdrop-filter:blur(12px);box-shadow:0 35px 90px rgba(0,0,0,.35);display:grid;place-items:center;align-content:center;gap:10px;color:#fff}
-.vd-welcome-store svg{filter:drop-shadow(0 8px 16px rgba(0,0,0,.22))}.vd-welcome-store span{font:800 clamp(22px,5vw,34px) Outfit;letter-spacing:.04em}
-.vd-welcome-float{position:absolute;width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);font-size:27px;box-shadow:0 18px 35px rgba(0,0,0,.2)}
-.vd-welcome-float-one{left:12%;top:28%;color:#f6a0c7}.vd-welcome-float-two{right:11%;top:58%;color:#b88cff}
-.vd-welcome-panel-content{position:absolute;z-index:3;left:clamp(22px,6vw,80px);right:clamp(22px,6vw,80px);bottom:clamp(78px,9vh,112px);max-width:650px}
-.vd-welcome-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(255,255,255,.17);background:rgba(8,7,26,.4);backdrop-filter:blur(10px);border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.12em;color:#f0e9f7}
-.vd-welcome-panel-content h1{font:800 clamp(42px,7vw,76px)/.93 Outfit;margin:18px 0 13px;letter-spacing:-.045em;text-shadow:0 10px 35px rgba(0,0,0,.28)}
-.vd-welcome-panel-content h1 strong{display:block;background:linear-gradient(90deg,#fff,#e58cff,#f39ac7);-webkit-background-clip:text;background-clip:text;color:transparent}
-.vd-welcome-panel-content p{max-width:520px;margin:0;color:rgba(255,255,255,.82);font-size:clamp(13px,1.8vw,16px);line-height:1.6}
-.vd-welcome-panel-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
-.vd-welcome-panel-actions button{min-height:50px;border-radius:999px;padding:0 19px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-size:13px;font-weight:800;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 12px 30px rgba(0,0,0,.18);transition:transform .15s ease,background .15s ease}
-.vd-welcome-panel-actions button:first-child{background:linear-gradient(100deg,#7434ff,#d51cb9);border-color:transparent}.vd-welcome-panel-actions button:active{transform:scale(.98)}.vd-welcome-panel-actions svg{width:18px;height:18px}
-.vd-welcome-swipe{position:absolute;z-index:4;bottom:clamp(22px,3.5vh,38px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.72);font-size:10px;font-weight:700;letter-spacing:.08em;white-space:nowrap}
-.vd-welcome-dots{position:absolute;z-index:5;bottom:1.2%;left:50%;transform:translateX(-50%);display:flex;gap:9px;align-items:center;padding:5px 9px;border-radius:99px;background:rgba(5,4,18,.28);backdrop-filter:blur(8px)}
-.vd-welcome-dots button{width:9px;height:9px;padding:0;border:1px solid rgba(255,255,255,.62);border-radius:50%;background:rgba(255,255,255,.16);cursor:pointer}.vd-welcome-dots button.active{width:11px;height:11px;background:#f6a0c7;border-color:#f6a0c7;box-shadow:0 0 10px rgba(246,160,199,.32)}
-
-@media(max-width:900px){
- .vd-welcome-panel{flex-basis:100%;min-width:100%}.vd-welcome-panel-content{left:24px;right:24px;bottom:clamp(78px,9vh,105px)}
- .vd-welcome-panel-content h1{font-size:clamp(42px,12vw,66px)}.vd-welcome-bag{width:min(58vw,250px);height:min(47vw,210px)}.vd-welcome-store{width:min(62vw,290px);height:min(42vw,190px)}
- .vd-welcome-float-one{left:8%;top:29%}.vd-welcome-float-two{right:8%;top:57%}
-}
-@media(max-width:560px){
- .vd-welcome-dots{bottom:1.1%;gap:8px}.vd-welcome-panel-content{bottom:clamp(72px,9vh,98px)}.vd-welcome-panel-content h1{font-size:clamp(40px,12.5vw,58px);margin-top:15px}.vd-welcome-panel-content p{font-size:13px;line-height:1.5}.vd-welcome-panel-actions{margin-top:18px}.vd-welcome-panel-actions button{min-height:48px;padding:0 16px;font-size:12px}.vd-welcome-float{width:48px;height:48px;font-size:22px}.vd-welcome-bag{top:39%;width:54vw;height:43vw}.vd-welcome-store{top:39%;width:62vw;height:39vw}.vd-welcome-store svg{width:54px;height:54px}.vd-welcome-store span{font-size:24px}.vd-welcome-swipe{bottom:clamp(21px,3.2vh,30px);font-size:9px}
-}
-@media(max-height:760px){.vd-welcome-panel-content{bottom:68px}.vd-welcome-panel-content h1{font-size:clamp(37px,10vw,56px);margin:12px 0 9px}.vd-welcome-panel-content p{font-size:12px}.vd-welcome-panel-actions{margin-top:14px}.vd-welcome-panel-actions button{min-height:45px}.vd-welcome-bag{top:37%}.vd-welcome-store{top:37%}.vd-welcome-float{transform:scale(.85)}}
-@media(prefers-reduced-motion:reduce){.vd-welcome-carousel{scroll-behavior:auto}}
+.vd-welcome-panel{position:relative;background:#08071a;isolation:isolate}
+.vd-welcome-art{position:absolute!important;inset:0!important;z-index:0!important;background-image:url('/VaniDaxi-Fontent/welcome-vandaxi-1.webp')!important;background-repeat:no-repeat!important;background-size:200% 100%!important;background-position:left center!important;background-color:#08071a!important;pointer-events:none!important;user-select:none!important;-webkit-user-drag:none!important}
+.vd-welcome-panel-buyer .vd-welcome-art{background-position:left center!important}
+.vd-welcome-panel-seller .vd-welcome-art{background-position:right center!important}
+.vd-welcome-art:before{display:none!important;content:none!important}
+.vd-welcome-ui{position:absolute!important;z-index:4!important;left:8%!important;right:8%!important;bottom:7.2%!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;pointer-events:auto!important}
+.vd-welcome-action{min-width:0!important;height:46px!important;border:1px solid rgba(255,255,255,.65)!important;border-radius:999px!important;padding:0 12px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;color:#fff!important;background:rgba(20,10,45,.45)!important;backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;box-shadow:0 5px 18px rgba(0,0,0,.22)!important;font:700 14px/1 Inter,system-ui,sans-serif!important;cursor:pointer!important}
+.vd-welcome-action-login{border-color:rgba(255,255,255,.72)!important}
+.vd-welcome-action-signup{background:linear-gradient(100deg,rgba(123,44,255,.88),rgba(217,27,184,.88))!important;border-color:rgba(255,190,225,.8)!important}
+.vd-welcome-action:hover{filter:brightness(1.08)!important}
+.vd-welcome-action:active{transform:scale(.97)!important}
+.vd-welcome-action:focus-visible{outline:3px solid rgba(255,159,202,.95)!important;outline-offset:3px!important}
+.vd-welcome-dots{position:absolute!important;z-index:5!important;bottom:1.2%!important;left:50%!important;transform:translateX(-50%)!important;display:flex!important;gap:9px!important;align-items:center!important;padding:5px 9px!important;border-radius:99px!important;background:rgba(5,4,18,.28)!important;backdrop-filter:blur(8px)!important}
+.vd-welcome-dots button{width:9px!important;height:9px!important;padding:0!important;border:1px solid rgba(255,255,255,.62)!important;border-radius:50%!important;background:rgba(255,255,255,.16)!important;cursor:pointer!important}
+.vd-welcome-dots button.active{width:11px!important;height:11px!important;background:#f6a0c7!important;border-color:#f6a0c7!important;box-shadow:0 0 10px rgba(246,160,199,.32)!important}
+@media(max-width:900px){.vd-welcome-panel{flex-basis:100%;min-width:100%}.vd-welcome-carousel{height:100dvh!important;scroll-snap-stop:always}.vd-welcome-art{background-size:200% 100%!important}.vd-welcome-ui{left:8%!important;right:8%!important;bottom:7%!important}.vd-welcome-action{height:45px!important;font-size:13px!important}}
+@media(max-width:560px){.vd-welcome-dots{bottom:1.1%!important;gap:8px!important}.vd-welcome-ui{left:6.5%!important;right:6.5%!important;bottom:6.5%!important;gap:7px!important}.vd-welcome-action{height:42px!important;padding:0 8px!important;gap:5px!important;font-size:12px!important}.vd-welcome-action svg{width:15px!important;height:15px!important}}
+@media(max-height:760px){.vd-welcome-ui{bottom:7%!important}.vd-welcome-action{height:40px!important}}
+@media(prefers-reduced-motion:reduce){.vd-welcome-carousel{scroll-behavior:auto!important}}
