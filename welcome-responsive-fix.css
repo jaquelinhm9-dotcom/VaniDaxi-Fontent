@@ -1,8 +1,8 @@
 /* VaniDaxi welcome: approved reference artwork as the actual visual surface. */
 .vd-welcome-approved{background:#08071a!important}
-.vd-welcome-carousel{height:100dvh!important}
-.vd-welcome-panel{position:relative;background:#08071a;isolation:isolate}
-.vd-welcome-art{position:absolute!important;inset:0!important;z-index:0!important;background-image:url('/VaniDaxi-Fontent/welcome-vandaxi-1.webp')!important;background-repeat:no-repeat!important;background-size:200% 100%!important;background-position:left center!important;background-color:#08071a!important;pointer-events:none!important;user-select:none!important;-webkit-user-drag:none!important}
+.vd-welcome-carousel{height:100dvh!important;scroll-behavior:smooth!important}
+.vd-welcome-panel{position:relative;flex:0 0 100%;min-width:100%;height:100%;background:#08071a;isolation:isolate}
+.vd-welcome-art{position:absolute!important;inset:0!important;z-index:0!important;background-image:url('./welcome-vandaxi-1.webp')!important;background-repeat:no-repeat!important;background-size:200% 100%!important;background-position:left center!important;background-color:#08071a!important;pointer-events:none!important;user-select:none!important;-webkit-user-drag:none!important}
 .vd-welcome-panel-buyer .vd-welcome-art{background-position:left center!important}
 .vd-welcome-panel-seller .vd-welcome-art{background-position:right center!important}
 .vd-welcome-art:before{display:none!important;content:none!important}
@@ -16,7 +16,6 @@
 .vd-welcome-dots{position:absolute!important;z-index:5!important;bottom:1.2%!important;left:50%!important;transform:translateX(-50%)!important;display:flex!important;gap:9px!important;align-items:center!important;padding:5px 9px!important;border-radius:99px!important;background:rgba(5,4,18,.28)!important;backdrop-filter:blur(8px)!important}
 .vd-welcome-dots button{width:9px!important;height:9px!important;padding:0!important;border:1px solid rgba(255,255,255,.62)!important;border-radius:50%!important;background:rgba(255,255,255,.16)!important;cursor:pointer!important}
 .vd-welcome-dots button.active{width:11px!important;height:11px!important;background:#f6a0c7!important;border-color:#f6a0c7!important;box-shadow:0 0 10px rgba(246,160,199,.32)!important}
-@media(max-width:900px){.vd-welcome-panel{flex-basis:100%;min-width:100%}.vd-welcome-carousel{height:100dvh!important;scroll-snap-stop:always}.vd-welcome-art{background-size:200% 100%!important}.vd-welcome-ui{left:8%!important;right:8%!important;bottom:7%!important}.vd-welcome-action{height:45px!important;font-size:13px!important}}
-@media(max-width:560px){.vd-welcome-dots{bottom:1.1%!important;gap:8px!important}.vd-welcome-ui{left:6.5%!important;right:6.5%!important;bottom:6.5%!important;gap:7px!important}.vd-welcome-action{height:42px!important;padding:0 8px!important;gap:5px!important;font-size:12px!important}.vd-welcome-action svg{width:15px!important;height:15px!important}}
+@media(max-width:560px){.vd-welcome-dots{bottom:1.1%!important;gap:8px!important}.vd-welcome-ui{left:6.5%!important;right:6.5%!important;bottom:6.5%!important;gap:7px!important}.vd-welcome-action{height:42px!important;padding:0 8px!important;gap:5px!important;font-size:12px!important}.vd-welcome-action svg{width:15px!important;height:15px!important}.vd-welcome-brand{padding-top:20px}.vd-welcome-brand small{letter-spacing:3px}}
 @media(max-height:760px){.vd-welcome-ui{bottom:7%!important}.vd-welcome-action{height:40px!important}}
 @media(prefers-reduced-motion:reduce){.vd-welcome-carousel{scroll-behavior:auto!important}}
