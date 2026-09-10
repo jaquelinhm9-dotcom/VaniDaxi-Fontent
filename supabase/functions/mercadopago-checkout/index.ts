@@ -1,0 +1,60 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
+
+const APP_ORIGIN = "https://jaquelinhm9-dotcom.github.io";
+const APP_PATH = "/VaniDaxi-Fontent/";
+const corsHeaders = {"Access-Control-Allow-Origin": APP_ORIGIN,"Access-Control-Allow-Headers": "authorization, apikey, content-type","Access-Control-Allow-Methods": "POST, OPTIONS"};
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const accessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }); }
+function safeUrl(kind: "success" | "failure" | "pending", orderId: string) { return `${APP_ORIGIN}${APP_PATH}?payment=${kind}&order=${encodeURIComponent(orderId)}`; }
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (!accessToken) return json({ error: "Mercado Pago is not configured" }, 503);
+  const authHeader = req.headers.get("Authorization") || "";
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!token) return json({ error: "Authentication required" }, 401);
+  const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data: { user }, error: userError } = await userClient.auth.getUser(token);
+  if (userError || !user) return json({ error: "Invalid authentication" }, 401);
+  const body = await req.json().catch(() => null) as { order_id?: string } | null;
+  const orderId = body?.order_id;
+  if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) return json({ error: "Invalid order_id" }, 400);
+  const { data: order, error: orderError } = await supabase.from("orders").select("id,order_number,status,subtotal,discount,shipping_cost,total,shipping_address").eq("id", orderId).eq("user_id", user.id).maybeSingle();
+  if (orderError) return json({ error: orderError.message }, 500);
+  if (!order) return json({ error: "Order not found" }, 404);
+  if (order.status !== "pending") return json({ error: "Order is not payable" }, 409);
+  if (!(Number(order.total) > 0)) return json({ error: "Invalid order total" }, 422);
+  const { data: items, error: itemsError } = await supabase.from("order_items").select("product_name,quantity,unit_price").eq("order_id", orderId);
+  if (itemsError) return json({ error: itemsError.message }, 500);
+  if (!items?.length) return json({ error: "Order has no items" }, 422);
+  const expectedSubtotal = Math.round(Number(order.subtotal || 0) * 100);
+  const expectedDiscount = Math.max(0, Math.round(Number(order.discount || 0) * 100));
+  const shipping = Math.max(0, Math.round(Number(order.shipping_cost || 0) * 100));
+  const total = Math.round(Number(order.total || 0) * 100);
+  const itemSubtotal = items.reduce((sum, item) => sum + Math.max(1, Number(item.quantity || 1)) * Math.max(0, Math.round(Number(item.unit_price || 0) * 100)), 0);
+  if (itemSubtotal !== expectedSubtotal) return json({ error: "Order item total mismatch" }, 409);
+  if (expectedDiscount > expectedSubtotal || expectedSubtotal - expectedDiscount + shipping !== total) return json({ error: "Order total mismatch" }, 409);
+  const lineTotals = items.map((item) => ({ title: String(item.product_name || "Producto VaniDaxi").slice(0, 200), quantity: Math.max(1, Number(item.quantity || 1)), cents: Math.max(0, Math.round(Number(item.unit_price || 0) * 100)) * Math.max(1, Number(item.quantity || 1)) }));
+  let remainingDiscount = expectedDiscount;
+  const mpItems = lineTotals.map((line, index) => {
+    let reduction = index === lineTotals.length - 1 ? Math.min(remainingDiscount, line.cents) : Math.min(line.cents, Math.floor(expectedDiscount * line.cents / Math.max(1, expectedSubtotal)));
+    if (index === lineTotals.length - 1) reduction = remainingDiscount;
+    reduction = Math.min(reduction, line.cents);
+    remainingDiscount -= reduction;
+    const adjustedCents = line.cents - reduction;
+    return { title: line.title, quantity: line.quantity, unit_price: adjustedCents / 100 / line.quantity, currency_id: "MXN" };
+  });
+  if (remainingDiscount !== 0) return json({ error: "Could not apply order discount" }, 409);
+  if (shipping > 0) mpItems.push({ title: "Envío VaniDaxi", quantity: 1, unit_price: shipping / 100, currency_id: "MXN" });
+  const preference = { items: mpItems, external_reference: orderId, back_urls: { success: safeUrl("success", orderId), failure: safeUrl("failure", orderId), pending: safeUrl("pending", orderId) }, auto_return: "approved", notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`, metadata: { order_id: orderId, order_number: order.order_number } };
+  const response = await fetch("https://api.mercadopago.com/checkout/preferences", { method: "POST", headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, body: JSON.stringify(preference) });
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.init_point) return json({ error: data?.message || data?.error || "Mercado Pago preference failed" }, 502);
+  const { error: updateError } = await supabase.from("orders").update({ payment_provider: "mercadopago" }).eq("id", orderId).eq("user_id", user.id);
+  if (updateError) return json({ error: "Could not update payment provider" }, 500);
+  return json({ checkout_url: data.init_point, preference_id: data.id, order_id: orderId });
+});
