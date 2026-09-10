@@ -7,110 +7,21 @@ import{saveSession}from'./auth.js'
 import'./welcome-gate.css'
 
 const HCAPTCHA_SITEKEY=import.meta.env.VITE_HCAPTCHA_SITEKEY||'390a44ec-b452-47d4-8514-5e6aeeece0ee'
-const BUYER_ART='./welcome-vandaxi-1.webp'
-const SELLER_ART='./welcome-vandaxi-vendedor.webp'
+const BUYER_ART='https://raw.githubusercontent.com/jaquelinhm9-dotcom/VaniDaxi-Fontent/main/welcome-vandaxi-1.webp'
+const SELLER_ART='https://raw.githubusercontent.com/jaquelinhm9-dotcom/VaniDaxi-Fontent/main/welcome-vandaxi-vendedor.webp'
 const passkeySupported=()=>typeof window!=='undefined'&&window.isSecureContext&&'PublicKeyCredential'in window
 const reducedMotion=()=>typeof window!=='undefined'&&window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 export default function WelcomeGate({locked=false,onUnlock}){
- const[authOpen,setAuthOpen]=useState(false)
- const[authType,setAuthType]=useState('login')
- const[busy,setBusy]=useState(false)
- const[err,setErr]=useState('')
- const[captchaReady,setCaptchaReady]=useState(false)
- const[panel,setPanel]=useState(0)
- const carouselRef=useRef(null)
- const captchaRef=useRef(null)
- const autoTimerRef=useRef(null)
-
+ const[authOpen,setAuthOpen]=useState(false),[authType,setAuthType]=useState('login'),[busy,setBusy]=useState(false),[err,setErr]=useState(''),[captchaReady,setCaptchaReady]=useState(false),[panel,setPanel]=useState(0)
+ const carouselRef=useRef(null),captchaRef=useRef(null),autoTimerRef=useRef(null)
  const open=type=>{setAuthType(type);setErr('');setAuthOpen(true)}
- const goPanel=index=>{
-  const next=Math.max(0,Math.min(1,index))
-  setPanel(next)
-  carouselRef.current?.children?.[next]?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'nearest',inline:'center'})
- }
+ const goPanel=index=>{const next=Math.max(0,Math.min(1,index));setPanel(next);carouselRef.current?.children?.[next]?.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'nearest',inline:'center'})}
  const stopAuto=()=>{if(autoTimerRef.current){clearTimeout(autoTimerRef.current);autoTimerRef.current=null}}
- const scheduleAuto=()=>{
-  stopAuto()
-  if(locked||authOpen||reducedMotion()||document.visibilityState==='hidden')return
-  autoTimerRef.current=setTimeout(()=>goPanel(panel===0?1:0),5200)
- }
+ const scheduleAuto=()=>{stopAuto();if(locked||authOpen||reducedMotion()||document.visibilityState==='hidden')return;autoTimerRef.current=setTimeout(()=>goPanel(panel===0?1:0),5200)}
  useEffect(()=>{scheduleAuto();return stopAuto},[panel,locked,authOpen])
- useEffect(()=>{
-  const onVisibility=()=>document.visibilityState==='hidden'?stopAuto():scheduleAuto()
-  document.addEventListener('visibilitychange',onVisibility)
-  return()=>document.removeEventListener('visibilitychange',onVisibility)
- })
-
- const unlock=async()=>{
-  setErr('')
-  if(!passkeySupported()){setErr('Este dispositivo o navegador no tiene disponible la llave de acceso. Usa tu contraseña para continuar.');return}
-  if(!captchaReady||!captchaRef.current){setErr('La verificación de seguridad todavía se está preparando. Inténtalo de nuevo en un momento.');return}
-  setBusy(true)
-  try{
-   const captcha=await captchaRef.current.execute({async:true})
-   const captchaToken=captcha?.response||captcha?.token||captchaRef.current.getResponse?.()
-   if(!captchaToken)throw new Error('No se pudo completar la verificación de seguridad.')
-   const{data,error}=await supabase.auth.signInWithPasskey({options:{captchaToken}})
-   captchaRef.current.resetCaptcha?.()
-   if(error)throw error
-   if(!data?.session)throw new Error('No se recibió una sesión válida.')
-   saveSession(data.session)
-   localStorage.removeItem('vanidaxi-app-lock')
-   onUnlock?.()
-  }catch(e){
-   captchaRef.current?.resetCaptcha?.()
-   if(e?.name==='NotAllowedError')setErr('La verificación del dispositivo fue cancelada.')
-   else if(e?.code==='passkey_disabled')setErr('La llave de acceso no está disponible en este momento.')
-   else setErr(e?.message||'No se pudo desbloquear la cuenta. Usa tu contraseña para continuar.')
-  }finally{setBusy(false)}
- }
-
- if(locked)return <div className="vd-welcome vd-welcome-locked">
-  <div className="vd-welcome-visual"><img src={BUYER_ART} alt=""/></div>
-  <div className="vd-welcome-overlay" aria-hidden="true"></div>
-  <header className="vd-welcome-lock-brand"><span className="vd-welcome-mark">V</span><strong>Vani<span>Daxi</span></strong></header>
-  <main className="vd-welcome-lock-panel">
-   <div className="vd-welcome-lock-icon"><LockKeyhole size={28}/></div>
-   <div className="vd-welcome-lock-copy"><span>Tu cuenta está protegida</span><h1>Bienvenido de nuevo a <b>VaniDaxi</b></h1><p>Verifica tu dispositivo para continuar de forma segura.</p></div>
-   <div className="vd-welcome-lock-actions">
-    <button className="vd-welcome-main-action" onClick={unlock} disabled={busy||!captchaReady}><Fingerprint/><span>{busy?'Verificando…':!captchaReady?'Preparando verificación…':'Desbloquear con huella, Face ID o PIN'}</span><ArrowRight/></button>
-    <button className="vd-welcome-alt-action" onClick={()=>open('login')} disabled={busy}><LogIn/><span>Continuar con contraseña</span><ArrowRight/></button>
-   </div>
-   <div className="vd-hidden-captcha"><HCaptcha ref={captchaRef} sitekey={HCAPTCHA_SITEKEY} size="invisible" onReady={()=>setCaptchaReady(true)} onLoad={()=>setCaptchaReady(true)} onError={()=>{setCaptchaReady(false);setErr('No se pudo completar la verificación de seguridad.')}} onExpire={()=>setCaptchaReady(true)}/></div>
-   {err&&<div className="vd-welcome-error">{err}</div>}
-  </main>
-  <footer className="vd-welcome-lock-footer"><ShieldCheck size={15}/> Acceso seguro a tu cuenta</footer>
-  {authOpen&&<AuthChoice type={authType} close={()=>setAuthOpen(false)} done={()=>{setAuthOpen(false);localStorage.removeItem('vanidaxi-app-lock');onUnlock?.()}}/>}
- </div>
-
- return <div className="vd-welcome vd-welcome-fresh">
-  <div ref={carouselRef} className="vd-welcome-carousel" onScroll={e=>{const width=e.currentTarget.clientWidth||1;const next=Math.round(e.currentTarget.scrollLeft/width);if(next!==panel)setPanel(next)}} onTouchStart={stopAuto} onTouchEnd={scheduleAuto} onMouseEnter={stopAuto} onMouseLeave={scheduleAuto}>
-   <section className="vd-welcome-screen vd-welcome-screen-buyer" aria-label="Comprar en VaniDaxi">
-    <div className="vd-welcome-photo"><img src={BUYER_ART} alt="Comprar en VaniDaxi" draggable="false"/></div>
-    <div className="vd-welcome-surface">
-     <div className="vd-welcome-heading"><span>COMPRAR</span><h1>Encuentra todo en un solo lugar</h1></div>
-     <div className="vd-welcome-actions" aria-label="Acciones de comprador">
-      <button className="vd-welcome-action vd-welcome-action-primary" onClick={()=>open('login')}><LogIn size={17}/><span>Iniciar sesión</span></button>
-      <button className="vd-welcome-action vd-welcome-action-secondary" onClick={()=>open('signup')}><UserPlus size={17}/><span>Crear cuenta</span></button>
-     </div>
-     <button className="vd-welcome-next" aria-label="Ver Vender" onClick={()=>goPanel(1)}><span>Vender</span><ArrowRight size={16}/></button>
-    </div>
-   </section>
-
-   <section className="vd-welcome-screen vd-welcome-screen-seller" aria-label="Vender en VaniDaxi">
-    <div className="vd-welcome-photo"><img src={SELLER_ART} alt="Vender en VaniDaxi" draggable="false"/></div>
-    <div className="vd-welcome-surface">
-     <div className="vd-welcome-heading"><span>VENDER</span><h1>Tu tienda, dentro de VaniDaxi</h1></div>
-     <div className="vd-welcome-actions" aria-label="Acciones de vendedor">
-      <button className="vd-welcome-action vd-welcome-action-primary" onClick={()=>open('login')}><LogIn size={17}/><span>Iniciar sesión</span></button>
-      <button className="vd-welcome-action vd-welcome-action-secondary" onClick={()=>open('seller-signup')}><UserPlus size={17}/><span>Crear cuenta</span></button>
-     </div>
-     <button className="vd-welcome-next" aria-label="Volver a Comprar" onClick={()=>goPanel(0)}><ArrowLeft size={16}/><span>Comprar</span></button>
-    </div>
-   </section>
-  </div>
-  <div className="vd-welcome-dots" aria-label="Seleccionar bienvenida"><button className={panel===0?'active':''} aria-label="Comprar" aria-current={panel===0?'page':undefined} onClick={()=>goPanel(0)}></button><button className={panel===1?'active':''} aria-label="Vender" aria-current={panel===1?'page':undefined} onClick={()=>goPanel(1)}></button></div>
-  {authOpen&&<AuthChoice type={authType} close={()=>setAuthOpen(false)} done={()=>{setAuthOpen(false);location.reload()}}/>}
- </div>
+ useEffect(()=>{const onVisibility=()=>document.visibilityState==='hidden'?stopAuto():scheduleAuto();document.addEventListener('visibilitychange',onVisibility);return()=>document.removeEventListener('visibilitychange',onVisibility)})
+ const unlock=async()=>{setErr('');if(!passkeySupported()){setErr('Este dispositivo o navegador no tiene disponible la llave de acceso. Usa tu contraseña para continuar.');return}if(!captchaReady||!captchaRef.current){setErr('La verificación de seguridad todavía se está preparando.');return}setBusy(true);try{const captcha=await captchaRef.current.execute({async:true}),captchaToken=captcha?.response||captcha?.token||captchaRef.current.getResponse?.();if(!captchaToken)throw new Error('No se pudo completar la verificación de seguridad.');const{data,error}=await supabase.auth.signInWithPasskey({options:{captchaToken}});captchaRef.current.resetCaptcha?.();if(error)throw error;if(!data?.session)throw new Error('No se recibió una sesión válida.');saveSession(data.session);localStorage.removeItem('vanidaxi-app-lock');onUnlock?.()}catch(e){captchaRef.current?.resetCaptcha?.();if(e?.name==='NotAllowedError')setErr('La verificación del dispositivo fue cancelada.');else if(e?.code==='passkey_disabled')setErr('La llave de acceso no está disponible en este momento.');else setErr(e?.message||'No se pudo desbloquear la cuenta.')}finally{setBusy(false)}}
+ if(locked)return <div className="vd-welcome vd-welcome-locked"><div className="vd-welcome-visual"><img src={BUYER_ART} alt=""/></div><div className="vd-welcome-overlay" aria-hidden="true"></div><header className="vd-welcome-lock-brand"><span className="vd-welcome-mark">V</span><strong>Vani<span>Daxi</span></strong></header><main className="vd-welcome-lock-panel"><div className="vd-welcome-lock-icon"><LockKeyhole size={28}/></div><div className="vd-welcome-lock-copy"><span>Tu cuenta está protegida</span><h1>Bienvenido de nuevo a <b>VaniDaxi</b></h1><p>Verifica tu dispositivo para continuar de forma segura.</p></div><div className="vd-welcome-lock-actions"><button className="vd-welcome-main-action" onClick={unlock} disabled={busy||!captchaReady}><Fingerprint/><span>{busy?'Verificando…':!captchaReady?'Preparando verificación…':'Desbloquear con huella, Face ID o PIN'}</span><ArrowRight/></button><button className="vd-welcome-alt-action" onClick={()=>open('login')} disabled={busy}><LogIn/><span>Continuar con contraseña</span><ArrowRight/></button></div><div className="vd-hidden-captcha"><HCaptcha ref={captchaRef} sitekey={HCAPTCHA_SITEKEY} size="invisible" onReady={()=>setCaptchaReady(true)} onLoad={()=>setCaptchaReady(true)} onError={()=>{setCaptchaReady(false);setErr('No se pudo completar la verificación de seguridad.')}} onExpire={()=>setCaptchaReady(true)}/></div>{err&&<div className="vd-welcome-error">{err}</div>}</main><footer className="vd-welcome-lock-footer"><ShieldCheck size={15}/> Acceso seguro a tu cuenta</footer>{authOpen&&<AuthChoice type={authType} close={()=>setAuthOpen(false)} done={()=>{setAuthOpen(false);localStorage.removeItem('vanidaxi-app-lock');onUnlock?.()}}/>}</div>
+ return <div className="vd-welcome vd-welcome-fresh"><div ref={carouselRef} className="vd-welcome-carousel" onScroll={e=>{const width=e.currentTarget.clientWidth||1,next=Math.round(e.currentTarget.scrollLeft/width);if(next!==panel)setPanel(next)}} onTouchStart={stopAuto} onTouchEnd={scheduleAuto} onMouseEnter={stopAuto} onMouseLeave={scheduleAuto}><section className="vd-welcome-screen vd-welcome-screen-buyer" aria-label="Comprar en VaniDaxi"><div className="vd-welcome-photo"><img src={BUYER_ART} alt="Comprar en VaniDaxi" draggable="false"/></div><div className="vd-welcome-surface"><div className="vd-welcome-heading"><span>COMPRAR</span><h1>Encuentra todo en un solo lugar</h1></div><div className="vd-welcome-actions" aria-label="Acciones de comprador"><button className="vd-welcome-action vd-welcome-action-primary" onClick={()=>open('login')}><LogIn size={17}/><span>Iniciar sesión</span></button><button className="vd-welcome-action vd-welcome-action-secondary" onClick={()=>open('signup')}><UserPlus size={17}/><span>Crear cuenta</span></button></div><button className="vd-welcome-next" aria-label="Ver Vender" onClick={()=>goPanel(1)}><span>Vender</span><ArrowRight size={16}/></button></div></section><section className="vd-welcome-screen vd-welcome-screen-seller" aria-label="Vender en VaniDaxi"><div className="vd-welcome-photo"><img src={SELLER_ART} alt="Vender en VaniDaxi" draggable="false"/></div><div className="vd-welcome-surface"><div className="vd-welcome-heading"><span>VENDER</span><h1>Tu tienda, dentro de VaniDaxi</h1></div><div className="vd-welcome-actions" aria-label="Acciones de vendedor"><button className="vd-welcome-action vd-welcome-action-primary" onClick={()=>open('login')}><LogIn size={17}/><span>Iniciar sesión</span></button><button className="vd-welcome-action vd-welcome-action-secondary" onClick={()=>open('seller-signup')}><UserPlus size={17}/><span>Crear cuenta</span></button></div><button className="vd-welcome-next" aria-label="Volver a Comprar" onClick={()=>goPanel(0)}><ArrowLeft size={16}/><span>Comprar</span></button></div></section></div><div className="vd-welcome-dots" aria-label="Seleccionar bienvenida"><button className={panel===0?'active':''} aria-label="Comprar" onClick={()=>goPanel(0)}></button><button className={panel===1?'active':''} aria-label="Vender" onClick={()=>goPanel(1)}></button></div>{authOpen&&<AuthChoice type={authType} close={()=>setAuthOpen(false)} done={()=>{setAuthOpen(false);location.reload()}}/>}</div>
 }
