@@ -4,7 +4,7 @@
 .vd-welcome-carousel{width:100%;height:100dvh;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
 .vd-welcome-carousel::-webkit-scrollbar{display:none}
 .vd-welcome-panel{position:relative;flex:0 0 100%;min-width:100%;height:100%;scroll-snap-align:start;overflow:hidden;background:#07091d}
-.vd-welcome-art{position:absolute;inset:0;background-image:url('./welcome-vandandaxi-1.webp');background-repeat:no-repeat;background-size:200% 100%;background-position:left center;background-color:#07091d;user-select:none;-webkit-user-drag:none}
+.vd-welcome-art{position:absolute;inset:0;background-image:url('./welcome-vandaxi-1.webp');background-repeat:no-repeat;background-size:200% 100%;background-position:left center;background-color:#07091d;user-select:none;-webkit-user-drag:none}
 .vd-welcome-panel-buyer .vd-welcome-art{background-position:left center}
 .vd-welcome-panel-seller .vd-welcome-art{background-position:right center}
 .vd-welcome-ui{position:absolute;z-index:4;left:8%;right:8%;bottom:7.2%;display:grid;grid-template-columns:1fr 1fr;gap:10px;pointer-events:auto}
