@@ -31,8 +31,9 @@ export async function signInWithProvider(provider) {
   return data
 }
 
-export async function signInWithPhone(phone, captchaToken = '') {
-  const { data, error } = await supabase.auth.signInWithOtp({ phone, options: { shouldCreateUser: true, captchaToken } })
+export async function signInWithPhone(phone, accountType = 'customer', captchaToken = '') {
+  const safeType = accountType === 'seller' ? 'seller' : 'customer'
+  const { data, error } = await supabase.auth.signInWithOtp({ phone, options: { shouldCreateUser: true, data: { account_type: safeType }, captchaToken } })
   if (error) throw new Error(error.message || 'No se pudo enviar el código SMS.')
   return data
 }
@@ -54,7 +55,7 @@ export async function sendPasswordReset(email, captchaToken = '') {
 
 export async function signOut() {
   const session = getSession()
-  if (session?.access_token) await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }).catch(() => {})
+  if (session?.access_token) await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}`) }).catch(() => {})
   await supabase.auth.signOut().catch(() => {})
   localStorage.removeItem(STORAGE_KEY)
 }
