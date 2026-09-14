@@ -1,4 +1,4 @@
-/* VaniDaxi — bienvenida: fotografías reales a pantalla completa, sin tarjetas. */
+/* VaniDaxi — bienvenida: escenas fotográficas generadas, a pantalla completa, sin tarjetas. */
 
 .welcome-page,
 .welcome-stage{background:transparent !important;}
@@ -13,7 +13,6 @@
   isolation:isolate !important;
 }
 
-/* La fotografía es el fondo completo de cada escena. */
 .welcome-page .scene-viewport{
   position:absolute !important;
   inset:0 !important;
@@ -41,7 +40,7 @@
   background:transparent !important;
 }
 
-/* COMPRADOR: frente exterior de mall moderno + compradores reales con bolsas. */
+/* COMPRADOR: fotografía generada específicamente para VaniDaxi: frente de mall, categorías y personas con bolsas. */
 .welcome-page .mall-scene{
   position:absolute !important;
   inset:0 !important;
@@ -51,34 +50,11 @@
   border:0 !important;
   border-radius:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.04) 45%,rgba(0,0,0,.48) 100%),
-    url('https://images.pexels.com/photos/2780551/pexels-photo-2780551.jpeg?auto=compress&cs=tinysrgb&w=2400') center center / cover no-repeat !important;
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.04) 45%,rgba(0,0,0,.52) 100%),
+    url('/VaniDaxi-Fontent/vani-mall-generated.svg') center center / cover no-repeat !important;
   box-shadow:none !important;
 }
 
-/* Primer plano fotográfico real de personas con bolsas, integrado sin marco. */
-.welcome-page .mall-scene::after{
-  content:'' !important;
-  position:absolute !important;
-  left:-10% !important;
-  right:-10% !important;
-  bottom:-12% !important;
-  height:58% !important;
-  z-index:2 !important;
-  pointer-events:none !important;
-  background:url('https://images.pexels.com/photos/6567654/pexels-photo-6567654.jpeg?auto=compress&cs=tinysrgb&w=1800') center bottom / cover no-repeat !important;
-  -webkit-mask-image:radial-gradient(ellipse 78% 76% at 50% 82%,#000 18%,rgba(0,0,0,.96) 46%,rgba(0,0,0,.52) 68%,transparent 90%);
-  mask-image:radial-gradient(ellipse 78% 76% at 50% 82%,#000 18%,rgba(0,0,0,.96) 46%,rgba(0,0,0,.52) 68%,transparent 90%);
-  opacity:.97 !important;
-}
-.welcome-page .mall-scene::before{
-  content:'' !important;
-  position:absolute !important;
-  inset:0 !important;
-  z-index:3 !important;
-  pointer-events:none !important;
-  background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.04) 52%,rgba(0,0,0,.45) 100%) !important;
-}
 .welcome-page .mall-sky,
 .welcome-page .mall-haze,
 .welcome-page .mall-store-row,
@@ -92,7 +68,7 @@
 .welcome-page .mall-phone,
 .welcome-page .mall-building{display:none !important;}
 
-/* VENDEDOR: tienda real + persona con tablet/analítica. */
+/* VENDEDOR: fotografía generada específicamente para VaniDaxi: tienda real, persona y tablet con analítica. */
 .welcome-page .seller-world{
   position:absolute !important;
   inset:0 !important;
@@ -110,8 +86,8 @@
   inset:0 !important;
   padding:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.03) 45%,rgba(0,0,0,.48) 100%),
-    url('https://www.elevify.com/_next/image?q=70&url=https%3A%2F%2Fproduction.elevify-cdn.com%2Fimages%2F2026-05%2Fa4f31e22-5fc0-4860-94a3-3d7c44c0d8a2.jpg&w=3840') center center / cover no-repeat !important;
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.03) 45%,rgba(0,0,0,.52) 100%),
+    url('/VaniDaxi-Fontent/vani-seller-generated.svg') center center / cover no-repeat !important;
 }
 .welcome-page .seller-store-shell,
 .welcome-page .seller-mall-sign,
@@ -120,7 +96,7 @@
 .welcome-page .seller-orbit,
 .welcome-page .seller-buy-strip{display:none !important;}
 
-/* Marca y descripción sobre la foto. */
+/* Marca y descripción sobre la fotografía. */
 .welcome-page .welcome-brand{
   position:absolute !important;
   top:clamp(16px,4vw,34px) !important;
@@ -145,7 +121,7 @@
 .welcome-page .welcome-copy p,
 .welcome-page .welcome-copy .scene-kicker{color:#fff !important;}
 
-/* Indicadores, Desliza y Omitir debajo de la descripción. */
+/* Indicadores y "Desliza" quedan debajo de la descripción. */
 .welcome-page .scene-controls{
   position:absolute !important;
   left:50% !important;
@@ -158,7 +134,7 @@
 .welcome-page .skip-link,
 .welcome-page .swipe-hint{color:#fff !important;text-shadow:0 3px 12px rgba(0,0,0,.65) !important;}
 
-/* Botones de acceso al final, separados de la descripción. */
+/* Botones de acceso al final. El primario es verde VaniDaxi. */
 .welcome-page .welcome-actions{
   position:absolute !important;
   left:50% !important;
@@ -176,12 +152,26 @@
   box-shadow:none !important;
 }
 .welcome-page .welcome-actions .secondary-auth,
-.welcome-page .welcome-actions .primary-auth{min-height:50px !important;border-radius:14px !important;font-weight:900 !important;box-shadow:0 12px 28px rgba(0,0,0,.30) !important;}
-.welcome-page .welcome-actions .secondary-auth{background:rgba(0,0,0,.30) !important;color:#fff !important;border:1px solid rgba(255,255,255,.54) !important;backdrop-filter:blur(7px) !important;-webkit-backdrop-filter:blur(7px) !important;}
-.welcome-page .welcome-actions .primary-auth{background:#fff !important;color:#102f32 !important;}
+.welcome-page .welcome-actions .primary-auth{
+  min-height:50px !important;
+  border-radius:14px !important;
+  font-weight:900 !important;
+  box-shadow:0 12px 28px rgba(0,0,0,.30) !important;
+}
+.welcome-page .welcome-actions .secondary-auth{
+  background:rgba(0,0,0,.30) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.54) !important;
+  backdrop-filter:blur(7px) !important;
+  -webkit-backdrop-filter:blur(7px) !important;
+}
+.welcome-page .welcome-actions .primary-auth{
+  background:#19d3c5 !important;
+  color:#082b2c !important;
+  border:1px solid rgba(255,255,255,.38) !important;
+}
 .welcome-page .welcome-access-note{display:none !important;}
 
-/* Sin decoraciones globales del fondo verde original. */
 .welcome-page .welcome-stage::before,
 .welcome-page .welcome-stage::after{display:none !important;}
 
