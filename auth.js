@@ -24,9 +24,12 @@ export async function signIn(email, password, captchaToken = '') {
   return { ...data, access_token: session.access_token, refresh_token: session.refresh_token }
 }
 
-export async function signInWithProvider(provider) {
+export async function signInWithProvider(provider, accountType = 'customer') {
   const safeProvider = provider === 'facebook' ? 'facebook' : 'google'
-  const { data, error } = await supabase.auth.signInWithOAuth({ provider: safeProvider, options: { redirectTo: window.location.origin + window.location.pathname } })
+  const safeType = accountType === 'seller' ? 'seller' : 'customer'
+  const redirect = new URL(window.location.origin + window.location.pathname)
+  if (safeType === 'seller') redirect.searchParams.set('oauth_role','seller')
+  const { data, error } = await supabase.auth.signInWithOAuth({ provider: safeProvider, options: { redirectTo: redirect.toString() } })
   if (error) throw new Error(error.message || `No se pudo iniciar sesión con ${safeProvider}.`)
   return data
 }
@@ -45,6 +48,12 @@ export async function verifyPhoneOtp(phone, token) {
   if (!session?.access_token) throw new Error('Supabase no devolvió una sesión válida.')
   saveSession(session)
   return { ...data, access_token: session.access_token, refresh_token: session.refresh_token }
+}
+
+export async function becomeSeller() {
+  const { data, error } = await supabase.rpc('become_seller')
+  if (error) throw new Error(error.message || 'No fue posible activar la cuenta de vendedor.')
+  return data
 }
 
 export async function sendPasswordReset(email, captchaToken = '') {
