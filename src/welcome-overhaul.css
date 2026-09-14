@@ -1,69 +1,225 @@
-/* VaniDaxi — bienvenida principal. Correcciones integrales de visualización. */
+/* VaniDaxi — bienvenida integral: foto a pantalla completa. */
 
-.welcome-page { background:#162022 !important; }
-.welcome-page .scene-viewport{overflow:hidden;border-radius:clamp(20px,4vw,36px);background:#162022;}
+.welcome-page,
+.welcome-stage{
+  background:transparent !important;
+}
 
-/* COMPRADOR: foto real de mall con personas y bolsas. */
+/* La fotografía ocupa TODO el espacio disponible. No recuadro, no marco, no fondo verde. */
+.welcome-page .scene-viewport{
+  position:absolute !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100svh !important;
+  min-height:100svh !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  border:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  z-index:0 !important;
+}
+
+.welcome-page .scene-frame{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  margin:0 !important;
+  border-radius:0 !important;
+}
+
+.welcome-page .scene-frame-buyer,
+.welcome-page .scene-frame-seller{
+  background:transparent !important;
+}
+
+/* COMPRADOR: fotografía real del mall con personas y bolsas. */
 .welcome-page .mall-scene{
-  position:absolute;inset:0;width:100%;height:100%;min-height:0;border-radius:0;border:0;
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  border-radius:0 !important;
+  border:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.02) 42%,rgba(3,12,13,.55) 100%),
-    url('https://images.pexels.com/photos/36712918/pexels-photo-36712918.jpeg?cs=srgb&dl=pexels-silverkblack-36712918.jpg&fm=jpg') center/cover no-repeat;
-  box-shadow:none;
+    linear-gradient(180deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.02) 48%,rgba(0,0,0,.48) 100%),
+    url('https://images.pexels.com/photos/36712918/pexels-photo-36712918.jpeg?cs=srgb&dl=pexels-silverkblack-36712918.jpg&fm=jpg') center center / cover no-repeat !important;
+  box-shadow:none !important;
 }
-.welcome-page .mall-scene::before{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.04),transparent 48%,rgba(0,0,0,.32));}
-.welcome-page .mall-scene::after{content:'VANIDAXI  •  MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:5;width:min(90%,900px);padding:10px 14px;border:1px solid rgba(255,255,255,.34);border-radius:999px;background:rgba(7,18,20,.28);color:#fff;font:800 clamp(8px,1.4vw,13px)/1.2 system-ui,sans-serif;letter-spacing:.10em;text-align:center;text-shadow:0 3px 16px rgba(0,0,0,.48);box-shadow:0 10px 26px rgba(0,0,0,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;}
 
-/* La escena CSS antigua queda fuera: no teléfono, no ilustración de mall ni siluetas encima de la foto. */
-.welcome-page .mall-sky,.welcome-page .mall-haze,.welcome-page .mall-store-row,.welcome-page .mall-store,.welcome-page .mall-glass-strip,.welcome-page .mall-entrance,.welcome-page .mall-forecourt,.welcome-page .people-zone,.welcome-page .scene-light,.welcome-page .phone-portal,.welcome-page .mall-phone,.welcome-page .mall-building{display:none!important;}
+/* Elimina todas las maquetas anteriores; queda únicamente la fotografía. */
+.welcome-page .mall-sky,
+.welcome-page .mall-haze,
+.welcome-page .mall-store-row,
+.welcome-page .mall-store,
+.welcome-page .mall-glass-strip,
+.welcome-page .mall-entrance,
+.welcome-page .mall-forecourt,
+.welcome-page .people-zone,
+.welcome-page .scene-light,
+.welcome-page .phone-portal,
+.welcome-page .mall-phone,
+.welcome-page .mall-building{display:none !important;}
 
-/* Copia y controles encima de la foto. */
-.welcome-page .scene-frame .scene-copy,.welcome-page .buyer-copy,.welcome-page .welcome-copy,.welcome-page .scene-controls,.welcome-page .welcome-actions,.welcome-page .welcome-access-note {position:relative;z-index:8;}
-.welcome-page .welcome-page-copy{text-shadow:0 4px 22px rgba(0,0,0,.48);}
+.welcome-page .mall-scene::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(180deg,transparent 48%,rgba(0,0,0,.22) 72%,rgba(0,0,0,.52) 100%);
+}
 
-/* VENDEDOR: foto real de tienda con persona y tablet mostrando analítica/estadísticas. */
-.welcome-page .seller-world{width:100%;height:100%;min-height:0;border-radius:0;overflow:hidden;position:relative;border:0;background:#132224;box-shadow:none;}
-.welcome-page .seller-backdrop{position:absolute;inset:0;padding:0;background:linear-gradient(180deg,rgba(4,10,11,.06),rgba(4,10,11,.48)),url('https://thunderbird.asu.edu/sites/default/files/2023-06/How%20Broadband%20is%20Reshaping%20the%20Retail%20Industry%20and%20What%20It%20Means%20for%20the%20Future_0.jpg') center/cover no-repeat;}
-.welcome-page .seller-backdrop::after{content:'TU TIENDA EN VANIDAXI';position:absolute;left:5%;top:6%;z-index:4;padding:8px 12px;border:1px solid rgba(255,255,255,.32);border-radius:999px;background:rgba(10,23,24,.28);color:#fff;font:900 clamp(10px,1.5vw,14px)/1 system-ui,sans-serif;letter-spacing:.10em;text-shadow:0 3px 14px rgba(0,0,0,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
+/* VENDEDOR: fotografía real de tienda; sobre ella colocamos la propuesta de tablet/estadísticas. */
+.welcome-page .seller-world{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  border-radius:0 !important;
+  border:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.welcome-page .seller-backdrop{
+  position:absolute !important;
+  inset:0 !important;
+  padding:0 !important;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.04) 48%,rgba(0,0,0,.52) 100%),
+    url('https://thunderbird.asu.edu/sites/default/files/2023-06/How%20Broadband%20is%20Reshaping%20the%20Retail%20Industry%20and%20What%20It%20Means%20for%20the%20Future_0.jpg') center center / cover no-repeat !important;
+}
 
-/* Ocultar las maquetas antiguas de la tienda para que domine la fotografía real. */
-.welcome-page .seller-store-shell,.welcome-page .seller-dashboard,.welcome-page .seller-mall-sign,.welcome-page .seller-display-row,.welcome-page .seller-buy-strip,.welcome-page .seller-orbit{display:none!important;}
+/* No poner una segunda tarjeta/tienda encima de la fotografía. */
+.welcome-page .seller-store-shell,
+.welcome-page .seller-mall-sign,
+.welcome-page .seller-display-row,
+.welcome-page .seller-orbit{display:none !important;}
 
-/* Botones de acceso directamente sobre la fotografía, en la franja inferior. */
+/* Panel de estadísticas con apariencia de tablet, integrado sobre la foto. */
+.welcome-page .seller-dashboard{
+  display:block !important;
+  position:absolute !important;
+  z-index:6 !important;
+  left:auto !important;
+  right:clamp(18px,5vw,72px) !important;
+  top:auto !important;
+  bottom:clamp(105px,14vw,145px) !important;
+  width:min(360px,42vw) !important;
+  padding:18px !important;
+  border-radius:24px !important;
+  background:rgba(248,255,255,.88) !important;
+  border:1px solid rgba(255,255,255,.72) !important;
+  box-shadow:0 24px 60px rgba(0,0,0,.28) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+}
+.welcome-page .dashboard-cards{grid-template-columns:repeat(3,1fr) !important;gap:8px !important;}
+.welcome-page .metric-card{border-radius:13px !important;}
+
+/* Marca, mensaje, indicadores y acceso quedan encima de la fotografía. */
+.welcome-page .welcome-brand{
+  position:absolute !important;
+  top:clamp(18px,4vw,38px) !important;
+  left:clamp(18px,4vw,48px) !important;
+  z-index:20 !important;
+  color:#fff !important;
+  text-shadow:0 3px 16px rgba(0,0,0,.55) !important;
+}
+
+.welcome-page .welcome-copy{
+  position:absolute !important;
+  left:50% !important;
+  bottom:clamp(155px,20vw,210px) !important;
+  transform:translateX(-50%) !important;
+  z-index:12 !important;
+  width:min(900px,calc(100% - 32px)) !important;
+  margin:0 !important;
+  text-align:center !important;
+  color:#fff !important;
+  text-shadow:0 4px 22px rgba(0,0,0,.72) !important;
+}
+.welcome-page .welcome-copy h1,
+.welcome-page .welcome-copy p{color:#fff !important;}
+
+.welcome-page .scene-controls{
+  position:absolute !important;
+  left:50% !important;
+  bottom:clamp(98px,13vw,128px) !important;
+  transform:translateX(-50%) !important;
+  z-index:15 !important;
+}
+
 .welcome-page .welcome-actions{
-  position:absolute!important;
-  z-index:20!important;
-  left:50%!important;
-  bottom:clamp(18px,4vw,42px)!important;
-  transform:translateX(-50%)!important;
-  width:min(620px,calc(100% - 28px))!important;
-  display:grid!important;
-  grid-template-columns:1fr 1.15fr!important;
-  gap:10px!important;
-  margin:0!important;
-  padding:10px!important;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:20px;
-  background:rgba(7,17,19,.30);
-  box-shadow:0 16px 36px rgba(0,0,0,.24);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
+  position:absolute !important;
+  left:50% !important;
+  bottom:clamp(26px,5vw,48px) !important;
+  transform:translateX(-50%) !important;
+  z-index:16 !important;
+  width:min(620px,calc(100% - 28px)) !important;
+  display:grid !important;
+  grid-template-columns:1fr 1.15fr !important;
+  gap:10px !important;
+  margin:0 !important;
+  padding:0 !important;
 }
-.welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:50px;border-radius:14px;font-weight:900;}
-.welcome-page .welcome-actions .secondary-auth{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.32);}
-.welcome-page .welcome-actions .primary-auth{background:#fff;color:#123235;border:1px solid rgba(255,255,255,.86);box-shadow:0 12px 24px rgba(0,0,0,.18);}
-.welcome-page .scene-controls{position:absolute!important;left:50%!important;bottom:clamp(86px,11vw,112px)!important;transform:translateX(-50%)!important;z-index:19!important;}
-.welcome-page .scene-controls .page-control{filter:drop-shadow(0 3px 8px rgba(0,0,0,.45));}
-.welcome-page .skip-link{position:relative;z-index:20;color:rgba(255,255,255,.94);text-shadow:0 3px 12px rgba(0,0,0,.55);}
-.welcome-page .page-control span{background:rgba(255,255,255,.48);}.welcome-page .page-control span.active{background:#fff;}.welcome-page .welcome-access-note{color:rgba(255,255,255,.86);font-size:11px;text-shadow:0 3px 12px rgba(0,0,0,.42);}
 
-.secondary-auth,.primary-auth{min-height:48px;border-radius:15px;font-weight:800;}.secondary-auth{background:rgba(6,55,59,.28);color:#fff;border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}.primary-auth{box-shadow:0 14px 30px rgba(4,56,59,.25);}
+.welcome-page .welcome-actions .secondary-auth,
+.welcome-page .welcome-actions .primary-auth{
+  min-height:52px !important;
+  border-radius:15px !important;
+  font-weight:900 !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.22) !important;
+}
+.welcome-page .welcome-actions .secondary-auth{
+  background:rgba(0,0,0,.28) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.50) !important;
+  backdrop-filter:blur(9px) !important;
+  -webkit-backdrop-filter:blur(9px) !important;
+}
+.welcome-page .welcome-actions .primary-auth{
+  background:#fff !important;
+  color:#102f32 !important;
+}
+
+.welcome-page .welcome-access-note{
+  position:absolute !important;
+  left:50% !important;
+  bottom:8px !important;
+  transform:translateX(-50%) !important;
+  z-index:16 !important;
+  color:rgba(255,255,255,.82) !important;
+  font-size:10px !important;
+  text-shadow:0 2px 10px rgba(0,0,0,.6) !important;
+}
 
 @media(max-width:700px){
-  .welcome-page .mall-scene::after{top:5%;width:calc(100% - 24px);padding:8px 10px;letter-spacing:.055em;}
-  .welcome-page .welcome-actions{bottom:14px!important;width:calc(100% - 20px)!important;padding:8px!important;border-radius:17px;gap:8px;}
-  .welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:47px;font-size:13px;}
-  .welcome-page .scene-controls{bottom:76px!important;}
-  .welcome-page .welcome-access-note{font-size:10px;}
+  .welcome-page .welcome-copy{
+    bottom:clamp(145px,27vw,185px) !important;
+  }
+  .welcome-page .scene-controls{
+    bottom:86px !important;
+  }
+  .welcome-page .welcome-actions{
+    bottom:18px !important;
+    width:calc(100% - 20px) !important;
+    gap:8px !important;
+  }
+  .welcome-page .welcome-actions .secondary-auth,
+  .welcome-page .welcome-actions .primary-auth{
+    min-height:48px !important;
+    font-size:13px !important;
+  }
+  .welcome-page .seller-dashboard{
+    width:min(86vw,330px) !important;
+    right:7vw !important;
+    bottom:150px !important;
+    padding:12px !important;
+  }
 }
-@media(prefers-reduced-motion:reduce){.scene-frame{transition:none!important;}}
