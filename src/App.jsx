@@ -1,156 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 
-const AUTO_ADVANCE_MS = 5000
-
-const buyerStores = [
-  { type: 'Moda', title: 'Tu tienda', detail: 'Moda', className: 'store-fashion', accent: 'rose' },
-  { type: 'Tecnología', title: 'Tu tienda', detail: 'Tecnología', className: 'store-tech', accent: 'blue' },
-  { type: 'Hogar', title: 'Tu tienda', detail: 'Hogar', className: 'store-home', accent: 'amber' },
-  { type: 'Servicios', title: 'Tu tienda', detail: 'Servicios', className: 'store-service', accent: 'violet' },
-  { type: 'Supermercado', title: 'Tu tienda', detail: 'Supermercado', className: 'store-market', accent: 'green' },
-]
-
-const sellerProducts = ['Tecnología', 'Moda', 'Hogar', 'Belleza', 'Alimentos']
-
 function VaniMark({ className = '' }) {
   return (
     <span className={`vd-mark ${className}`} aria-hidden="true">
       <span className="vd-mark-v">V</span>
     </span>
-  )
-}
-
-function PhonePortal() {
-  return (
-    <div className="phone-portal" aria-hidden="true">
-      <div className="phone-device">
-        <div className="phone-camera" />
-        <div className="phone-screen">
-          <div className="phone-topline">
-            <span>VaniDaxi</span>
-            <span className="phone-dot" />
-          </div>
-          <div className="phone-hero" />
-          <div className="phone-tiles">
-            <span /><span /><span /><span />
-          </div>
-          <div className="phone-nav">
-            <i /><i className="active" /><i /><i />
-          </div>
-        </div>
-      </div>
-      <div className="portal-ring portal-ring-one" />
-      <div className="portal-ring portal-ring-two" />
-    </div>
-  )
-}
-
-function Person({ className = '', bag = null }) {
-  return (
-    <div className={`person ${className}`} aria-hidden="true">
-      <span className="person-head" />
-      <span className="person-body" />
-      <span className="person-leg person-leg-left" />
-      <span className="person-leg person-leg-right" />
-      {bag && (
-        <span className={`shopping-bag bag-${bag}`}>
-          <span className="bag-handle" />
-          {bag !== 'vanidaxi' && <span className="bag-label">Tu tienda</span>}
-          {bag === 'vanidaxi' && <VaniMark />}
-        </span>
-      )}
-    </div>
-  )
-}
-
-function MallBuyerScene() {
-  return (
-    <div className="mall-scene buyer-scene" aria-label="Mall VaniDaxi para compradores">
-      <div className="mall-sky" />
-      <div className="mall-haze" />
-      <div className="mall-building">
-        <div className="mall-roof">
-          <div className="brand-transform">VANIDAXI</div>
-        </div>
-        <div className="mall-glass-strip" />
-        <div className="mall-store-row">
-          {buyerStores.map((store) => (
-            <div className={`mall-store ${store.className}`} key={store.type}>
-              <div className="store-sign">{store.title} ✍🏻</div>
-              <div className="store-category">{store.detail}</div>
-              <div className={`store-window window-${store.accent}`}>
-                <span className="display-card display-card-one" />
-                <span className="display-card display-card-two" />
-                <span className="display-product" />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mall-entrance">
-          <div className="entrance-wordmark">VANIDAXI</div>
-          <div className="entrance-doors"><span /><span /></div>
-        </div>
-      </div>
-      <div className="mall-forecourt" />
-      <div className="people-zone">
-        <Person className="person-one" />
-        <Person className="person-two" />
-        <Person className="person-three" bag="fashion" />
-        <Person className="person-four" bag="vanidaxi" />
-        <Person className="person-five" bag="tech" />
-        <Person className="person-six" />
-      </div>
-      <div className="scene-light scene-light-one" />
-      <div className="scene-light scene-light-two" />
-    </div>
-  )
-}
-
-function SellerStoreScene() {
-  return (
-    <div className="seller-world" aria-label="Vista para vendedores y empresas">
-      <div className="seller-backdrop">
-        <div className="seller-mall-sign">VANIDAXI</div>
-        <div className="seller-store-shell">
-          <div className="seller-store-header">
-            <div>
-              <span className="seller-small-label">Tu tienda</span>
-              <strong>Tu negocio en VaniDaxi</strong>
-            </div>
-            <span className="seller-live-dot">Activo</span>
-          </div>
-          <div className="seller-display-row">
-            <div className="seller-shelf shelf-tech"><span>TECH</span><i /><i /><i /></div>
-            <div className="seller-shelf shelf-fashion"><span>MODA</span><i /><i /><i /></div>
-            <div className="seller-shelf shelf-home"><span>HOGAR</span><i /><i /><i /></div>
-            <div className="seller-shelf shelf-beauty"><span>BELLEZA</span><i /><i /><i /></div>
-            <div className="seller-shelf shelf-market"><span>ALIMENTOS</span><i /><i /><i /></div>
-          </div>
-        </div>
-      </div>
-      <div className="seller-dashboard">
-        <div className="dashboard-head">
-          <div>
-            <span>Resumen</span>
-            <strong>Tu negocio hoy</strong>
-          </div>
-          <span className="dashboard-pill">En línea</span>
-        </div>
-        <div className="dashboard-cards">
-          <div className="metric-card metric-sales"><span>Ventas</span><strong>$12,480</strong><small>+18% esta semana</small></div>
-          <div className="metric-card metric-orders"><span>Pedidos</span><strong>38</strong><small>7 por preparar</small></div>
-          <div className="metric-card metric-stock"><span>Inventario</span><strong>96%</strong><small>Stock saludable</small></div>
-        </div>
-        <div className="seller-buy-strip">
-          <div className="mini-store-icon"><VaniMark /></div>
-          <div><strong>También puedes comprar</strong><span>Encuentra productos de otros vendedores dentro de VaniDaxi.</span></div>
-          <span className="mini-arrow">→</span>
-        </div>
-      </div>
-      <div className="seller-orbit orbit-one" />
-      <div className="seller-orbit orbit-two" />
-    </div>
   )
 }
 
@@ -161,13 +16,11 @@ function AuthPanel({ onClose }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [captchaToken, setCaptchaToken] = useState('')
-  const [captchaReady, setCaptchaReady] = useState(false)
   const [captchaRequired, setCaptchaRequired] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const captchaRef = useRef(null)
   const widgetId = useRef(null)
-
   const siteKey = import.meta.env.VITE_HCAPTCHA_SITEKEY || ''
 
   useEffect(() => {
@@ -176,9 +29,7 @@ function AuthPanel({ onClose }) {
     let cancelled = false
 
     const ensureHcaptcha = () => {
-      if (!window.hcaptcha) return
-      if (cancelled) return
-      setCaptchaReady(true)
+      if (!window.hcaptcha || cancelled) return
       if (captchaRef.current && widgetId.current === null) {
         widgetId.current = window.hcaptcha.render(captchaRef.current, {
           sitekey: siteKey,
@@ -364,20 +215,18 @@ function AuthPanel({ onClose }) {
   )
 }
 
-function Welcome({ onAuth }) {
-  const [scene, setScene] = useState(0)
+function Welcome() {
+  const [scene, setScene] = useState('buyer')
   const [authOpen, setAuthOpen] = useState(false)
   const touchStart = useRef(null)
-  const autoTimer = useRef(null)
 
-  const nextScene = useCallback(() => setScene(1), [])
-  const prevScene = useCallback(() => setScene(0), [])
+  const goTo = useCallback((nextScene) => setScene(nextScene), [])
 
   useEffect(() => {
-    autoTimer.current = window.setTimeout(() => {
-      setScene((current) => current === 0 ? 1 : 0)
-    }, AUTO_ADVANCE_MS)
-    return () => window.clearTimeout(autoTimer.current)
+    const timer = window.setTimeout(() => {
+      setScene((current) => current === 'buyer' ? 'seller' : 'buyer')
+    }, 5000)
+    return () => window.clearTimeout(timer)
   }, [scene])
 
   const handlePointerDown = (event) => {
@@ -389,57 +238,53 @@ function Welcome({ onAuth }) {
     const delta = event.clientX - touchStart.current
     touchStart.current = null
     if (Math.abs(delta) < 45) return
-    if (delta < 0) nextScene()
-    else prevScene()
+    goTo(delta < 0 ? 'seller' : 'buyer')
   }
 
-  const openAuth = () => setAuthOpen(true)
-
   return (
-    <main className="welcome-page" onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { touchStart.current = null }}>
-      <div className={`welcome-stage scene-${scene}`}>
-        <div className="welcome-brand"><VaniMark /><span>VaniDaxi</span></div>
-
-        <div className="scene-viewport">
-          <div className="scene-frame scene-frame-buyer">
-            <PhonePortal />
-            <MallBuyerScene />
-          </div>
-          <div className="scene-frame scene-frame-seller">
-            <SellerStoreScene />
-          </div>
-        </div>
-
-        <div className="welcome-copy">
-          <div className="copy-block copy-buyer">
-            <span className="scene-kicker">COMPRADOR</span>
-            <h1>Encuentra todo en un solo lugar</h1>
-          </div>
-          <div className="copy-block copy-seller">
-            <span className="scene-kicker">VENDEDOR / EMPRESA</span>
-            <h1>Lleva tu negocio a VaniDaxi</h1>
-            <p>Tu tienda. Tus productos. Un superapp/marketplace para hacerlos visibles.</p>
-          </div>
-        </div>
-
-        <div className="scene-controls">
-          <div className="page-control" aria-label={`Escena ${scene + 1} de 2`}><span className={scene === 0 ? 'active' : ''} /><span className={scene === 1 ? 'active' : ''} /></div>
-          <button className="swipe-hint" onClick={scene === 0 ? nextScene : prevScene} type="button">
-            <span className="swipe-arrow">{scene === 0 ? '→' : '←'}</span>
-            <span>{scene === 0 ? 'Desliza para vender' : 'Desliza para comprar'}</span>
-          </button>
-          <button className="skip-link" onClick={openAuth} type="button">Omitir</button>
-        </div>
-
-        <div className="welcome-actions">
-          <button className="secondary-auth" onClick={() => { setAuthOpen(true) }} type="button">Iniciar sesión</button>
-          <button className="primary-auth" onClick={() => { setAuthOpen(true) }} type="button">Crear cuenta</button>
-        </div>
-
-        <div className="welcome-access-note">Tu experiencia cambia automáticamente según el rol de tu cuenta.</div>
+    <main
+      className={`welcome-page welcome-${scene}`}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => { touchStart.current = null }}
+    >
+      <div className="welcome-background" aria-hidden="true">
+        <div className="welcome-image welcome-image-buyer" />
+        <div className="welcome-image welcome-image-seller" />
       </div>
+
+      <div className="welcome-shade" aria-hidden="true" />
+
+      <header className="welcome-header">
+        <div className="welcome-brand"><VaniMark /><span>VaniDaxi</span></div>
+        <button className="welcome-skip" onClick={() => setAuthOpen(true)} type="button">Omitir</button>
+      </header>
+
+      <section className="welcome-content" aria-live="polite">
+        <div className="welcome-card">
+          <span className="welcome-kicker">{scene === 'buyer' ? 'COMPRADOR' : 'VENDEDOR / EMPRESA'}</span>
+          <h1>{scene === 'buyer' ? 'Encuentra todo en un solo lugar' : 'Lleva tu negocio a VaniDaxi'}</h1>
+          <p>{scene === 'buyer' ? 'Descubre tiendas, productos y servicios cerca de ti.' : 'Crea tu tienda, publica tus productos y haz crecer tu negocio.'}</p>
+        </div>
+      </section>
+
+      <div className="welcome-controls">
+        <div className="welcome-dots" aria-label={`Vista ${scene === 'buyer' ? 'comprador' : 'vendedor'}`}>
+          <button className={scene === 'buyer' ? 'active' : ''} onClick={() => goTo('buyer')} type="button" aria-label="Ver comprador" />
+          <button className={scene === 'seller' ? 'active' : ''} onClick={() => goTo('seller')} type="button" aria-label="Ver vendedor" />
+        </div>
+        <button className="welcome-swipe" onClick={() => goTo(scene === 'buyer' ? 'seller' : 'buyer')} type="button">
+          <span className="welcome-arrow">{scene === 'buyer' ? '→' : '←'}</span>
+          <span>{scene === 'buyer' ? 'Desliza para vender' : 'Desliza para comprar'}</span>
+        </button>
+      </div>
+
+      <div className="welcome-actions">
+        <button className="welcome-secondary" onClick={() => setAuthOpen(true)} type="button">Iniciar sesión</button>
+        <button className="welcome-primary" onClick={() => setAuthOpen(true)} type="button">Crear cuenta</button>
+      </div>
+
       {authOpen && <AuthPanel onClose={() => setAuthOpen(false)} />}
-      <button className="sr-only" onClick={() => onAuth?.('register')} type="button">Abrir acceso</button>
     </main>
   )
 }
