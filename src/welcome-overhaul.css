@@ -35,7 +35,7 @@
   padding: clamp(0px, 1vw, 10px);
 }
 
-/* BUYER */
+/* BUYER — VaniDaxi debe verse como un MALL / SUPERAPP, no como una tienda individual. */
 .welcome-page .mall-scene {
   width: 100%;
   height: 100%;
@@ -43,8 +43,8 @@
   border-radius: clamp(24px, 3vw, 38px);
   border: 1px solid rgba(255,255,255,.32);
   background:
-    linear-gradient(180deg, rgba(3,44,50,.03), rgba(3,44,50,.24)),
-    url('https://images.pexels.com/photos/8318183/pexels-photo-8318183.jpeg?auto=compress&cs=tinysrgb&w=1800') center 48% / cover no-repeat;
+    linear-gradient(180deg, rgba(3,44,50,.02), rgba(3,44,50,.20)),
+    url('https://images.pexels.com/photos/16189737/pexels-photo-16189737.jpeg?auto=compress&cs=tinysrgb&w=1800') center 46% / cover no-repeat;
   box-shadow: 0 34px 100px rgba(0,44,48,.34);
 }
 
@@ -54,8 +54,8 @@
   inset: 0;
   z-index: 3;
   background:
-    linear-gradient(180deg, rgba(3,35,39,.03) 0%, rgba(3,35,39,.01) 42%, rgba(2,35,40,.38) 100%),
-    linear-gradient(90deg, rgba(0,55,59,.14), transparent 25%, transparent 75%, rgba(0,55,59,.12));
+    linear-gradient(180deg, rgba(3,35,39,.02) 0%, rgba(3,35,39,.01) 44%, rgba(2,35,40,.34) 100%),
+    linear-gradient(90deg, rgba(0,55,59,.10), transparent 23%, transparent 77%, rgba(0,55,59,.10));
   pointer-events: none;
 }
 
@@ -72,61 +72,61 @@
   display: none;
 }
 
-/* Keep the message card integrated with the buyer scene without covering the subject. */
+/* Message panel: keeps the real mall visible and clearly frames the superapp categories. */
 .welcome-page .mall-building {
   display: block;
   position: absolute;
   z-index: 6;
   left: 50%;
-  bottom: 9%;
+  bottom: 7%;
   transform: translateX(-50%);
-  width: min(620px, 86%);
-  height: min(190px, 30%);
-  border-radius: 30px;
+  width: min(720px, 90%);
+  height: min(210px, 31%);
+  border-radius: 28px;
   background: transparent;
   box-shadow: none;
   overflow: visible;
 }
 
 .welcome-page .mall-building::before {
-  content: 'Encuentra todo en un solo lugar';
+  content: 'VANIDAXI  •  EL MALL DE TU VIDA';
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: clamp(28px, 6vw, 58px);
+  padding: clamp(24px, 4.4vw, 40px) 26px 66px;
   border-radius: inherit;
   color: #fff;
   text-align: center;
-  font-size: clamp(27px, 4.4vw, 58px);
-  line-height: 1.02;
-  letter-spacing: -.045em;
+  font-size: clamp(22px, 3.6vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -.025em;
   font-weight: 900;
-  text-shadow: 0 8px 34px rgba(0,0,0,.4);
-  background: linear-gradient(145deg, rgba(8,48,53,.68), rgba(4,100,103,.35));
+  text-shadow: 0 8px 34px rgba(0,0,0,.44);
+  background: linear-gradient(145deg, rgba(5,43,48,.64), rgba(3,99,101,.30));
   border: 1px solid rgba(255,255,255,.34);
-  box-shadow: 0 28px 70px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.22);
-  backdrop-filter: blur(13px);
-  -webkit-backdrop-filter: blur(13px);
+  box-shadow: 0 28px 70px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .welcome-page .mall-building::after {
-  content: 'VANIDAXI  •  ROPA Y MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';
+  content: 'Ropa y moda   •   Tecnología   •   Hogar   •   Servicios   •   Supermercado';
   position: absolute;
   left: 50%;
-  bottom: -44px;
+  bottom: 16px;
   transform: translateX(-50%);
-  width: min(780px, 96%);
-  padding: 10px 15px;
+  width: min(650px, 92%);
+  padding: 9px 13px;
   border-radius: 999px;
-  color: rgba(255,255,255,.94);
-  background: rgba(4,46,50,.62);
-  border: 1px solid rgba(255,255,255,.2);
-  font-size: clamp(9px, 1.35vw, 13px);
+  color: rgba(255,255,255,.96);
+  background: rgba(4,46,50,.70);
+  border: 1px solid rgba(255,255,255,.20);
+  font-size: clamp(9px, 1.3vw, 13px);
   line-height: 1.2;
   font-weight: 800;
-  letter-spacing: .04em;
+  letter-spacing: .015em;
   text-align: center;
   box-shadow: 0 14px 28px rgba(0,0,0,.16);
   backdrop-filter: blur(9px);
@@ -241,7 +241,6 @@
   background: rgba(228,248,246,.9);
 }
 
-/* Controls feel like part of the same premium surface. */
 .welcome-actions {
   margin-top: 2px;
 }
@@ -293,20 +292,20 @@
   }
 
   .welcome-page .mall-building {
-    width: 88%;
-    height: 28%;
-    bottom: 7%;
+    width: 90%;
+    height: 27%;
+    bottom: 6%;
   }
 
   .welcome-page .mall-building::before {
-    padding: 26px;
+    padding: 22px 16px 58px;
     border-radius: 24px;
-    font-size: clamp(24px, 7vw, 38px);
+    font-size: clamp(19px, 6vw, 31px);
   }
 
   .welcome-page .mall-building::after {
-    bottom: -50px;
-    width: 105%;
+    bottom: 10px;
+    width: 96%;
     font-size: 8px;
     line-height: 1.35;
   }
