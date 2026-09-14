@@ -1,15 +1,69 @@
 /* VaniDaxi — bienvenida principal. Capa visual sobre la estructura existente. */
 
-/* BUYER: el mall ocupa TODO el escenario. Sin celular, sin marco y sin fondo turquesa. */
-.welcome-page { background:#f5f3ee; }
-.welcome-page .mall-scene { position:absolute; inset:0; width:100%; height:100%; min-height:0; border-radius:0; border:0; background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.02) 42%,rgba(0,0,0,.30)),url('https://images.pexels.com/photos/8318183/pexels-photo-8318183.jpeg?auto=compress&cs=tinysrgb&w=2200') center/cover no-repeat; box-shadow:none; }
-.welcome-page .mall-scene::before { content:''; position:absolute; inset:0; z-index:3; background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.25)); pointer-events:none; }
-.welcome-page .mall-sky,.welcome-page .mall-haze,.welcome-page .mall-store-row,.welcome-page .mall-store,.welcome-page .mall-glass-strip,.welcome-page .mall-entrance,.welcome-page .mall-forecourt,.welcome-page .people-zone,.welcome-page .scene-light,.welcome-page .phone-portal,.welcome-page .mall-phone { display:none!important; }
+/* BUYER: frente exterior de un mall moderno VaniDaxi a pantalla completa. */
+.welcome-page { background:#11181a; }
+.welcome-page .mall-scene {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  min-height:0;
+  border-radius:0;
+  border:0;
+  background:
+    linear-gradient(180deg,rgba(5,12,14,.08),rgba(5,12,14,.12) 40%,rgba(4,10,12,.58)),
+    url('https://images.pexels.com/photos/2780551/pexels-photo-2780551.jpeg?auto=compress&cs=tinysrgb&w=2400') center/cover no-repeat;
+  box-shadow:none;
+}
+.welcome-page .mall-scene::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:3;
+  background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,transparent 46%,rgba(0,0,0,.32) 100%);
+  pointer-events:none;
+}
+.welcome-page .mall-scene::after {
+  content:'VANIDAXI  •  MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';
+  position:absolute;
+  left:50%;
+  top:14%;
+  transform:translateX(-50%);
+  z-index:5;
+  width:min(92%,980px);
+  padding:12px 18px;
+  border:1px solid rgba(255,255,255,.27);
+  border-radius:999px;
+  background:rgba(7,18,20,.38);
+  color:#fff;
+  font:800 clamp(9px,1.45vw,14px)/1.2 system-ui,sans-serif;
+  letter-spacing:.12em;
+  text-align:center;
+  text-shadow:0 3px 16px rgba(0,0,0,.4);
+  box-shadow:0 12px 32px rgba(0,0,0,.16);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+  pointer-events:none;
+}
+.welcome-page .mall-sky,
+.welcome-page .mall-haze,
+.welcome-page .mall-store-row,
+.welcome-page .mall-store,
+.welcome-page .mall-glass-strip,
+.welcome-page .mall-entrance,
+.welcome-page .mall-forecourt,
+.welcome-page .people-zone,
+.welcome-page .scene-light,
+.welcome-page .phone-portal,
+.welcome-page .mall-phone,
 .welcome-page .mall-building { display:none!important; }
+
+/* El concepto conserva las bolsas como parte del relato, pero evita anatomía CSS defectuosa. */
 .scene-frame { position:relative; padding:0; }
 .scene-viewport { position:relative; min-height:clamp(430px,72svh,820px); border-radius:0; overflow:hidden; }
-.welcome-page .scene-frame .scene-copy,.welcome-page .buyer-copy { position:relative; z-index:8; }
-.welcome-page .welcome-page-copy { text-shadow:0 4px 22px rgba(0,0,0,.45); }
+.welcome-page .scene-frame .scene-copy,
+.welcome-page .buyer-copy { position:relative; z-index:8; }
+.welcome-page .welcome-page-copy { text-shadow:0 4px 22px rgba(0,0,0,.48); }
 
 /* SELLER */
 .welcome-page .seller-world { width:100%; height:100%; min-height:390px; border-radius:0; overflow:hidden; position:relative; border:0; background:#063f44; box-shadow:none; }
@@ -34,5 +88,13 @@
 .page-control span { background:rgba(255,255,255,.42); }
 .page-control span.active { background:#fff; }
 .welcome-access-note { color:rgba(255,255,255,.82); font-size:11px; }
-@media(max-width:700px){ .scene-viewport{min-height:62svh;} .welcome-page .seller-store-shell{top:5%;height:31%;padding:14px;} .welcome-page .seller-mall-sign{top:16px;right:18px;font-size:15px;} .welcome-page .seller-dashboard{left:4%;right:4%;bottom:4%;padding:12px;} .welcome-page .dashboard-cards{gap:6px;} .welcome-page .metric-card{padding:9px 7px;} }
+@media(max-width:700px){
+  .scene-viewport{min-height:62svh;}
+  .welcome-page .mall-scene::after{top:10%; width:calc(100% - 28px); padding:9px 12px; letter-spacing:.075em;}
+  .welcome-page .seller-store-shell{top:5%;height:31%;padding:14px;}
+  .welcome-page .seller-mall-sign{top:16px;right:18px;font-size:15px;}
+  .welcome-page .seller-dashboard{left:4%;right:4%;bottom:4%;padding:12px;}
+  .welcome-page .dashboard-cards{gap:6px;}
+  .welcome-page .metric-card{padding:9px 7px;}
+}
 @media(prefers-reduced-motion:reduce){ .scene-frame{transition:none!important;} }
