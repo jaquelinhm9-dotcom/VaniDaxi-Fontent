@@ -2,7 +2,7 @@ import React,{useEffect,useMemo,useState}from'react'
 import{ArrowLeft,Check,Clock3,MapPin,Package,RefreshCw,Truck,UserRound,ShieldCheck}from'lucide-react'
 import{getMySellerStore,loadCommercialState,loadOrderDeliveryEvents,updateOrderDelivery}from'./commercialApi.js'
 import'./logistics-dashboard.css'
-const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpY'
+const URL='https://oycwqpqoxgohzqivclzd.supabase.co',KEY=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||'sb_publishable_OIoqR1IOg5t3BIQR7g6_0w_1KWzgpYj'
 const session=()=>{try{return JSON.parse(localStorage.getItem('vanidaxi-auth-session')||'null')}catch{return null}}
 const money=v=>`$${Number(v||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}`
 const date=v=>v?new Date(v).toLocaleString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'
