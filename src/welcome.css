@@ -14,8 +14,11 @@
 
 .reference-viewport {
   position: relative;
-  width: min(100vw, 346px);
-  aspect-ratio: 346 / 755;
+  width: 100vw;
+  height: 100svh;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
   overflow: hidden;
   background: #050505;
 }
@@ -26,7 +29,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
+  image-rendering: auto;
   pointer-events: none;
   -webkit-user-drag: none;
 }
@@ -150,7 +154,21 @@
 .auth-message { margin-top: 13px; padding: 10px 12px; border-radius: 12px; background: #eef8f7; color: #174d4d; font-size: 13px; line-height: 1.45; }
 
 @media (max-width: 430px) {
-  .reference-viewport { width: 100vw; }
+  .reference-welcome { min-height: 100svh; width: 100vw; }
+  .reference-viewport { width: 100vw; height: 100svh; }
   .auth-overlay { padding: 12px; }
-  .auth-panel { padding: 20px 16px; border-radius: 22px; }
+  .auth-panel { width: 100%; max-width: 420px; max-height: calc(100svh - 24px); padding: 20px 16px; border-radius: 22px; }
+  .auth-form { gap: 11px; }
+  .auth-form input { min-height: 48px; font-size: 16px; }
+  .captcha-slot { width: 100%; overflow: hidden; }
+  .social-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 360px) {
+  .auth-overlay { padding: 6px; }
+  .auth-panel { max-height: calc(100svh - 12px); padding: 16px 13px; border-radius: 20px; }
+  .auth-top { gap: 9px; margin-bottom: 14px; }
+  .auth-top h2 { font-size: 21px; }
+  .auth-tabs { margin-bottom: 13px; }
+  .role-grid { grid-template-columns: 1fr; }
 }
