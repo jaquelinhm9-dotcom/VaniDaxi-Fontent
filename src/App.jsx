@@ -182,6 +182,7 @@ function Welcome() {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('register')
   const touchStart = useRef(null)
+  const baseUrl = import.meta.env.BASE_URL || '/'
 
   const openAuth = useCallback((mode) => {
     setAuthMode(mode)
@@ -201,7 +202,7 @@ function Welcome() {
   return (
     <main className={`reference-welcome reference-${scene}`} onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { touchStart.current = null }}>
       <div className="reference-viewport">
-        <img className="reference-screen" src={scene === 'buyer' ? '/VaniDaxi-Fontent/welcome-buyer.svg' : '/VaniDaxi-Fontent/welcome-seller.svg'} alt={scene === 'buyer' ? 'Bienvenida VaniDaxi para compradores' : 'Bienvenida VaniDaxi para vendedores'} draggable="false" />
+        <img className="reference-screen" src={`${baseUrl}${scene === 'buyer' ? 'welcome-buyer.svg' : 'welcome-seller.svg'}`} alt={scene === 'buyer' ? 'Bienvenida VaniDaxi para compradores' : 'Bienvenida VaniDaxi para vendedores'} draggable="false" />
         <div className="reference-hit-layer" aria-label={scene === 'buyer' ? 'Acciones de comprador' : 'Acciones de vendedor'}>
           <button className="hit-swipe" type="button" onClick={() => goTo(scene === 'buyer' ? 'seller' : 'buyer')} aria-label={scene === 'buyer' ? 'Cambiar a vendedor' : 'Cambiar a comprador'} />
           <button className="hit-login" type="button" onClick={() => openAuth('login')} aria-label="Iniciar sesión" />
