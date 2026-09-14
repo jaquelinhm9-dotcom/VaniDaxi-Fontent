@@ -1,0 +1,345 @@
+/*
+ * VaniDaxi — bienvenida principal.
+ * Capa visual nueva sobre la estructura existente.
+ * No modifica Auth, Supabase ni el flujo de navegación.
+ */
+
+.welcome-page {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.28), transparent 34%),
+    linear-gradient(180deg, #7be8dc 0%, #16c9ba 48%, #079b96 100%);
+}
+
+.welcome-stage {
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: 10px;
+  padding: clamp(14px, 2.5vw, 28px) clamp(14px, 4vw, 46px) max(18px, env(safe-area-inset-bottom));
+}
+
+.welcome-brand {
+  padding: 7px 11px 7px 7px;
+  border-radius: 16px;
+  background: rgba(5,55,58,.22);
+  border: 1px solid rgba(255,255,255,.23);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.scene-viewport {
+  min-height: clamp(390px, 62svh, 760px);
+  border-radius: clamp(24px, 4vw, 38px);
+  overflow: hidden;
+}
+
+.scene-frame {
+  padding: clamp(0px, 1vw, 10px);
+}
+
+/* BUYER */
+.welcome-page .mall-scene {
+  width: 100%;
+  height: 100%;
+  min-height: 390px;
+  border-radius: clamp(24px, 3vw, 38px);
+  border: 1px solid rgba(255,255,255,.32);
+  background:
+    linear-gradient(180deg, rgba(3,44,50,.04), rgba(3,44,50,.34)),
+    url('https://images.pexels.com/photos/16189737/pexels-photo-16189737.jpeg?auto=compress&cs=tinysrgb&w=1800') center 46% / cover no-repeat;
+  box-shadow: 0 34px 100px rgba(0,44,48,.34);
+}
+
+.welcome-page .mall-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    linear-gradient(180deg, rgba(3,35,39,.08) 0%, rgba(3,35,39,.02) 42%, rgba(2,35,40,.42) 100%),
+    linear-gradient(90deg, rgba(0,55,59,.2), transparent 25%, transparent 75%, rgba(0,55,59,.16));
+  pointer-events: none;
+}
+
+.welcome-page .mall-sky,
+.welcome-page .mall-haze,
+.welcome-page .mall-store-row,
+.welcome-page .mall-store,
+.welcome-page .mall-glass-strip,
+.welcome-page .mall-entrance,
+.welcome-page .mall-forecourt,
+.welcome-page .people-zone,
+.welcome-page .scene-light,
+.welcome-page .phone-portal {
+  display: none;
+}
+
+/* Card integrated into the photographic scene. */
+.welcome-page .mall-building {
+  display: block;
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  margin: auto;
+  width: min(620px, 86%);
+  height: min(300px, 45%);
+  border-radius: 30px;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+}
+
+.welcome-page .mall-building::before {
+  content: 'Encuentra todo en un solo lugar';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(28px, 6vw, 58px);
+  border-radius: inherit;
+  color: #fff;
+  text-align: center;
+  font-size: clamp(27px, 4.4vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+  font-weight: 900;
+  text-shadow: 0 8px 34px rgba(0,0,0,.4);
+  background: linear-gradient(145deg, rgba(8,48,53,.68), rgba(4,100,103,.35));
+  border: 1px solid rgba(255,255,255,.34);
+  box-shadow: 0 28px 70px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.22);
+  backdrop-filter: blur(13px);
+  -webkit-backdrop-filter: blur(13px);
+}
+
+.welcome-page .mall-building::after {
+  content: 'VANIDAXI  •  ROPA Y MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';
+  position: absolute;
+  left: 50%;
+  bottom: -44px;
+  transform: translateX(-50%);
+  width: min(780px, 96%);
+  padding: 10px 15px;
+  border-radius: 999px;
+  color: rgba(255,255,255,.94);
+  background: rgba(4,46,50,.62);
+  border: 1px solid rgba(255,255,255,.2);
+  font-size: clamp(9px, 1.35vw, 13px);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-align: center;
+  box-shadow: 0 14px 28px rgba(0,0,0,.16);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+
+/* SELLER */
+.welcome-page .seller-world {
+  width: 100%;
+  height: 100%;
+  min-height: 390px;
+  border-radius: clamp(24px, 3vw, 38px);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255,255,255,.28);
+  background: #063f44;
+  box-shadow: 0 34px 100px rgba(0,44,48,.34);
+}
+
+.welcome-page .seller-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(4,38,43,.2), rgba(4,38,43,.62)),
+    url('https://images.pexels.com/photos/31318437/pexels-photo-31318437.jpeg?auto=compress&cs=tinysrgb&w=1800') center / cover no-repeat;
+}
+
+.welcome-page .seller-store-shell {
+  position: absolute;
+  z-index: 4;
+  left: 6%;
+  right: 6%;
+  top: 7%;
+  height: 35%;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.24);
+  background: rgba(5,49,54,.46);
+  box-shadow: 0 20px 46px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.14);
+  backdrop-filter: blur(11px);
+  -webkit-backdrop-filter: blur(11px);
+}
+
+.welcome-page .seller-store-header {
+  color: #fff;
+}
+
+.welcome-page .seller-small-label {
+  color: rgba(255,255,255,.72);
+}
+
+.welcome-page .seller-store-header strong {
+  color: #fff;
+  text-shadow: 0 3px 16px rgba(0,0,0,.3);
+}
+
+.welcome-page .seller-display-row {
+  display: none;
+}
+
+.welcome-page .seller-mall-sign {
+  position: absolute;
+  top: 26px;
+  right: 28px;
+  z-index: 5;
+  color: #fff;
+  font-size: clamp(18px, 3vw, 34px);
+  font-weight: 900;
+  letter-spacing: .15em;
+  text-shadow: 0 5px 20px rgba(0,0,0,.38);
+}
+
+.welcome-page .seller-dashboard {
+  position: absolute;
+  z-index: 7;
+  left: 6%;
+  right: 6%;
+  bottom: 5%;
+  padding: clamp(14px, 2.2vw, 24px);
+  border-radius: 24px;
+  background: rgba(248,255,255,.91);
+  border: 1px solid rgba(255,255,255,.78);
+  box-shadow: 0 24px 56px rgba(0,0,0,.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.welcome-page .dashboard-head span,
+.welcome-page .dashboard-head strong,
+.welcome-page .metric-card span,
+.welcome-page .metric-card strong,
+.welcome-page .metric-card small,
+.welcome-page .seller-buy-strip strong,
+.welcome-page .seller-buy-strip span {
+  color: #0b3c40;
+}
+
+.welcome-page .dashboard-cards {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.welcome-page .metric-card {
+  border-radius: 14px;
+  background: rgba(239,251,250,.9);
+  box-shadow: inset 0 0 0 1px rgba(8,104,101,.1);
+}
+
+.welcome-page .seller-buy-strip {
+  margin-top: 10px;
+  border-radius: 16px;
+  background: rgba(228,248,246,.9);
+}
+
+/* Controls feel like part of the same premium surface. */
+.welcome-actions {
+  margin-top: 2px;
+}
+
+.secondary-auth,
+.primary-auth {
+  min-height: 48px;
+  border-radius: 15px;
+  font-weight: 800;
+}
+
+.secondary-auth {
+  background: rgba(6,55,59,.28);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.primary-auth {
+  box-shadow: 0 14px 30px rgba(4,56,59,.25);
+}
+
+.scene-controls {
+  position: relative;
+  z-index: 10;
+}
+
+.skip-link {
+  color: rgba(255,255,255,.92);
+}
+
+.page-control span {
+  background: rgba(255,255,255,.42);
+}
+
+.page-control span.active {
+  background: #fff;
+}
+
+.welcome-access-note {
+  color: rgba(255,255,255,.82);
+  font-size: 11px;
+}
+
+@media (max-width: 700px) {
+  .scene-viewport {
+    min-height: 60svh;
+  }
+
+  .welcome-page .mall-building {
+    width: 88%;
+    height: 32%;
+  }
+
+  .welcome-page .mall-building::before {
+    padding: 26px;
+    border-radius: 24px;
+    font-size: clamp(24px, 7vw, 38px);
+  }
+
+  .welcome-page .mall-building::after {
+    bottom: -50px;
+    width: 105%;
+    font-size: 8px;
+    line-height: 1.35;
+  }
+
+  .welcome-page .seller-store-shell {
+    top: 5%;
+    height: 31%;
+    padding: 14px;
+  }
+
+  .welcome-page .seller-mall-sign {
+    top: 16px;
+    right: 18px;
+    font-size: 15px;
+  }
+
+  .welcome-page .seller-dashboard {
+    left: 4%;
+    right: 4%;
+    bottom: 4%;
+    padding: 12px;
+  }
+
+  .welcome-page .dashboard-cards {
+    gap: 6px;
+  }
+
+  .welcome-page .metric-card {
+    padding: 9px 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-frame {
+    transition: none !important;
+  }
+}
