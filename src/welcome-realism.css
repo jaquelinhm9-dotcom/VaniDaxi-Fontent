@@ -1,0 +1,130 @@
+/* VaniDaxi welcome: photographic treatment, not illustrated shapes. */
+.welcome-page .mall-scene {
+  background: #0ab9aa url('https://images.pexels.com/photos/16189737/pexels-photo-16189737.jpeg?cs=srgb&dl=pexels-altaf-shah-3143825-16189737.jpg&fm=jpg') center 62% / cover no-repeat;
+  border: 1px solid rgba(255,255,255,.28);
+  box-shadow: 0 30px 90px rgba(4,55,56,.30);
+  isolation: isolate;
+}
+
+.welcome-page .mall-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(7,73,76,.08) 0%, rgba(7,73,76,0) 34%, rgba(5,53,55,.30) 100%),
+    linear-gradient(90deg, rgba(7,73,76,.18), transparent 24%, transparent 76%, rgba(7,73,76,.14));
+  pointer-events: none;
+}
+
+.welcome-page .mall-scene::after {
+  content: 'VANIDAXI';
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
+  padding: 10px 24px;
+  border-radius: 14px;
+  color: #fff;
+  font-size: clamp(18px, 3.2vw, 42px);
+  font-weight: 900;
+  letter-spacing: .17em;
+  background: rgba(5,61,64,.72);
+  border: 1px solid rgba(255,255,255,.42);
+  box-shadow: 0 12px 30px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-shadow: 0 2px 12px rgba(0,0,0,.32);
+}
+
+/* Replace the previous CSS-drawn building/persons with the photographic base. */
+.welcome-page .mall-building {
+  position: absolute;
+  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  border-radius: 0;
+}
+.welcome-page .mall-roof,
+.welcome-page .mall-glass-strip,
+.welcome-page .mall-entrance { display: none; }
+.welcome-page .mall-sky,
+.welcome-page .mall-haze,
+.welcome-page .mall-forecourt { display: none; }
+
+.welcome-page .mall-store-row {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: auto;
+  bottom: 7%;
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 10px;
+  z-index: 5;
+}
+.welcome-page .mall-store {
+  min-height: 82px;
+  padding: 12px 10px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(255,255,255,.65);
+  box-shadow: 0 10px 28px rgba(0,0,0,.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.welcome-page .store-sign,
+.welcome-page .store-category {
+  position: relative;
+  z-index: 2;
+  color: #083d40;
+  text-shadow: 0 1px 2px rgba(255,255,255,.6);
+}
+.welcome-page .store-sign { font-size: clamp(9px, 1.05vw, 13px); font-weight: 900; }
+.welcome-page .store-category { font-size: clamp(8px, .9vw, 12px); font-weight: 700; margin-top: 3px; }
+.welcome-page .store-window { display: none; }
+
+/* Real people remain the people in the photograph; no artificial illustrated bodies. */
+.welcome-page .people-zone,
+.welcome-page .scene-light { display: none; }
+
+/* Simple physical bags only; never replace the photographic people. */
+.welcome-page .shopping-bag { display: none; }
+
+/* Keep the requested phone-to-mall transition feeling without changing the app flow. */
+.welcome-page .phone-portal { z-index: 8; }
+.welcome-page .scene-frame-buyer { transition-duration: 1.15s; }
+
+@media (max-width: 700px) {
+  .welcome-page .mall-scene {
+    width: 96vw;
+    height: min(610px, 62svh);
+    min-height: 420px;
+    background-position: 54% 66%;
+  }
+  .welcome-page .mall-scene::after {
+    top: 5%;
+    padding: 8px 15px;
+    letter-spacing: .12em;
+  }
+  .welcome-page .mall-store-row {
+    left: 3%;
+    right: 3%;
+    bottom: 4%;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+  .welcome-page .mall-store:last-child { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-page .scene-frame-buyer { transition: none; }
+}
