@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#081820"/><stop offset=".5" stop-color="#154c55"/><stop offset="1" stop-color="#031013"/></linearGradient>
+  <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eaffff" stop-opacity=".2"/><stop offset="1" stop-color="#55d8cf" stop-opacity=".1"/></linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#73fff1"/><stop offset="1" stop-color="#1bbcae"/></linearGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="26"/></filter>
+  <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="25" flood-opacity=".42"/></filter>
+</defs>
+<rect width="1600" height="1000" fill="url(#bg)"/>
+<circle cx="1240" cy="170" r="180" fill="#7ffff4" opacity=".1" filter="url(#blur)"/>
+<circle cx="340" cy="680" r="240" fill="#4bd4d2" opacity=".08" filter="url(#blur)"/>
+<g transform="translate(100 125)" opacity=".9">
+  <rect width="1400" height="710" rx="48" fill="#04171c" stroke="#dfffff" stroke-opacity=".26"/>
+  <rect x="26" y="26" width="1348" height="658" rx="36" fill="url(#panel)"/>
+  <text x="72" y="90" fill="#eaffff" font-family="Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="7">VANIDAXI</text>
+  <text x="72" y="132" fill="#bffefa" font-family="Arial, sans-serif" font-size="18" opacity=".82">TU NEGOCIO, TU TIENDA, TU ALCANCE</text>
+  <rect x="72" y="178" width="1256" height="1" fill="#dfffff" opacity=".16"/>
+  <g transform="translate(72 220)">
+    <rect width="540" height="395" rx="28" fill="#051d22" stroke="#dfffff" stroke-opacity=".18"/>
+    <text x="34" y="56" fill="#bffefa" font-family="Arial, sans-serif" font-size="17" font-weight="700">PANEL DEL NEGOCIO</text>
+    <g transform="translate(34 82)"><rect width="145" height="112" rx="20" fill="#19d3c5" opacity=".22"/><text x="20" y="38" fill="#a9fff8" font-family="Arial, sans-serif" font-size="14">VENTAS</text><text x="20" y="79" fill="#fff" font-family="Arial, sans-serif" font-size="30" font-weight="800">$12,480</text></g>
+    <g transform="translate(198 82)"><rect width="145" height="112" rx="20" fill="#6bcbff" opacity=".18"/><text x="20" y="38" fill="#d1f6ff" font-family="Arial, sans-serif" font-size="14">PEDIDOS</text><text x="20" y="79" fill="#fff" font-family="Arial, sans-serif" font-size="30" font-weight="800">38</text></g>
+    <g transform="translate(362 82)"><rect width="144" height="112" rx="20" fill="#ffd67a" opacity=".16"/><text x="20" y="38" fill="#fff0bf" font-family="Arial, sans-serif" font-size="14">INVENTARIO</text><text x="20" y="79" fill="#fff" font-family="Arial, sans-serif" font-size="30" font-weight="800">96%</text></g>
+    <rect x="34" y="228" width="472" height="18" rx="9" fill="#dfffff" opacity=".13"/><rect x="34" y="264" width="390" height="12" rx="6" fill="#dfffff" opacity=".17"/>
+    <rect x="34" y="304" width="212" height="42" rx="14" fill="url(#accent)"/><circle cx="59" cy="325" r="10" fill="#072a2e"/><path d="M56 319 66 325 56 331Z" fill="#dfffff"/><rect x="84" y="319" width="130" height="11" rx="5" fill="#073236" opacity=".8"/>
+  </g>
+  <g transform="translate(654 220)">
+    <rect width="674" height="395" rx="28" fill="#051d22" stroke="#dfffff" stroke-opacity=".18"/>
+    <text x="34" y="56" fill="#bffefa" font-family="Arial, sans-serif" font-size="17" font-weight="700">TU TIENDA EN VANI DAXI</text>
+    <g transform="translate(34 86)">
+      <rect width="606" height="88" rx="20" fill="#0a3037"/>
+      <rect x="20" y="18" width="250" height="16" rx="8" fill="#dfffff" opacity=".74"/>
+      <rect x="20" y="46" width="330" height="10" rx="5" fill="#dfffff" opacity=".24"/>
+      <rect x="470" y="20" width="112" height="42" rx="13" fill="#19d3c5" opacity=".72"/>
+      <text x="501" y="47" fill="#062d31" font-family="Arial, sans-serif" font-size="14" font-weight="800">ACTIVO</text>
+    </g>
+    <g transform="translate(34 198)">
+      <g><rect width="176" height="138" rx="20" fill="#ff8dbb" opacity=".25"/><text x="20" y="35" fill="#fff" font-family="Arial, sans-serif" font-size="15" font-weight="700">MODA</text><rect x="20" y="55" width="136" height="48" rx="12" fill="#ff8dbb" opacity=".58"/></g>
+      <g transform="translate(194)"><rect width="176" height="138" rx="20" fill="#6bcbff" opacity=".22"/><text x="20" y="35" fill="#fff" font-family="Arial, sans-serif" font-size="15" font-weight="700">TECNOLOGÍA</text><rect x="20" y="55" width="136" height="48" rx="12" fill="#6bcbff" opacity=".58"/></g>
+      <g transform="translate(388)"><rect width="176" height="138" rx="20" fill="#ffd67a" opacity=".18"/><text x="20" y="35" fill="#fff" font-family="Arial, sans-serif" font-size="15" font-weight="700">HOGAR</text><rect x="20" y="55" width="136" height="48" rx="12" fill="#ffd67a" opacity=".56"/></g>
+    </g>
+  </g>
+</g>
+<g transform="translate(0 805)">
+  <path d="M0 20C300-20 530 55 820 18S1270-12 1600 28V195H0Z" fill="#041013" opacity=".9"/>
+  <g transform="translate(1240 -20)">
+    <circle cx="90" cy="65" r="34" fill="#f2c7b0"/>
+    <path d="M47 158c10-58 21-76 43-76s33 18 43 76" fill="#0f6b70"/>
+    <path d="M62 156 30 220M118 156 151 220" stroke="#071c22" stroke-width="23" stroke-linecap="round"/>
+    <path d="M48 112 17 153M132 112 164 153" stroke="#f2c7b0" stroke-width="16" stroke-linecap="round"/>
+    <rect x="14" y="148" width="50" height="72" rx="10" fill="url(#accent)"/>
+    <path d="M26 148c0-24 25-24 25 0" fill="none" stroke="#c4fffb" stroke-width="6"/>
+  </g>
+</g>
+</svg>
