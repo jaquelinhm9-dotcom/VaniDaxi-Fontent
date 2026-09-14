@@ -9,8 +9,8 @@ function VaniMark({ className = '' }) {
   )
 }
 
-function AuthPanel({ onClose }) {
-  const [mode, setMode] = useState('register')
+function AuthPanel({ onClose, initialMode = 'register' }) {
+  const [mode, setMode] = useState(initialMode)
   const [role, setRole] = useState('buyer')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -218,16 +218,15 @@ function AuthPanel({ onClose }) {
 function Welcome() {
   const [scene, setScene] = useState('buyer')
   const [authOpen, setAuthOpen] = useState(false)
+  const [authMode, setAuthMode] = useState('register')
   const touchStart = useRef(null)
 
-  const goTo = useCallback((nextScene) => setScene(nextScene), [])
+  const openAuth = useCallback((mode) => {
+    setAuthMode(mode)
+    setAuthOpen(true)
+  }, [])
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setScene((current) => current === 'buyer' ? 'seller' : 'buyer')
-    }, 5000)
-    return () => window.clearTimeout(timer)
-  }, [scene])
+  const goTo = useCallback((nextScene) => setScene(nextScene), [])
 
   const handlePointerDown = (event) => {
     touchStart.current = event.clientX
@@ -241,50 +240,32 @@ function Welcome() {
     goTo(delta < 0 ? 'seller' : 'buyer')
   }
 
+  const handleSkip = () => openAuth('login')
+
   return (
     <main
-      className={`welcome-page welcome-${scene}`}
+      className={`reference-welcome reference-${scene}`}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={() => { touchStart.current = null }}
     >
-      <div className="welcome-background" aria-hidden="true">
-        <div className="welcome-image welcome-image-buyer" />
-        <div className="welcome-image welcome-image-seller" />
-      </div>
+      <div className="reference-viewport">
+        <img
+          className="reference-screen"
+          src={scene === 'buyer' ? '/VaniDaxi-Fontent/welcome-buyer-reference.svg' : '/VaniDaxi-Fontent/welcome-seller-reference.svg'}
+          alt={scene === 'buyer' ? 'Bienvenida VaniDaxi para compradores' : 'Bienvenida VaniDaxi para vendedores'}
+          draggable="false"
+        />
 
-      <div className="welcome-shade" aria-hidden="true" />
-
-      <header className="welcome-header">
-        <div className="welcome-brand"><VaniMark /><span>VaniDaxi</span></div>
-        <button className="welcome-skip" onClick={() => setAuthOpen(true)} type="button">Omitir</button>
-      </header>
-
-      <section className="welcome-content" aria-live="polite">
-        <div className="welcome-card">
-          <span className="welcome-kicker">{scene === 'buyer' ? 'COMPRADOR' : 'VENDEDOR / EMPRESA'}</span>
-          <h1>{scene === 'buyer' ? 'Encuentra todo en un solo lugar' : 'Lleva tu negocio a VaniDaxi'}</h1>
-          <p>{scene === 'buyer' ? 'Descubre tiendas, productos y servicios cerca de ti.' : 'Crea tu tienda, publica tus productos y haz crecer tu negocio.'}</p>
+        <div className="reference-hit-layer" aria-label={scene === 'buyer' ? 'Acciones de comprador' : 'Acciones de vendedor'}>
+          <button className="hit-swipe" type="button" onClick={() => goTo(scene === 'buyer' ? 'seller' : 'buyer')} aria-label={scene === 'buyer' ? 'Cambiar a vendedor' : 'Cambiar a comprador'} />
+          <button className="hit-login" type="button" onClick={() => openAuth('login')} aria-label="Iniciar sesión" />
+          <button className="hit-register" type="button" onClick={() => openAuth('register')} aria-label="Crear cuenta" />
+          <button className="hit-skip" type="button" onClick={handleSkip} aria-label="Omitir bienvenida" />
         </div>
-      </section>
-
-      <div className="welcome-controls">
-        <div className="welcome-dots" aria-label={`Vista ${scene === 'buyer' ? 'comprador' : 'vendedor'}`}>
-          <button className={scene === 'buyer' ? 'active' : ''} onClick={() => goTo('buyer')} type="button" aria-label="Ver comprador" />
-          <button className={scene === 'seller' ? 'active' : ''} onClick={() => goTo('seller')} type="button" aria-label="Ver vendedor" />
-        </div>
-        <button className="welcome-swipe" onClick={() => goTo(scene === 'buyer' ? 'seller' : 'buyer')} type="button">
-          <span className="welcome-arrow">{scene === 'buyer' ? '→' : '←'}</span>
-          <span>{scene === 'buyer' ? 'Desliza para vender' : 'Desliza para comprar'}</span>
-        </button>
       </div>
 
-      <div className="welcome-actions">
-        <button className="welcome-secondary" onClick={() => setAuthOpen(true)} type="button">Iniciar sesión</button>
-        <button className="welcome-primary" onClick={() => setAuthOpen(true)} type="button">Crear cuenta</button>
-      </div>
-
-      {authOpen && <AuthPanel onClose={() => setAuthOpen(false)} />}
+      {authOpen && <AuthPanel initialMode={authMode} onClose={() => setAuthOpen(false)} />}
     </main>
   )
 }
