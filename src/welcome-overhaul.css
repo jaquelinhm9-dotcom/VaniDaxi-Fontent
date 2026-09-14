@@ -1,245 +1,37 @@
 /* VaniDaxi — bienvenida principal. Correcciones integrales de visualización. */
 
-/* La bienvenida debe verse como un mall VaniDaxi, no como un color de fondo vacío. */
-.welcome-page {
-  background: #162022 !important;
-}
+.welcome-page { background:#162022 !important; }
+.welcome-page .scene-viewport{overflow:hidden;border-radius:clamp(20px,4vw,36px);background:#162022;}
 
-.welcome-page .scene-viewport {
-  overflow: hidden;
-  border-radius: clamp(20px, 4vw, 36px);
-  background: #162022;
-}
-
-/* BUYER: fondo LOCAL para que siempre exista una imagen visible, incluso sin red externa. */
-.welcome-page .mall-scene {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  border-radius: 0;
-  border: 0;
+/* COMPRADOR: escena visual local del Mall VaniDaxi. */
+.welcome-page .mall-scene{
+  position:absolute;inset:0;width:100%;height:100%;min-height:0;border-radius:0;border:0;
   background:
-    linear-gradient(180deg, rgba(10,18,20,.02), rgba(10,18,20,.10) 54%, rgba(5,10,11,.56)),
-    url('/VaniDaxi-Fontent/vani-mall-exterior.svg') center / cover no-repeat;
-  box-shadow: none;
+    linear-gradient(180deg,rgba(10,18,20,.02),rgba(10,18,20,.05) 55%,rgba(5,10,11,.42)),
+    url('/VaniDaxi-Fontent/vani-mall-exterior.svg') center/cover no-repeat;
+  box-shadow:none;
 }
+.welcome-page .mall-scene::before{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.02),transparent 50%,rgba(0,0,0,.22));}
+.welcome-page .mall-scene::after{content:'VANIDAXI  •  MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:5;width:min(90%,900px);padding:10px 14px;border:1px solid rgba(255,255,255,.30);border-radius:999px;background:rgba(7,18,20,.25);color:#fff;font:800 clamp(8px,1.4vw,13px)/1.2 system-ui,sans-serif;letter-spacing:.10em;text-align:center;text-shadow:0 3px 16px rgba(0,0,0,.42);box-shadow:0 10px 26px rgba(0,0,0,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;}
 
-.welcome-page .mall-scene::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(0,0,0,.02) 0%, transparent 48%, rgba(0,0,0,.24) 100%),
-    linear-gradient(90deg, rgba(5,12,14,.10), transparent 25%, transparent 75%, rgba(5,12,14,.10));
-}
+/* La escena antigua queda fuera: no teléfono, no maqueta CSS ni fondos que puedan tapar la ilustración. */
+.welcome-page .mall-sky,.welcome-page .mall-haze,.welcome-page .mall-store-row,.welcome-page .mall-store,.welcome-page .mall-glass-strip,.welcome-page .mall-entrance,.welcome-page .mall-forecourt,.welcome-page .people-zone,.welcome-page .scene-light,.welcome-page .phone-portal,.welcome-page .mall-phone,.welcome-page .mall-building{display:none!important;}
 
-.welcome-page .mall-scene::after {
-  content: 'VANIDAXI  •  MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';
-  position: absolute;
-  left: 50%;
-  top: 7%;
-  transform: translateX(-50%);
-  z-index: 5;
-  width: min(90%, 900px);
-  padding: 10px 14px;
-  border: 1px solid rgba(255,255,255,.30);
-  border-radius: 999px;
-  background: rgba(7,18,20,.28);
-  color: #fff;
-  font: 800 clamp(8px, 1.4vw, 13px)/1.2 system-ui, sans-serif;
-  letter-spacing: .10em;
-  text-align: center;
-  text-shadow: 0 3px 16px rgba(0,0,0,.42);
-  box-shadow: 0 10px 26px rgba(0,0,0,.14);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  pointer-events: none;
-}
+.welcome-page .scene-frame .scene-copy,.welcome-page .buyer-copy,.welcome-page .welcome-copy,.welcome-page .scene-controls,.welcome-page .welcome-actions,.welcome-page .welcome-access-note{position:relative;z-index:8;}
+.welcome-page .welcome-page-copy{text-shadow:0 4px 22px rgba(0,0,0,.48);}
 
-/* No mostramos la maqueta anterior ni el concepto del teléfono. */
-.welcome-page .mall-sky,
-.welcome-page .mall-haze,
-.welcome-page .mall-store-row,
-.welcome-page .mall-store,
-.welcome-page .mall-glass-strip,
-.welcome-page .mall-entrance,
-.welcome-page .mall-forecourt,
-.welcome-page .people-zone,
-.welcome-page .scene-light,
-.welcome-page .phone-portal,
-.welcome-page .mall-phone,
-.welcome-page .mall-building { display: none !important; }
-
-/* Copy y controles encima de la escena. */
-.welcome-page .scene-frame .scene-copy,
-.welcome-page .buyer-copy,
-.welcome-page .welcome-copy,
-.welcome-page .scene-controls,
-.welcome-page .welcome-actions,
-.welcome-page .welcome-access-note { position: relative; z-index: 8; }
-
-.welcome-page .welcome-page-copy { text-shadow: 0 4px 22px rgba(0,0,0,.48); }
-
-/* SELLER: ahora sí mostramos la tienda y sus categorías. */
-.welcome-page .seller-world {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  border-radius: 0;
-  overflow: hidden;
-  position: relative;
-  border: 0;
-  background:
-    radial-gradient(circle at 18% 20%, rgba(255,255,255,.14), transparent 28%),
-    linear-gradient(145deg, #253436 0%, #172123 55%, #0d1416 100%);
-  box-shadow: none;
-}
-
-.welcome-page .seller-backdrop {
-  position: absolute;
-  inset: 0;
-  padding: 0;
-  background:
-    linear-gradient(180deg, rgba(7,14,15,.15), rgba(7,12,13,.60)),
-    radial-gradient(circle at 78% 22%, rgba(42,199,188,.18), transparent 30%);
-}
-
-.welcome-page .seller-mall-sign {
-  position: absolute;
-  top: 24px;
-  left: 6%;
-  z-index: 5;
-  color: #fff;
-  font-size: clamp(18px, 3vw, 34px);
-  font-weight: 900;
-  letter-spacing: .15em;
-  text-shadow: 0 5px 20px rgba(0,0,0,.42);
-}
-
-.welcome-page .seller-store-shell {
-  position: absolute;
-  z-index: 4;
-  left: 5%;
-  right: 5%;
-  top: 8%;
-  height: 42%;
-  padding: clamp(14px, 2vw, 22px);
-  border-radius: 24px;
-  border: 1px solid rgba(255,255,255,.20);
-  background: rgba(17,31,33,.68);
-  box-shadow: 0 20px 46px rgba(0,0,0,.28);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.welcome-page .seller-store-header { color: #fff; }
-.welcome-page .seller-small-label { color: rgba(255,255,255,.70); }
-.welcome-page .seller-store-header strong { color: #fff; text-shadow: 0 3px 16px rgba(0,0,0,.30); }
-
-/* Antes estaba oculto y por eso "Tu tienda" no mostraba el negocio. */
-.welcome-page .seller-display-row {
-  display: grid !important;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-  height: 58%;
-  margin-top: 14px;
-}
-
-.welcome-page .seller-shelf {
-  position: relative;
-  min-width: 0;
-  padding: 10px 8px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(225,235,235,.92));
-  color: #123235;
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), 0 8px 18px rgba(0,0,0,.12);
-}
-
-.welcome-page .seller-shelf span {
-  display: block;
-  font-size: clamp(7px, .9vw, 11px);
-  font-weight: 900;
-  letter-spacing: .08em;
-}
-
-.welcome-page .seller-shelf i {
-  position: absolute;
-  bottom: 14%;
-  width: 18%;
-  height: 34%;
-  border-radius: 5px 5px 2px 2px;
-  background: #9ab3b4;
-  box-shadow: 0 5px 10px rgba(0,0,0,.12);
-}
-.welcome-page .seller-shelf i:nth-of-type(1) { left: 13%; }
-.welcome-page .seller-shelf i:nth-of-type(2) { left: 41%; height: 45%; }
-.welcome-page .seller-shelf i:nth-of-type(3) { right: 13%; }
-.welcome-page .shelf-tech i { background: #70a8d6; }
-.welcome-page .shelf-fashion i { background: #d98a99; }
-.welcome-page .shelf-home i { background: #d0b46c; }
-.welcome-page .shelf-beauty i { background: #af90d5; }
-.welcome-page .shelf-market i { background: #7db98b; }
-
-.welcome-page .seller-live-dot,
-.welcome-page .dashboard-pill {
-  color: #d9fffb;
-}
-
-.welcome-page .seller-dashboard {
-  position: absolute;
-  z-index: 7;
-  left: 5%;
-  right: 5%;
-  bottom: 4%;
-  padding: clamp(12px, 2vw, 22px);
-  border-radius: 24px;
-  background: rgba(248,255,255,.94);
-  border: 1px solid rgba(255,255,255,.78);
-  box-shadow: 0 24px 56px rgba(0,0,0,.24);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.welcome-page .dashboard-head span,
-.welcome-page .dashboard-head strong,
-.welcome-page .metric-card span,
-.welcome-page .metric-card strong,
-.welcome-page .metric-card small,
-.welcome-page .seller-buy-strip strong,
-.welcome-page .seller-buy-strip span { color: #142f31; }
-
-.welcome-page .dashboard-cards { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.welcome-page .metric-card { border-radius: 14px; background: rgba(239,251,250,.92); box-shadow: inset 0 0 0 1px rgba(8,104,101,.10); }
-.welcome-page .seller-buy-strip { margin-top: 10px; border-radius: 16px; background: rgba(228,248,246,.92); }
-
-.secondary-auth,
-.primary-auth { min-height: 48px; border-radius: 15px; font-weight: 800; }
-.secondary-auth { background: rgba(6,55,59,.28); color: #fff; border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.primary-auth { box-shadow: 0 14px 30px rgba(4,56,59,.25); }
-
-.scene-controls { position: relative; z-index: 10; }
-.skip-link { color: rgba(255,255,255,.92); }
-.page-control span { background: rgba(255,255,255,.42); }
-.page-control span.active { background: #fff; }
-.welcome-access-note { color: rgba(255,255,255,.82); font-size: 11px; }
-
-@media (max-width: 700px) {
-  .welcome-page .mall-scene::after { top: 5%; width: calc(100% - 24px); padding: 8px 10px; letter-spacing: .055em; }
-  .welcome-page .seller-store-shell { top: 5%; height: 39%; padding: 12px; }
-  .welcome-page .seller-mall-sign { top: 12px; left: 5%; font-size: 15px; }
-  .welcome-page .seller-display-row { gap: 5px; margin-top: 10px; }
-  .welcome-page .seller-shelf { padding: 7px 5px; border-radius: 10px; }
-  .welcome-page .seller-shelf i { bottom: 10%; }
-  .welcome-page .seller-dashboard { left: 4%; right: 4%; bottom: 3%; padding: 10px; }
-  .welcome-page .dashboard-cards { gap: 5px; }
-  .welcome-page .metric-card { padding: 8px 6px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scene-frame { transition: none !important; }
-}
+/* VENDEDOR: tienda visual local + productos, manteniendo el panel funcional. */
+.welcome-page .seller-world{width:100%;height:100%;min-height:0;border-radius:0;overflow:hidden;position:relative;border:0;background:#132224;box-shadow:none;}
+.welcome-page .seller-backdrop{position:absolute;inset:0;padding:0;background:linear-gradient(180deg,rgba(6,12,13,.06),rgba(6,12,13,.38)),url('/VaniDaxi-Fontent/vani-seller-store.svg') center/cover no-repeat;}
+.welcome-page .seller-mall-sign{position:absolute;top:24px;left:6%;z-index:5;color:#fff;font-size:clamp(18px,3vw,34px);font-weight:900;letter-spacing:.15em;text-shadow:0 5px 20px rgba(0,0,0,.42);}
+.welcome-page .seller-store-shell{position:absolute;z-index:4;left:5%;right:5%;top:8%;height:42%;padding:clamp(14px,2vw,22px);border-radius:24px;border:1px solid rgba(255,255,255,.20);background:rgba(10,23,24,.24);box-shadow:0 20px 46px rgba(0,0,0,.20);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.welcome-page .seller-store-header{color:#fff;}.welcome-page .seller-small-label{color:rgba(255,255,255,.70);}.welcome-page .seller-store-header strong{color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.30);}
+.welcome-page .seller-display-row{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;height:58%;margin-top:14px;}
+.welcome-page .seller-shelf{position:relative;min-width:0;padding:10px 8px;border-radius:14px;background:rgba(255,255,255,.92);color:#123235;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.65),0 8px 18px rgba(0,0,0,.12);}
+.welcome-page .seller-shelf span{display:block;font-size:clamp(7px,.9vw,11px);font-weight:900;letter-spacing:.08em;}.welcome-page .seller-shelf i{position:absolute;bottom:14%;width:18%;height:34%;border-radius:5px 5px 2px 2px;background:#9ab3b4;box-shadow:0 5px 10px rgba(0,0,0,.12);}.welcome-page .seller-shelf i:nth-of-type(1){left:13%;}.welcome-page .seller-shelf i:nth-of-type(2){left:41%;height:45%;}.welcome-page .seller-shelf i:nth-of-type(3){right:13%;}.welcome-page .shelf-tech i{background:#70a8d6;}.welcome-page .shelf-fashion i{background:#d98a99;}.welcome-page .shelf-home i{background:#d0b46c;}.welcome-page .shelf-beauty i{background:#af90d5;}.welcome-page .shelf-market i{background:#7db98b;}
+.welcome-page .seller-live-dot,.welcome-page .dashboard-pill{color:#d9fffb;}
+.welcome-page .seller-dashboard{position:absolute;z-index:7;left:5%;right:5%;bottom:4%;padding:clamp(12px,2vw,22px);border-radius:24px;background:rgba(248,255,255,.94);border:1px solid rgba(255,255,255,.78);box-shadow:0 24px 56px rgba(0,0,0,.24);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.welcome-page .dashboard-head span,.welcome-page .dashboard-head strong,.welcome-page .metric-card span,.welcome-page .metric-card strong,.welcome-page .metric-card small,.welcome-page .seller-buy-strip strong,.welcome-page .seller-buy-strip span{color:#142f31;}.welcome-page .dashboard-cards{grid-template-columns:repeat(3,1fr);gap:8px;}.welcome-page .metric-card{border-radius:14px;background:rgba(239,251,250,.92);box-shadow:inset 0 0 0 1px rgba(8,104,101,.10);}.welcome-page .seller-buy-strip{margin-top:10px;border-radius:16px;background:rgba(228,248,246,.92);}
+.secondary-auth,.primary-auth{min-height:48px;border-radius:15px;font-weight:800;}.secondary-auth{background:rgba(6,55,59,.28);color:#fff;border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}.primary-auth{box-shadow:0 14px 30px rgba(4,56,59,.25);}.scene-controls{position:relative;z-index:10;}.skip-link{color:rgba(255,255,255,.92);}.page-control span{background:rgba(255,255,255,.42);}.page-control span.active{background:#fff;}.welcome-access-note{color:rgba(255,255,255,.82);font-size:11px;}
+@media(max-width:700px){.welcome-page .mall-scene::after{top:5%;width:calc(100% - 24px);padding:8px 10px;letter-spacing:.055em;}.welcome-page .seller-store-shell{top:5%;height:39%;padding:12px;}.welcome-page .seller-mall-sign{top:12px;left:5%;font-size:15px;}.welcome-page .seller-display-row{gap:5px;margin-top:10px;}.welcome-page .seller-shelf{padding:7px 5px;border-radius:10px;}.welcome-page .seller-shelf i{bottom:10%;}.welcome-page .seller-dashboard{left:4%;right:4%;bottom:3%;padding:10px;}.welcome-page .dashboard-cards{gap:5px;}.welcome-page .metric-card{padding:8px 6px;}}
+@media(prefers-reduced-motion:reduce){.scene-frame{transition:none!important;}}
