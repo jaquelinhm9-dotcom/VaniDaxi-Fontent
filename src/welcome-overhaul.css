@@ -13,7 +13,7 @@
   isolation:isolate !important;
 }
 
-/* La foto ocupa literalmente toda la pantalla. */
+/* La fotografía ocupa toda la pantalla y cada deslizable ocupa el mismo lienzo. */
 .welcome-page .scene-viewport{
   position:absolute !important;
   inset:0 !important;
@@ -28,7 +28,6 @@
   box-shadow:none !important;
   z-index:0 !important;
 }
-
 .welcome-page .scene-frame,
 .welcome-page .scene-frame-buyer,
 .welcome-page .scene-frame-seller{
@@ -42,7 +41,7 @@
   background:transparent !important;
 }
 
-/* COMPRADOR: frente de centro comercial real, personas y bolsas. */
+/* COMPRADOR: frente exterior real de centro comercial + personas con bolsas. Pexels, uso gratuito. */
 .welcome-page .mall-scene{
   position:absolute !important;
   inset:0 !important;
@@ -52,12 +51,12 @@
   border:0 !important;
   border-radius:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.02) 45%,rgba(0,0,0,.48) 100%),
-    url('https://images.pexels.com/photos/36747998/pexels-photo-36747998.jpeg?auto=compress&cs=tinysrgb&w=2400') center center / cover no-repeat !important;
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.04) 45%,rgba(0,0,0,.48) 100%),
+    url('https://images.pexels.com/photos/6567730/pexels-photo-6567730.jpeg?auto=compress&cs=tinysrgb&w=2400') center center / cover no-repeat !important;
   box-shadow:none !important;
 }
 
-/* Quitamos por completo la maqueta anterior. */
+/* Elimina la maqueta anterior, incluido el teléfono. */
 .welcome-page .mall-sky,
 .welcome-page .mall-haze,
 .welcome-page .mall-store-row,
@@ -71,7 +70,7 @@
 .welcome-page .mall-phone,
 .welcome-page .mall-building{display:none !important;}
 
-/* VENDEDOR: tienda real + persona con tablet mostrando información/analítica. */
+/* VENDEDOR: tienda real y persona con tablet mostrando gráficas/estadísticas. La foto ya contiene ambos. */
 .welcome-page .seller-world{
   position:absolute !important;
   inset:0 !important;
@@ -84,27 +83,24 @@
   background:transparent !important;
   box-shadow:none !important;
 }
-
 .welcome-page .seller-backdrop{
   position:absolute !important;
   inset:0 !important;
   padding:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.02) 45%,rgba(0,0,0,.50) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.01) 0%,rgba(0,0,0,.02) 44%,rgba(0,0,0,.50) 100%),
     url('https://www.elevify.com/_next/image?q=70&url=https%3A%2F%2Fproduction.elevify-cdn.com%2Fimages%2F2026-05%2Fa4f31e22-5fc0-4860-94a3-3d7c44c0d8a2.jpg&w=3840') center center / cover no-repeat !important;
 }
 
-/* No tarjetas falsas de tienda ni módulos dibujados sobre la fotografía. */
+/* Nada de tarjeta falsa encima de la tienda. */
 .welcome-page .seller-store-shell,
 .welcome-page .seller-mall-sign,
 .welcome-page .seller-display-row,
+.welcome-page .seller-dashboard,
 .welcome-page .seller-orbit,
 .welcome-page .seller-buy-strip{display:none !important;}
 
-/* La propia foto ya muestra a la persona con tablet y gráficas; no duplicamos la escena. */
-.welcome-page .seller-dashboard{display:none !important;}
-
-/* Contenido de bienvenida encima de la fotografía. */
+/* Contenido de bienvenida sobre la fotografía. */
 .welcome-page .welcome-brand{
   position:absolute !important;
   top:clamp(16px,4vw,34px) !important;
@@ -113,7 +109,6 @@
   color:#fff !important;
   text-shadow:0 3px 18px rgba(0,0,0,.72) !important;
 }
-
 .welcome-page .welcome-copy{
   position:absolute !important;
   left:50% !important;
@@ -130,7 +125,6 @@
 .welcome-page .welcome-copy p,
 .welcome-page .welcome-copy .scene-kicker{color:#fff !important;}
 
-/* Indicadores y Omitir justo sobre la foto. */
 .welcome-page .scene-controls{
   position:absolute !important;
   left:50% !important;
@@ -141,7 +135,7 @@
 .welcome-page .scene-controls .page-control{filter:drop-shadow(0 3px 8px rgba(0,0,0,.60));}
 .welcome-page .skip-link{color:#fff !important;text-shadow:0 3px 12px rgba(0,0,0,.65) !important;}
 
-/* BOTONES: debajo del mensaje y directamente sobre la fotografía, sin tarjeta contenedora. */
+/* Solo los dos botones de acceso; no existe tarjeta contenedora. */
 .welcome-page .welcome-actions{
   position:absolute !important;
   left:50% !important;
@@ -158,7 +152,6 @@
   border:0 !important;
   box-shadow:none !important;
 }
-
 .welcome-page .welcome-actions .secondary-auth,
 .welcome-page .welcome-actions .primary-auth{
   min-height:50px !important;
@@ -189,7 +182,7 @@
   text-shadow:0 2px 12px rgba(0,0,0,.70) !important;
 }
 
-/* Elimina los adornos globales del stage que podían dejar ver el verde original. */
+/* Elimina los adornos globales que podían dejar aparecer el verde original. */
 .welcome-page .welcome-stage::before,
 .welcome-page .welcome-stage::after{display:none !important;}
 
@@ -197,8 +190,7 @@
   .welcome-page .welcome-copy{bottom:143px !important;width:calc(100% - 24px) !important;}
   .welcome-page .scene-controls{bottom:80px !important;}
   .welcome-page .welcome-actions{bottom:16px !important;width:calc(100% - 18px) !important;gap:7px !important;}
-  .welcome-page .welcome-actions .secondary-auth,
-  .welcome-page .welcome-actions .primary-auth{min-height:47px !important;font-size:13px !important;}
+  .welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:47px !important;font-size:13px !important;}
   .welcome-page .welcome-access-note{display:none !important;}
 }
 
