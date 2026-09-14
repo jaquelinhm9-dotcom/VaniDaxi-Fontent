@@ -31,6 +31,27 @@ export async function signInWithProvider(provider) {
   return data
 }
 
+export async function signInWithPhone(phone, captchaToken = '') {
+  const { data, error } = await supabase.auth.signInWithOtp({ phone, options: { shouldCreateUser: true, captchaToken } })
+  if (error) throw new Error(error.message || 'No se pudo enviar el código SMS.')
+  return data
+}
+
+export async function verifyPhoneOtp(phone, token) {
+  const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms' })
+  if (error) throw new Error(error.message || 'El código SMS no es válido.')
+  const session = data?.session
+  if (!session?.access_token) throw new Error('Supabase no devolvió una sesión válida.')
+  saveSession(session)
+  return { ...data, access_token: session.access_token, refresh_token: session.refresh_token }
+}
+
+export async function sendPasswordReset(email, captchaToken = '') {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname, captchaToken })
+  if (error) throw new Error(error.message || 'No se pudo enviar el restablecimiento.')
+  return data
+}
+
 export async function signOut() {
   const session = getSession()
   if (session?.access_token) await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }).catch(() => {})
