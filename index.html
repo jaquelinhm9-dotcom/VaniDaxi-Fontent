@@ -2,26 +2,12 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f8f0fa" />
-    <meta name="description" content="VaniDaxi — moda, tecnología, hogar, comida y servicios en un solo lugar." />
-    <link rel="icon" type="image/svg+xml" href="./logo.svg" />
-    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
     <title>VaniDaxi</title>
-    <script>
-      try {
-        const raw = localStorage.getItem('vanidaxi-address')
-        if (!raw) localStorage.setItem('vanidaxi-address', JSON.stringify({ name: '', street: '', city: '', zip: '' }))
-      } catch (_) {}
-    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./main.jsx?v=7"></script>
-    <link rel="stylesheet" href="./hero-ad.css?v=1" />
-    <script type="module" src="./checkout-fixes.js?v=5"></script>
-    <script>
-      if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=7', { updateViaCache: 'none' }).catch(() => {})
-    </script>
+    <script type="module" src="/VaniDaxi-Fontent/src/main.jsx"></script>
   </body>
 </html>
