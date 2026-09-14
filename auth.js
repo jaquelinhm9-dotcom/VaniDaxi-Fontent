@@ -62,6 +62,15 @@ export async function sendPasswordReset(email, captchaToken = '') {
   return data
 }
 
+export async function updatePassword(password) {
+  if (!password) throw new Error('La contraseña es obligatoria.')
+  const { data, error } = await supabase.auth.updateUser({ password })
+  if (error) throw new Error(error.message || 'No fue posible actualizar la contraseña.')
+  const session = data?.user ? (await supabase.auth.getSession()).data?.session : null
+  if (session?.access_token) saveSession(session)
+  return data
+}
+
 export async function signOut() {
   const session = getSession()
   if (session?.access_token) await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }).catch(() => {})
