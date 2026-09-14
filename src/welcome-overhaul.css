@@ -3,35 +3,67 @@
 .welcome-page { background:#162022 !important; }
 .welcome-page .scene-viewport{overflow:hidden;border-radius:clamp(20px,4vw,36px);background:#162022;}
 
-/* COMPRADOR: escena visual local del Mall VaniDaxi. */
+/* COMPRADOR: foto real de mall con personas y bolsas. */
 .welcome-page .mall-scene{
   position:absolute;inset:0;width:100%;height:100%;min-height:0;border-radius:0;border:0;
   background:
-    linear-gradient(180deg,rgba(10,18,20,.02),rgba(10,18,20,.05) 55%,rgba(5,10,11,.42)),
-    url('/VaniDaxi-Fontent/vani-mall-exterior.svg') center/cover no-repeat;
+    linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.02) 42%,rgba(3,12,13,.55) 100%),
+    url('https://images.pexels.com/photos/36712918/pexels-photo-36712918.jpeg?cs=srgb&dl=pexels-silverkblack-36712918.jpg&fm=jpg') center/cover no-repeat;
   box-shadow:none;
 }
-.welcome-page .mall-scene::before{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.02),transparent 50%,rgba(0,0,0,.22));}
-.welcome-page .mall-scene::after{content:'VANIDAXI  •  MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:5;width:min(90%,900px);padding:10px 14px;border:1px solid rgba(255,255,255,.30);border-radius:999px;background:rgba(7,18,20,.25);color:#fff;font:800 clamp(8px,1.4vw,13px)/1.2 system-ui,sans-serif;letter-spacing:.10em;text-align:center;text-shadow:0 3px 16px rgba(0,0,0,.42);box-shadow:0 10px 26px rgba(0,0,0,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;}
+.welcome-page .mall-scene::before{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.04),transparent 48%,rgba(0,0,0,.32));}
+.welcome-page .mall-scene::after{content:'VANIDAXI  •  MODA  •  TECNOLOGÍA  •  HOGAR  •  SERVICIOS  •  SUPERMERCADO';position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:5;width:min(90%,900px);padding:10px 14px;border:1px solid rgba(255,255,255,.34);border-radius:999px;background:rgba(7,18,20,.28);color:#fff;font:800 clamp(8px,1.4vw,13px)/1.2 system-ui,sans-serif;letter-spacing:.10em;text-align:center;text-shadow:0 3px 16px rgba(0,0,0,.48);box-shadow:0 10px 26px rgba(0,0,0,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;}
 
-/* La escena antigua queda fuera: no teléfono, no maqueta CSS ni fondos que puedan tapar la ilustración. */
+/* La escena CSS antigua queda fuera: no teléfono, no ilustración de mall ni siluetas encima de la foto. */
 .welcome-page .mall-sky,.welcome-page .mall-haze,.welcome-page .mall-store-row,.welcome-page .mall-store,.welcome-page .mall-glass-strip,.welcome-page .mall-entrance,.welcome-page .mall-forecourt,.welcome-page .people-zone,.welcome-page .scene-light,.welcome-page .phone-portal,.welcome-page .mall-phone,.welcome-page .mall-building{display:none!important;}
 
-.welcome-page .scene-frame .scene-copy,.welcome-page .buyer-copy,.welcome-page .welcome-copy,.welcome-page .scene-controls,.welcome-page .welcome-actions,.welcome-page .welcome-access-note{position:relative;z-index:8;}
+/* Copia y controles encima de la foto. */
+.welcome-page .scene-frame .scene-copy,.welcome-page .buyer-copy,.welcome-page .welcome-copy,.welcome-page .scene-controls,.welcome-page .welcome-actions,.welcome-page .welcome-access-note {position:relative;z-index:8;}
 .welcome-page .welcome-page-copy{text-shadow:0 4px 22px rgba(0,0,0,.48);}
 
-/* VENDEDOR: tienda visual local + productos, manteniendo el panel funcional. */
+/* VENDEDOR: foto real de tienda con persona y tablet mostrando analítica/estadísticas. */
 .welcome-page .seller-world{width:100%;height:100%;min-height:0;border-radius:0;overflow:hidden;position:relative;border:0;background:#132224;box-shadow:none;}
-.welcome-page .seller-backdrop{position:absolute;inset:0;padding:0;background:linear-gradient(180deg,rgba(6,12,13,.06),rgba(6,12,13,.38)),url('/VaniDaxi-Fontent/vani-seller-store.svg') center/cover no-repeat;}
-.welcome-page .seller-mall-sign{position:absolute;top:24px;left:6%;z-index:5;color:#fff;font-size:clamp(18px,3vw,34px);font-weight:900;letter-spacing:.15em;text-shadow:0 5px 20px rgba(0,0,0,.42);}
-.welcome-page .seller-store-shell{position:absolute;z-index:4;left:5%;right:5%;top:8%;height:42%;padding:clamp(14px,2vw,22px);border-radius:24px;border:1px solid rgba(255,255,255,.20);background:rgba(10,23,24,.24);box-shadow:0 20px 46px rgba(0,0,0,.20);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
-.welcome-page .seller-store-header{color:#fff;}.welcome-page .seller-small-label{color:rgba(255,255,255,.70);}.welcome-page .seller-store-header strong{color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.30);}
-.welcome-page .seller-display-row{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;height:58%;margin-top:14px;}
-.welcome-page .seller-shelf{position:relative;min-width:0;padding:10px 8px;border-radius:14px;background:rgba(255,255,255,.92);color:#123235;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.65),0 8px 18px rgba(0,0,0,.12);}
-.welcome-page .seller-shelf span{display:block;font-size:clamp(7px,.9vw,11px);font-weight:900;letter-spacing:.08em;}.welcome-page .seller-shelf i{position:absolute;bottom:14%;width:18%;height:34%;border-radius:5px 5px 2px 2px;background:#9ab3b4;box-shadow:0 5px 10px rgba(0,0,0,.12);}.welcome-page .seller-shelf i:nth-of-type(1){left:13%;}.welcome-page .seller-shelf i:nth-of-type(2){left:41%;height:45%;}.welcome-page .seller-shelf i:nth-of-type(3){right:13%;}.welcome-page .shelf-tech i{background:#70a8d6;}.welcome-page .shelf-fashion i{background:#d98a99;}.welcome-page .shelf-home i{background:#d0b46c;}.welcome-page .shelf-beauty i{background:#af90d5;}.welcome-page .shelf-market i{background:#7db98b;}
-.welcome-page .seller-live-dot,.welcome-page .dashboard-pill{color:#d9fffb;}
-.welcome-page .seller-dashboard{position:absolute;z-index:7;left:5%;right:5%;bottom:4%;padding:clamp(12px,2vw,22px);border-radius:24px;background:rgba(248,255,255,.94);border:1px solid rgba(255,255,255,.78);box-shadow:0 24px 56px rgba(0,0,0,.24);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
-.welcome-page .dashboard-head span,.welcome-page .dashboard-head strong,.welcome-page .metric-card span,.welcome-page .metric-card strong,.welcome-page .metric-card small,.welcome-page .seller-buy-strip strong,.welcome-page .seller-buy-strip span{color:#142f31;}.welcome-page .dashboard-cards{grid-template-columns:repeat(3,1fr);gap:8px;}.welcome-page .metric-card{border-radius:14px;background:rgba(239,251,250,.92);box-shadow:inset 0 0 0 1px rgba(8,104,101,.10);}.welcome-page .seller-buy-strip{margin-top:10px;border-radius:16px;background:rgba(228,248,246,.92);}
-.secondary-auth,.primary-auth{min-height:48px;border-radius:15px;font-weight:800;}.secondary-auth{background:rgba(6,55,59,.28);color:#fff;border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}.primary-auth{box-shadow:0 14px 30px rgba(4,56,59,.25);}.scene-controls{position:relative;z-index:10;}.skip-link{color:rgba(255,255,255,.92);}.page-control span{background:rgba(255,255,255,.42);}.page-control span.active{background:#fff;}.welcome-access-note{color:rgba(255,255,255,.82);font-size:11px;}
-@media(max-width:700px){.welcome-page .mall-scene::after{top:5%;width:calc(100% - 24px);padding:8px 10px;letter-spacing:.055em;}.welcome-page .seller-store-shell{top:5%;height:39%;padding:12px;}.welcome-page .seller-mall-sign{top:12px;left:5%;font-size:15px;}.welcome-page .seller-display-row{gap:5px;margin-top:10px;}.welcome-page .seller-shelf{padding:7px 5px;border-radius:10px;}.welcome-page .seller-shelf i{bottom:10%;}.welcome-page .seller-dashboard{left:4%;right:4%;bottom:3%;padding:10px;}.welcome-page .dashboard-cards{gap:5px;}.welcome-page .metric-card{padding:8px 6px;}}
+.welcome-page .seller-backdrop{position:absolute;inset:0;padding:0;background:linear-gradient(180deg,rgba(4,10,11,.06),rgba(4,10,11,.48)),url('https://thunderbird.asu.edu/sites/default/files/2023-06/How%20Broadband%20is%20Reshaping%20the%20Retail%20Industry%20and%20What%20It%20Means%20for%20the%20Future_0.jpg') center/cover no-repeat;}
+.welcome-page .seller-backdrop::after{content:'TU TIENDA EN VANIDAXI';position:absolute;left:5%;top:6%;z-index:4;padding:8px 12px;border:1px solid rgba(255,255,255,.32);border-radius:999px;background:rgba(10,23,24,.28);color:#fff;font:900 clamp(10px,1.5vw,14px)/1 system-ui,sans-serif;letter-spacing:.10em;text-shadow:0 3px 14px rgba(0,0,0,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
+
+/* Ocultar las maquetas antiguas de la tienda para que domine la fotografía real. */
+.welcome-page .seller-store-shell,.welcome-page .seller-dashboard,.welcome-page .seller-mall-sign,.welcome-page .seller-display-row,.welcome-page .seller-buy-strip,.welcome-page .seller-orbit{display:none!important;}
+
+/* Botones de acceso directamente sobre la fotografía, en la franja inferior. */
+.welcome-page .welcome-actions{
+  position:absolute!important;
+  z-index:20!important;
+  left:50%!important;
+  bottom:clamp(18px,4vw,42px)!important;
+  transform:translateX(-50%)!important;
+  width:min(620px,calc(100% - 28px))!important;
+  display:grid!important;
+  grid-template-columns:1fr 1.15fr!important;
+  gap:10px!important;
+  margin:0!important;
+  padding:10px!important;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:20px;
+  background:rgba(7,17,19,.30);
+  box-shadow:0 16px 36px rgba(0,0,0,.24);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:50px;border-radius:14px;font-weight:900;}
+.welcome-page .welcome-actions .secondary-auth{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.32);}
+.welcome-page .welcome-actions .primary-auth{background:#fff;color:#123235;border:1px solid rgba(255,255,255,.86);box-shadow:0 12px 24px rgba(0,0,0,.18);}
+.welcome-page .scene-controls{position:absolute!important;left:50%!important;bottom:clamp(86px,11vw,112px)!important;transform:translateX(-50%)!important;z-index:19!important;}
+.welcome-page .scene-controls .page-control{filter:drop-shadow(0 3px 8px rgba(0,0,0,.45));}
+.welcome-page .skip-link{position:relative;z-index:20;color:rgba(255,255,255,.94);text-shadow:0 3px 12px rgba(0,0,0,.55);}
+.welcome-page .page-control span{background:rgba(255,255,255,.48);}.welcome-page .page-control span.active{background:#fff;}.welcome-page .welcome-access-note{color:rgba(255,255,255,.86);font-size:11px;text-shadow:0 3px 12px rgba(0,0,0,.42);}
+
+.secondary-auth,.primary-auth{min-height:48px;border-radius:15px;font-weight:800;}.secondary-auth{background:rgba(6,55,59,.28);color:#fff;border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}.primary-auth{box-shadow:0 14px 30px rgba(4,56,59,.25);}
+
+@media(max-width:700px){
+  .welcome-page .mall-scene::after{top:5%;width:calc(100% - 24px);padding:8px 10px;letter-spacing:.055em;}
+  .welcome-page .welcome-actions{bottom:14px!important;width:calc(100% - 20px)!important;padding:8px!important;border-radius:17px;gap:8px;}
+  .welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:47px;font-size:13px;}
+  .welcome-page .scene-controls{bottom:76px!important;}
+  .welcome-page .welcome-access-note{font-size:10px;}
+}
 @media(prefers-reduced-motion:reduce){.scene-frame{transition:none!important;}}
