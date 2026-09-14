@@ -1,4 +1,4 @@
-const CACHE = 'vanidaxi-v5'
+const CACHE = 'vanidaxi-v6'
 
 self.addEventListener('install', event => {
   event.waitUntil(
