@@ -1,11 +1,19 @@
-/* VaniDaxi — bienvenida integral: foto a pantalla completa. */
+/* VaniDaxi — bienvenida: cada escena es el fondo completo, sin tarjetas. */
 
 .welcome-page,
-.welcome-stage{
-  background:transparent !important;
+.welcome-stage{background:transparent !important;}
+
+.welcome-page .welcome-stage{
+  position:relative !important;
+  min-height:100svh !important;
+  height:100svh !important;
+  padding:0 !important;
+  display:block !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
 }
 
-/* La fotografía ocupa TODO el espacio disponible. No recuadro, no marco, no fondo verde. */
+/* FOTO = TODA LA PANTALLA. */
 .welcome-page .scene-viewport{
   position:absolute !important;
   inset:0 !important;
@@ -13,44 +21,46 @@
   height:100svh !important;
   min-height:100svh !important;
   margin:0 !important;
-  border-radius:0 !important;
   border:0 !important;
+  border-radius:0 !important;
   overflow:hidden !important;
   background:transparent !important;
   box-shadow:none !important;
   z-index:0 !important;
 }
-
 .welcome-page .scene-frame{
   position:absolute !important;
   inset:0 !important;
   width:100% !important;
   height:100% !important;
   margin:0 !important;
+  border:0 !important;
   border-radius:0 !important;
-}
-
-.welcome-page .scene-frame-buyer,
-.welcome-page .scene-frame-seller{
   background:transparent !important;
 }
 
-/* COMPRADOR: fotografía real del mall con personas y bolsas. */
+/* COMPRADOR: frente de mall real + personas con bolsas. */
 .welcome-page .mall-scene{
   position:absolute !important;
   inset:0 !important;
   width:100% !important;
   height:100% !important;
   min-height:100% !important;
-  border-radius:0 !important;
   border:0 !important;
+  border-radius:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.02) 48%,rgba(0,0,0,.48) 100%),
-    url('https://images.pexels.com/photos/36712918/pexels-photo-36712918.jpeg?cs=srgb&dl=pexels-silverkblack-36712918.jpg&fm=jpg') center center / cover no-repeat !important;
+    linear-gradient(180deg,rgba(0,0,0,.04) 0%,rgba(0,0,0,.02) 42%,rgba(0,0,0,.46) 100%),
+    url('https://images.pexels.com/photos/2780551/pexels-photo-2780551.jpeg?auto=compress&cs=tinysrgb&w=1920') center center / cover no-repeat !important;
   box-shadow:none !important;
 }
-
-/* Elimina todas las maquetas anteriores; queda únicamente la fotografía. */
+.welcome-page .mall-scene::before{
+  content:'' !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  pointer-events:none !important;
+  background:linear-gradient(180deg,transparent 43%,rgba(0,0,0,.10) 58%,rgba(0,0,0,.50) 100%) !important;
+}
 .welcome-page .mall-sky,
 .welcome-page .mall-haze,
 .welcome-page .mall-store-row,
@@ -64,24 +74,15 @@
 .welcome-page .mall-phone,
 .welcome-page .mall-building{display:none !important;}
 
-.welcome-page .mall-scene::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  z-index:1;
-  pointer-events:none;
-  background:linear-gradient(180deg,transparent 48%,rgba(0,0,0,.22) 72%,rgba(0,0,0,.52) 100%);
-}
-
-/* VENDEDOR: fotografía real de tienda; sobre ella colocamos la propuesta de tablet/estadísticas. */
+/* VENDEDOR: tienda real + persona usando tablet; sin tarjeta falsa de tienda. */
 .welcome-page .seller-world{
   position:absolute !important;
   inset:0 !important;
   width:100% !important;
   height:100% !important;
   min-height:100% !important;
-  border-radius:0 !important;
   border:0 !important;
+  border-radius:0 !important;
   overflow:hidden !important;
   background:transparent !important;
   box-shadow:none !important;
@@ -91,135 +92,91 @@
   inset:0 !important;
   padding:0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.04) 48%,rgba(0,0,0,.52) 100%),
-    url('https://thunderbird.asu.edu/sites/default/files/2023-06/How%20Broadband%20is%20Reshaping%20the%20Retail%20Industry%20and%20What%20It%20Means%20for%20the%20Future_0.jpg') center center / cover no-repeat !important;
+    linear-gradient(180deg,rgba(0,0,0,.03) 0%,rgba(0,0,0,.04) 44%,rgba(0,0,0,.55) 100%),
+    url('https://images.pexels.com/photos/36730438/pexels-photo-36730438.jpeg?auto=compress&cs=tinysrgb&w=1920') center center / cover no-repeat !important;
 }
-
-/* No poner una segunda tarjeta/tienda encima de la fotografía. */
 .welcome-page .seller-store-shell,
 .welcome-page .seller-mall-sign,
 .welcome-page .seller-display-row,
 .welcome-page .seller-orbit{display:none !important;}
 
-/* Panel de estadísticas con apariencia de tablet, integrado sobre la foto. */
+/* Único elemento informativo sobre la foto del vendedor: estadísticas estilo tablet. */
 .welcome-page .seller-dashboard{
   display:block !important;
   position:absolute !important;
-  z-index:6 !important;
-  left:auto !important;
-  right:clamp(18px,5vw,72px) !important;
-  top:auto !important;
-  bottom:clamp(105px,14vw,145px) !important;
+  z-index:7 !important;
+  right:clamp(14px,4vw,58px) !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
   width:min(360px,42vw) !important;
-  padding:18px !important;
-  border-radius:24px !important;
+  padding:16px !important;
+  border-radius:22px !important;
   background:rgba(248,255,255,.88) !important;
-  border:1px solid rgba(255,255,255,.72) !important;
-  box-shadow:0 24px 60px rgba(0,0,0,.28) !important;
-  backdrop-filter:blur(10px) !important;
-  -webkit-backdrop-filter:blur(10px) !important;
+  border:1px solid rgba(255,255,255,.75) !important;
+  box-shadow:0 22px 55px rgba(0,0,0,.30) !important;
+  backdrop-filter:blur(9px) !important;
+  -webkit-backdrop-filter:blur(9px) !important;
 }
-.welcome-page .dashboard-cards{grid-template-columns:repeat(3,1fr) !important;gap:8px !important;}
+.welcome-page .dashboard-cards{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:8px !important;}
 .welcome-page .metric-card{border-radius:13px !important;}
 
-/* Marca, mensaje, indicadores y acceso quedan encima de la fotografía. */
+/* Todo el contenido de bienvenida flota sobre la foto. */
 .welcome-page .welcome-brand{
   position:absolute !important;
-  top:clamp(18px,4vw,38px) !important;
-  left:clamp(18px,4vw,48px) !important;
+  top:clamp(16px,4vw,34px) !important;
+  left:clamp(16px,4vw,46px) !important;
   z-index:20 !important;
   color:#fff !important;
-  text-shadow:0 3px 16px rgba(0,0,0,.55) !important;
+  text-shadow:0 3px 18px rgba(0,0,0,.65) !important;
 }
-
 .welcome-page .welcome-copy{
   position:absolute !important;
   left:50% !important;
-  bottom:clamp(155px,20vw,210px) !important;
+  bottom:clamp(150px,19vw,205px) !important;
   transform:translateX(-50%) !important;
   z-index:12 !important;
   width:min(900px,calc(100% - 32px)) !important;
   margin:0 !important;
   text-align:center !important;
   color:#fff !important;
-  text-shadow:0 4px 22px rgba(0,0,0,.72) !important;
+  text-shadow:0 4px 24px rgba(0,0,0,.78) !important;
 }
 .welcome-page .welcome-copy h1,
-.welcome-page .welcome-copy p{color:#fff !important;}
+.welcome-page .welcome-copy p,
+.welcome-page .welcome-copy .scene-kicker{color:#fff !important;}
 
 .welcome-page .scene-controls{
   position:absolute !important;
   left:50% !important;
-  bottom:clamp(98px,13vw,128px) !important;
+  bottom:clamp(90px,12vw,120px) !important;
   transform:translateX(-50%) !important;
   z-index:15 !important;
 }
-
 .welcome-page .welcome-actions{
   position:absolute !important;
   left:50% !important;
-  bottom:clamp(26px,5vw,48px) !important;
+  bottom:clamp(22px,4vw,40px) !important;
   transform:translateX(-50%) !important;
   z-index:16 !important;
-  width:min(620px,calc(100% - 28px)) !important;
+  width:min(620px,calc(100% - 24px)) !important;
   display:grid !important;
   grid-template-columns:1fr 1.15fr !important;
   gap:10px !important;
   margin:0 !important;
   padding:0 !important;
 }
-
 .welcome-page .welcome-actions .secondary-auth,
-.welcome-page .welcome-actions .primary-auth{
-  min-height:52px !important;
-  border-radius:15px !important;
-  font-weight:900 !important;
-  box-shadow:0 12px 30px rgba(0,0,0,.22) !important;
-}
-.welcome-page .welcome-actions .secondary-auth{
-  background:rgba(0,0,0,.28) !important;
-  color:#fff !important;
-  border:1px solid rgba(255,255,255,.50) !important;
-  backdrop-filter:blur(9px) !important;
-  -webkit-backdrop-filter:blur(9px) !important;
-}
-.welcome-page .welcome-actions .primary-auth{
-  background:#fff !important;
-  color:#102f32 !important;
-}
-
-.welcome-page .welcome-access-note{
-  position:absolute !important;
-  left:50% !important;
-  bottom:8px !important;
-  transform:translateX(-50%) !important;
-  z-index:16 !important;
-  color:rgba(255,255,255,.82) !important;
-  font-size:10px !important;
-  text-shadow:0 2px 10px rgba(0,0,0,.6) !important;
-}
+.welcome-page .welcome-actions .primary-auth{min-height:50px !important;border-radius:14px !important;font-weight:900 !important;box-shadow:0 12px 28px rgba(0,0,0,.25) !important;}
+.welcome-page .welcome-actions .secondary-auth{background:rgba(0,0,0,.28) !important;color:#fff !important;border:1px solid rgba(255,255,255,.50) !important;backdrop-filter:blur(8px) !important;-webkit-backdrop-filter:blur(8px) !important;}
+.welcome-page .welcome-actions .primary-auth{background:#fff !important;color:#102f32 !important;}
+.welcome-page .welcome-access-note{position:absolute !important;left:50% !important;bottom:5px !important;transform:translateX(-50%) !important;z-index:16 !important;color:rgba(255,255,255,.84) !important;font-size:10px !important;text-shadow:0 2px 12px rgba(0,0,0,.65) !important;}
 
 @media(max-width:700px){
-  .welcome-page .welcome-copy{
-    bottom:clamp(145px,27vw,185px) !important;
-  }
-  .welcome-page .scene-controls{
-    bottom:86px !important;
-  }
-  .welcome-page .welcome-actions{
-    bottom:18px !important;
-    width:calc(100% - 20px) !important;
-    gap:8px !important;
-  }
-  .welcome-page .welcome-actions .secondary-auth,
-  .welcome-page .welcome-actions .primary-auth{
-    min-height:48px !important;
-    font-size:13px !important;
-  }
-  .welcome-page .seller-dashboard{
-    width:min(86vw,330px) !important;
-    right:7vw !important;
-    bottom:150px !important;
-    padding:12px !important;
-  }
+  .welcome-page .welcome-copy{bottom:143px !important;width:calc(100% - 24px) !important;}
+  .welcome-page .scene-controls{bottom:80px !important;}
+  .welcome-page .welcome-actions{bottom:16px !important;width:calc(100% - 18px) !important;gap:7px !important;}
+  .welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:47px !important;font-size:13px !important;}
+  .welcome-page .welcome-access-note{display:none !important;}
+  .welcome-page .seller-dashboard{width:86vw !important;right:7vw !important;top:auto !important;bottom:155px !important;transform:none !important;padding:11px !important;}
 }
+@media(prefers-reduced-motion:reduce){.scene-frame{transition:none !important;}}
