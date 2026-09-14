@@ -55,7 +55,7 @@ export async function sendPasswordReset(email, captchaToken = '') {
 
 export async function signOut() {
   const session = getSession()
-  if (session?.access_token) await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}`) }).catch(() => {})
+  if (session?.access_token) await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }).catch(() => {})
   await supabase.auth.signOut().catch(() => {})
   localStorage.removeItem(STORAGE_KEY)
 }
