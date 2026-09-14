@@ -1,12 +1,12 @@
 import React,{useEffect,useRef,useState}from'react'
 import{ArrowRight}from'lucide-react'
 import'./welcome-gate.css'
-import buyerImage from'./welcome-vandaxi-1.webp'
-import sellerImage from'./welcome-vandaxi-vendedor.webp'
+import buyerImage from'./welcome-vandaxi-buyer.svg'
+import sellerImage from'./welcome-vandaxi-seller.svg'
 
 const slides=[
- {type:'buyer',image:buyerImage,alt:'Bienvenida de compradores de VaniDaxi',label:'Entrar a VaniDaxi',aria:'la tienda'},
- {type:'seller',image:sellerImage,alt:'Bienvenida de vendedores de VaniDaxi',label:'Entrar a mi local',aria:'mi local'}
+ {type:'buyer',image:buyerImage,alt:'Bienvenida para compradores de VaniDaxi',label:'Entrar a VaniDaxi',aria:'la experiencia de compra'},
+ {type:'seller',image:sellerImage,alt:'Bienvenida para vendedores de VaniDaxi',label:'Entrar a mi local',aria:'la experiencia de vendedor'}
 ]
 
 export default function WelcomeGate({onContinue}){
@@ -15,19 +15,10 @@ export default function WelcomeGate({onContinue}){
  const touchEnd=useRef(null)
  const slide=slides[index]
  const goTo=i=>setIndex((i+slides.length)%slides.length)
- useEffect(()=>{
-  const timer=setInterval(()=>setIndex(i=>(i+1)%slides.length),5000)
-  return()=>clearInterval(timer)
- },[])
+ useEffect(()=>{const timer=setInterval(()=>setIndex(i=>(i+1)%slides.length),5000);return()=>clearInterval(timer)},[])
  const onTouchStart=e=>{touchStart.current=e.changedTouches[0].clientX;touchEnd.current=null}
  const onTouchMove=e=>{touchEnd.current=e.changedTouches[0].clientX}
- const onTouchEnd=()=>{
-  if(touchStart.current===null||touchEnd.current===null)return
-  const distance=touchStart.current-touchEnd.current
-  if(Math.abs(distance)>=45)goTo(index+(distance>0?1:-1))
-  touchStart.current=null
-  touchEnd.current=null
- }
+ const onTouchEnd=()=>{if(touchStart.current===null||touchEnd.current===null)return;const distance=touchStart.current-touchEnd.current;if(Math.abs(distance)>=45)goTo(index+(distance>0?1:-1));touchStart.current=null;touchEnd.current=null}
  return <section className="vd-welcome" aria-label="Bienvenida a VaniDaxi">
   <div className="vd-welcome-scene" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
    <img className="vd-welcome-image" src={slide.image} alt={slide.alt} draggable="false" />
