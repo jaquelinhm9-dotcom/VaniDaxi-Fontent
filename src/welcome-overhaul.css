@@ -1,58 +1,67 @@
-/* VaniDaxi — bienvenida: escenas fotográficas generadas, a pantalla completa, sin tarjetas. */
+/* VaniDaxi — bienvenida integral.
+   Mantiene la arquitectura de Welcome/App.jsx y concentra aquí los ajustes visuales.
+   Las escenas usan ilustraciones vectoriales estables para evitar artefactos anatómicos
+   o deformaciones que podían aparecer en las imágenes generadas. */
 
 .welcome-page,
-.welcome-stage{background:transparent !important;}
-
-.welcome-page .welcome-stage{
-  position:relative !important;
-  min-height:100svh !important;
-  height:100svh !important;
-  padding:0 !important;
-  display:block !important;
-  overflow:hidden !important;
-  isolation:isolate !important;
+.welcome-stage {
+  background: transparent !important;
 }
 
-.welcome-page .scene-viewport{
-  position:absolute !important;
-  inset:0 !important;
-  width:100vw !important;
-  height:100svh !important;
-  min-height:100svh !important;
-  margin:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  overflow:hidden !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  z-index:0 !important;
+.welcome-page .welcome-stage {
+  position: relative !important;
+  min-height: 100svh !important;
+  height: 100svh !important;
+  padding: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
 }
+
+.welcome-page .scene-viewport {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100svh !important;
+  min-height: 100svh !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: 0 !important;
+}
+
 .welcome-page .scene-frame,
 .welcome-page .scene-frame-buyer,
-.welcome-page .scene-frame-seller{
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
-  margin:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  background:transparent !important;
+.welcome-page .scene-frame-seller {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
 }
 
-/* COMPRADOR: fotografía generada específicamente para VaniDaxi: frente de mall, categorías y personas con bolsas. */
-.welcome-page .mall-scene{
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
-  min-height:100% !important;
-  border:0 !important;
-  border-radius:0 !important;
+/* ---------------------------------------------------------
+   ESCENAS DE FONDO
+   --------------------------------------------------------- */
+
+.welcome-page .mall-scene {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.04) 45%,rgba(0,0,0,.52) 100%),
-    url('/VaniDaxi-Fontent/vani-mall-generated.svg') center center / cover no-repeat !important;
-  box-shadow:none !important;
+    linear-gradient(180deg, rgba(7, 27, 29, .02) 0%, rgba(7, 27, 29, .08) 50%, rgba(7, 22, 24, .56) 100%),
+    url('/VaniDaxi-Fontent/vani-mall-exterior.svg') center center / cover no-repeat !important;
+  box-shadow: none !important;
 }
 
 .welcome-page .mall-sky,
@@ -66,120 +75,219 @@
 .welcome-page .scene-light,
 .welcome-page .phone-portal,
 .welcome-page .mall-phone,
-.welcome-page .mall-building{display:none !important;}
+.welcome-page .mall-building {
+  display: none !important;
+}
 
-/* VENDEDOR: fotografía generada específicamente para VaniDaxi: tienda real, persona y tablet con analítica. */
-.welcome-page .seller-world{
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
-  min-height:100% !important;
-  border:0 !important;
-  border-radius:0 !important;
-  overflow:hidden !important;
-  background:transparent !important;
-  box-shadow:none !important;
+.welcome-page .seller-world {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
-.welcome-page .seller-backdrop{
-  position:absolute !important;
-  inset:0 !important;
-  padding:0 !important;
+
+.welcome-page .seller-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  padding: 0 !important;
   background:
-    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.03) 45%,rgba(0,0,0,.52) 100%),
-    url('/VaniDaxi-Fontent/vani-seller-generated.svg') center center / cover no-repeat !important;
+    linear-gradient(180deg, rgba(4, 25, 28, .01) 0%, rgba(4, 25, 28, .05) 46%, rgba(4, 22, 24, .48) 100%),
+    url('/VaniDaxi-Fontent/vani-seller-store.svg') center center / cover no-repeat !important;
 }
+
 .welcome-page .seller-store-shell,
 .welcome-page .seller-mall-sign,
 .welcome-page .seller-display-row,
 .welcome-page .seller-dashboard,
 .welcome-page .seller-orbit,
-.welcome-page .seller-buy-strip{display:none !important;}
+.welcome-page .seller-buy-strip {
+  display: none !important;
+}
 
-/* Marca y descripción sobre la fotografía. */
-.welcome-page .welcome-brand{
-  position:absolute !important;
-  top:clamp(16px,4vw,34px) !important;
-  left:clamp(16px,4vw,46px) !important;
-  z-index:20 !important;
-  color:#fff !important;
-  text-shadow:0 3px 18px rgba(0,0,0,.72) !important;
+/* ---------------------------------------------------------
+   MARCA + COPY
+   --------------------------------------------------------- */
+
+.welcome-page .welcome-brand {
+  position: absolute !important;
+  top: clamp(16px, 4vw, 34px) !important;
+  left: clamp(16px, 4vw, 46px) !important;
+  z-index: 20 !important;
+  color: #fff !important;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, .72) !important;
 }
-.welcome-page .welcome-copy{
-  position:absolute !important;
-  left:50% !important;
-  bottom:clamp(208px,24vw,250px) !important;
-  transform:translateX(-50%) !important;
-  z-index:12 !important;
-  width:min(920px,calc(100% - 32px)) !important;
-  margin:0 !important;
-  text-align:center !important;
-  color:#fff !important;
-  text-shadow:0 4px 24px rgba(0,0,0,.84) !important;
+
+.welcome-page .welcome-copy {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(208px, 24vw, 250px) !important;
+  transform: translateX(-50%) !important;
+  z-index: 12 !important;
+  width: min(920px, calc(100% - 32px)) !important;
+  margin: 0 !important;
+  text-align: center !important;
+  color: #fff !important;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, .84) !important;
 }
+
 .welcome-page .welcome-copy h1,
 .welcome-page .welcome-copy p,
-.welcome-page .welcome-copy .scene-kicker{color:#fff !important;}
-
-/* Indicadores y "Desliza" quedan debajo de la descripción. */
-.welcome-page .scene-controls{
-  position:absolute !important;
-  left:50% !important;
-  bottom:clamp(130px,15vw,162px) !important;
-  transform:translateX(-50%) !important;
-  z-index:15 !important;
-  white-space:nowrap !important;
+.welcome-page .welcome-copy .scene-kicker {
+  color: #fff !important;
 }
-.welcome-page .scene-controls .page-control{filter:drop-shadow(0 3px 8px rgba(0,0,0,.65));}
+
+.welcome-page .welcome-copy h1 {
+  max-width: 820px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.welcome-page .welcome-copy p {
+  max-width: 720px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Escena no activa completamente fuera de flujo visual. */
+.welcome-page .scene-frame-buyer,
+.welcome-page .scene-frame-seller,
+.welcome-page .copy-buyer,
+.welcome-page .copy-seller {
+  transition: opacity .42s ease, transform .42s ease !important;
+}
+
+/* ---------------------------------------------------------
+   CONTROLES
+   --------------------------------------------------------- */
+
+.welcome-page .scene-controls {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(130px, 15vw, 162px) !important;
+  transform: translateX(-50%) !important;
+  z-index: 15 !important;
+  white-space: nowrap !important;
+}
+
+.welcome-page .scene-controls .page-control {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, .65));
+}
+
 .welcome-page .skip-link,
-.welcome-page .swipe-hint{color:#fff !important;text-shadow:0 3px 12px rgba(0,0,0,.65) !important;}
+.welcome-page .swipe-hint {
+  color: #fff !important;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, .65) !important;
+}
 
-/* Botones de acceso al final. El primario es verde VaniDaxi. */
-.welcome-page .welcome-actions{
-  position:absolute !important;
-  left:50% !important;
-  bottom:clamp(24px,4vw,42px) !important;
-  transform:translateX(-50%) !important;
-  z-index:16 !important;
-  width:min(620px,calc(100% - 24px)) !important;
-  display:grid !important;
-  grid-template-columns:1fr 1.15fr !important;
-  gap:10px !important;
-  margin:0 !important;
-  padding:0 !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
+/* Botones al pie: visibles, equilibrados y con contraste estable. */
+.welcome-page .welcome-actions {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(24px, 4vw, 42px) !important;
+  transform: translateX(-50%) !important;
+  z-index: 16 !important;
+  width: min(620px, calc(100% - 24px)) !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1.15fr !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
+
 .welcome-page .welcome-actions .secondary-auth,
-.welcome-page .welcome-actions .primary-auth{
-  min-height:50px !important;
-  border-radius:14px !important;
-  font-weight:900 !important;
-  box-shadow:0 12px 28px rgba(0,0,0,.30) !important;
+.welcome-page .welcome-actions .primary-auth {
+  min-height: 50px !important;
+  border-radius: 14px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .30) !important;
 }
-.welcome-page .welcome-actions .secondary-auth{
-  background:rgba(0,0,0,.30) !important;
-  color:#fff !important;
-  border:1px solid rgba(255,255,255,.54) !important;
-  backdrop-filter:blur(7px) !important;
-  -webkit-backdrop-filter:blur(7px) !important;
+
+.welcome-page .welcome-actions .secondary-auth {
+  background: rgba(0, 0, 0, .30) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, .54) !important;
+  backdrop-filter: blur(7px) !important;
+  -webkit-backdrop-filter: blur(7px) !important;
 }
-.welcome-page .welcome-actions .primary-auth{
-  background:#19d3c5 !important;
-  color:#082b2c !important;
-  border:1px solid rgba(255,255,255,.38) !important;
+
+.welcome-page .welcome-actions .primary-auth {
+  background: #19d3c5 !important;
+  color: #082b2c !important;
+  border: 1px solid rgba(255, 255, 255, .38) !important;
 }
-.welcome-page .welcome-access-note{display:none !important;}
+
+.welcome-page .welcome-access-note {
+  display: none !important;
+}
 
 .welcome-page .welcome-stage::before,
-.welcome-page .welcome-stage::after{display:none !important;}
-
-@media(max-width:700px){
-  .welcome-page .welcome-copy{bottom:184px !important;width:calc(100% - 24px) !important;}
-  .welcome-page .scene-controls{bottom:112px !important;}
-  .welcome-page .welcome-actions{bottom:16px !important;width:calc(100% - 18px) !important;gap:7px !important;}
-  .welcome-page .welcome-actions .secondary-auth,.welcome-page .welcome-actions .primary-auth{min-height:47px !important;font-size:13px !important;}
+.welcome-page .welcome-stage::after {
+  display: none !important;
 }
 
-@media(prefers-reduced-motion:reduce){.scene-frame{transition:none !important;}}
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .welcome-page .welcome-copy {
+    bottom: 184px !important;
+    width: calc(100% - 24px) !important;
+  }
+
+  .welcome-page .scene-controls {
+    bottom: 112px !important;
+  }
+
+  .welcome-page .welcome-actions {
+    bottom: 16px !important;
+    width: calc(100% - 18px) !important;
+    gap: 7px !important;
+  }
+
+  .welcome-page .welcome-actions .secondary-auth,
+  .welcome-page .welcome-actions .primary-auth {
+    min-height: 47px !important;
+    font-size: 13px !important;
+  }
+
+  .welcome-page .mall-scene {
+    background-position: 50% 50% !important;
+  }
+
+  .welcome-page .seller-backdrop {
+    background-position: 52% 50% !important;
+  }
+}
+
+@media (max-height: 700px) and (orientation: landscape) {
+  .welcome-page .welcome-copy {
+    bottom: 150px !important;
+  }
+
+  .welcome-page .scene-controls {
+    bottom: 82px !important;
+  }
+
+  .welcome-page .welcome-actions {
+    bottom: 10px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-page .scene-frame-buyer,
+  .welcome-page .scene-frame-seller,
+  .welcome-page .copy-buyer,
+  .welcome-page .copy-seller {
+    transition: none !important;
+  }
+}
