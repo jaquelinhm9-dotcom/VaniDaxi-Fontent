@@ -1,1 +1,156 @@
-.welcome-page{position:relative;width:100%;height:100svh;min-height:620px;overflow:hidden;isolation:isolate;background:#07161a;color:#fff;touch-action:pan-y;user-select:none}.welcome-background,.welcome-image,.welcome-shade{position:absolute;inset:0}.welcome-background{z-index:0}.welcome-image{background-position:center;background-repeat:no-repeat;background-size:cover;opacity:0;transform:scale(1.01);transition:opacity .6s ease,transform 5s ease}.welcome-image-buyer{background-image:url('/VaniDaxi-Fontent/welcome-buyer.svg')}.welcome-image-seller{background-image:url('/VaniDaxi-Fontent/welcome-seller.svg')}.welcome-buyer .welcome-image-buyer,.welcome-seller .welcome-image-seller{opacity:1;transform:scale(1)}.welcome-shade{z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(3,12,15,.48) 0%,rgba(3,14,17,.05) 34%,rgba(3,12,15,.08) 56%,rgba(2,10,12,.78) 100%),linear-gradient(90deg,rgba(0,0,0,.28) 0%,transparent 25%,transparent 74%,rgba(0,0,0,.25) 100%)}.welcome-header{position:absolute;inset:0 0 auto;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px clamp(16px,4vw,46px)}.welcome-brand{display:inline-flex;align-items:center;gap:9px;color:#fff;font-size:clamp(19px,2.5vw,29px);font-weight:900;letter-spacing:-.04em;text-shadow:0 5px 20px rgba(0,0,0,.65)}.welcome-skip{min-height:38px;padding:7px 14px;border:1px solid rgba(255,255,255,.4);border-radius:999px;color:#fff;background:rgba(3,18,22,.25);backdrop-filter:blur(9px);font-size:12px;font-weight:800;cursor:pointer}.welcome-content{position:absolute;left:0;right:0;bottom:154px;z-index:6;padding:0 clamp(18px,6vw,84px);pointer-events:none}.welcome-card{width:min(560px,74vw);padding:0;text-align:left;background:transparent;border:0;box-shadow:none;backdrop-filter:none}.welcome-kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;color:#b8fff8;font-size:12px;font-weight:900;letter-spacing:.2em;text-shadow:0 3px 14px rgba(0,0,0,.8)}.welcome-kicker::before{content:'';width:30px;height:2px;border-radius:2px;background:#28dfcf;box-shadow:0 0 12px rgba(40,223,207,.6)}.welcome-card h1{margin:0;color:#fff;font-size:clamp(35px,5.6vw,66px);line-height:.98;letter-spacing:-.055em;text-shadow:0 6px 25px rgba(0,0,0,.65);max-width:620px}.welcome-card p{margin:14px 0 0;max-width:520px;color:rgba(255,255,255,.9);font-size:clamp(14px,1.9vw,18px);line-height:1.42;text-shadow:0 3px 13px rgba(0,0,0,.78)}.welcome-controls{position:absolute;left:50%;bottom:107px;z-index:9;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px}.welcome-dots{display:flex;align-items:center;gap:7px}.welcome-dots button{width:8px;height:8px;padding:0;border:0;border-radius:999px;background:rgba(255,255,255,.44);cursor:pointer}.welcome-dots button.active{width:28px;background:#22d8c8}.welcome-swipe{display:inline-flex;align-items:center;min-height:34px;padding:4px 10px;border:0;border-radius:999px;color:#fff;background:rgba(3,14,17,.22);font-size:12px;font-weight:800;text-shadow:0 3px 12px rgba(0,0,0,.85);backdrop-filter:blur(6px);cursor:pointer}.welcome-arrow{margin-right:7px;color:#28dfcf;font-size:20px;line-height:1}.welcome-actions{position:absolute;left:50%;bottom:12px;z-index:9;transform:translateX(-50%);display:grid;grid-template-columns:1fr 1.08fr;gap:10px;width:min(620px,calc(100% - 24px))}.welcome-actions button{min-height:52px;border-radius:17px;padding:0 18px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 15px 34px rgba(0,0,0,.3)}.welcome-secondary{color:#fff;border:1px solid rgba(255,255,255,.5);background:rgba(3,20,23,.48);backdrop-filter:blur(10px)}.welcome-primary{color:#062d30;border:1px solid rgba(255,255,255,.4);background:linear-gradient(135deg,#67f9eb,#19cabe)}.welcome-secondary:hover,.welcome-primary:hover,.welcome-skip:hover,.welcome-swipe:hover{filter:brightness(1.07)}@media(max-width:700px){.welcome-page{min-height:560px}.welcome-header{padding:14px}.welcome-brand{font-size:20px}.welcome-skip{min-height:36px;padding:6px 12px}.welcome-content{bottom:146px;padding:0 16px}.welcome-card{width:min(90vw,520px)}.welcome-card h1{font-size:clamp(31px,9.5vw,46px)}.welcome-card p{font-size:14px;margin-top:10px}.welcome-controls{bottom:102px}.welcome-actions{bottom:8px;width:calc(100% - 14px);gap:7px}.welcome-actions button{min-height:48px;border-radius:15px;padding:0 10px;font-size:13px}}@media(max-height:700px){.welcome-content{bottom:126px}.welcome-controls{bottom:84px}.welcome-actions{bottom:7px}.welcome-card h1{font-size:clamp(28px,6vw,42px)}}@media(prefers-reduced-motion:reduce){.welcome-image{transition:none;transform:none}}
+/* VaniDaxi — nueva bienvenida basada exclusivamente en las referencias visuales aprobadas. */
+.reference-welcome {
+  --vd-cyan: #20d7d2;
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #000;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.reference-viewport {
+  position: relative;
+  width: min(100vw, 346px);
+  aspect-ratio: 346 / 755;
+  overflow: hidden;
+  background: #050505;
+}
+
+.reference-screen {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.reference-hit-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.reference-hit-layer button {
+  position: absolute;
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reference-hit-layer button:focus-visible {
+  outline: 2px solid rgba(255,255,255,.95);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* Coordenadas correspondientes a los controles de las referencias aprobadas. */
+.hit-swipe {
+  left: 20%;
+  top: 78.5%;
+  width: 60%;
+  height: 5.5%;
+}
+
+.hit-login {
+  left: 7%;
+  top: 85.2%;
+  width: 42%;
+  height: 5.6%;
+}
+
+.hit-register {
+  left: 52%;
+  top: 85.2%;
+  width: 41%;
+  height: 5.6%;
+}
+
+.hit-skip {
+  left: 4%;
+  top: 92%;
+  width: 28%;
+  height: 5%;
+}
+
+/* El panel de autenticación conserva el flujo Supabase existente. */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, .68);
+  backdrop-filter: blur(12px);
+}
+
+.auth-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  cursor: default;
+}
+
+.auth-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 470px);
+  max-height: min(92svh, 820px);
+  overflow: auto;
+  padding: 24px;
+  border-radius: 26px;
+  background: #fff;
+  color: #0a2a2a;
+  box-shadow: 0 28px 80px rgba(0,0,0,.35);
+}
+
+.auth-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.auth-top h2 { margin: 2px 0 0; font-size: 24px; }
+.auth-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; background: #eef5f5; color: #0a2a2a; font-size: 24px; cursor: pointer; }
+.eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+.vd-mark { display: inline-grid; place-items: center; width: 42px; height: 42px; flex: 0 0 auto; border-radius: 12px; color: #fff; background: linear-gradient(145deg, #0c8780, #063f45); }
+.vd-mark-v { font-size: 22px; line-height: 1; font-weight: 900; }
+.auth-tabs, .role-grid, .social-row { display: grid; gap: 8px; }
+.auth-tabs { grid-template-columns: 1fr 1fr; padding: 4px; margin-bottom: 18px; border-radius: 14px; background: #edf4f4; }
+.auth-tabs button { padding: 10px; border-radius: 10px; background: transparent; color: #496568; font-weight: 800; cursor: pointer; }
+.auth-tabs button.active { background: #fff; color: #073e40; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.role-choice { margin-bottom: 16px; }
+.field-label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 800; }
+.role-grid { grid-template-columns: 1fr 1fr; }
+.role-card { display: grid; gap: 4px; text-align: left; padding: 13px; border: 1px solid #dbe8e8; border-radius: 16px; background: #fff; color: #173b3d; cursor: pointer; }
+.role-card.active { border-color: var(--vd-cyan); box-shadow: inset 0 0 0 2px rgba(32,215,210,.18); }
+.role-icon { font-size: 21px; }
+.role-card small { opacity: .62; }
+.auth-form { display: grid; gap: 13px; }
+.auth-form label { display: grid; gap: 6px; }
+.auth-form label > span { font-size: 13px; font-weight: 800; }
+.auth-form input { width: 100%; padding: 12px 13px; border: 1px solid #d6e2e2; border-radius: 12px; color: #0a2a2a; background: #fbfdfd; }
+.password-hint, .legal-note { margin: 0; font-size: 12px; line-height: 1.5; opacity: .65; }
+.primary-action { width: 100%; padding: 13px 16px; border-radius: 13px; background: #16cfc3; color: #06363a; font-weight: 900; cursor: pointer; }
+.primary-action:disabled, .social-row button:disabled { opacity: .55; cursor: not-allowed; }
+.captcha-slot { min-height: 78px; display: grid; place-items: center; }
+.divider { display: flex; align-items: center; gap: 10px; margin: 17px 0 12px; color: #71888a; font-size: 12px; }
+.divider::before, .divider::after { content: ''; height: 1px; flex: 1; background: #dbe5e5; }
+.social-row { grid-template-columns: 1fr 1fr; }
+.social-row button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px; border: 1px solid #d6e2e2; border-radius: 12px; background: #fff; color: #173b3d; cursor: pointer; }
+.text-action { display: block; margin: 14px auto 0; background: transparent; color: #087f79; font-weight: 800; cursor: pointer; }
+.auth-message { margin-top: 13px; padding: 10px 12px; border-radius: 12px; background: #eef8f7; color: #174d4d; font-size: 13px; line-height: 1.45; }
+
+@media (max-width: 430px) {
+  .reference-viewport { width: 100vw; }
+  .auth-overlay { padding: 12px; }
+  .auth-panel { padding: 20px 16px; border-radius: 22px; }
+}
