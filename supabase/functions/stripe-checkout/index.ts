@@ -102,9 +102,6 @@ Deno.serve(async (req) => {
   params.set("integration_identifier", "vanidaxiQmNwRtPk");
   if (user.email) params.set("customer_email", user.email);
 
-  // Keep Stripe's dynamic payment-method behavior. The selector expresses the
-  // customer's preference by excluding the alternatives rather than hard-coding
-  // payment_method_types, so Stripe can still enforce account/country eligibility.
   if (paymentMethod === "oxxo") {
     params.append("excluded_payment_method_types[]", "card");
     params.append("excluded_payment_method_types[]", "customer_balance");
