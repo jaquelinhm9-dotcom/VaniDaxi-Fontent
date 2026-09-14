@@ -11,7 +11,7 @@
   border-radius:0;
   border:0;
   background:
-    linear-gradient(180deg,rgba(5,12,14,.08),rgba(5,12,14,.12) 40%,rgba(4,10,12,.58)),
+    linear-gradient(180deg,rgba(5,12,14,.04),rgba(5,12,14,.08) 45%,rgba(4,10,12,.56)),
     url('https://images.pexels.com/photos/2780551/pexels-photo-2780551.jpeg?auto=compress&cs=tinysrgb&w=2400') center/cover no-repeat;
   box-shadow:none;
 }
@@ -20,7 +20,9 @@
   position:absolute;
   inset:0;
   z-index:3;
-  background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,transparent 46%,rgba(0,0,0,.32) 100%);
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%,transparent 42%,rgba(0,0,0,.28) 100%),
+    linear-gradient(90deg,rgba(5,12,14,.16),transparent 24%,transparent 76%,rgba(5,12,14,.16));
   pointer-events:none;
 }
 .welcome-page .mall-scene::after {
@@ -45,6 +47,11 @@
   -webkit-backdrop-filter:blur(9px);
   pointer-events:none;
 }
+
+/* Entrada visual de VaniDaxi sobre el frente real del mall. */
+.welcome-page .mall-scene .vd-facade-badge { display:block; }
+
+/* Ocultamos la maqueta antigua: no habrá edificio, portal ni personas dibujadas por CSS. */
 .welcome-page .mall-sky,
 .welcome-page .mall-haze,
 .welcome-page .mall-store-row,
@@ -58,24 +65,26 @@
 .welcome-page .mall-phone,
 .welcome-page .mall-building { display:none!important; }
 
-/* El concepto conserva las bolsas como parte del relato, pero evita anatomía CSS defectuosa. */
+/* Bolsas: elementos abstractos independientes, sin colocarlas sobre manos/cuerpos generados. */
+.welcome-page .buyer-scene .bag-hint-row { display:flex; }
+
 .scene-frame { position:relative; padding:0; }
 .scene-viewport { position:relative; min-height:clamp(430px,72svh,820px); border-radius:0; overflow:hidden; }
 .welcome-page .scene-frame .scene-copy,
 .welcome-page .buyer-copy { position:relative; z-index:8; }
 .welcome-page .welcome-page-copy { text-shadow:0 4px 22px rgba(0,0,0,.48); }
 
-/* SELLER */
-.welcome-page .seller-world { width:100%; height:100%; min-height:390px; border-radius:0; overflow:hidden; position:relative; border:0; background:#063f44; box-shadow:none; }
-.welcome-page .seller-backdrop { position:absolute; inset:0; background:linear-gradient(180deg,rgba(4,38,43,.16),rgba(4,38,43,.58)),url('https://images.pexels.com/photos/31318437/pexels-photo-31318437.jpeg?auto=compress&cs=tinysrgb&w=2200') center/cover no-repeat; }
-.welcome-page .seller-store-shell { position:absolute; z-index:4; left:6%; right:6%; top:7%; height:35%; padding:18px; border-radius:22px; border:1px solid rgba(255,255,255,.24); background:rgba(5,49,54,.46); box-shadow:0 20px 46px rgba(0,0,0,.2); backdrop-filter:blur(11px); -webkit-backdrop-filter:blur(11px); }
+/* SELLER: local de vendedor integrado en el ecosistema VaniDaxi. */
+.welcome-page .seller-world { width:100%; height:100%; min-height:390px; border-radius:0; overflow:hidden; position:relative; border:0; background:#151918; box-shadow:none; }
+.welcome-page .seller-backdrop { position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,10,10,.08),rgba(6,10,10,.66)),url('https://images.pexels.com/photos/31318437/pexels-photo-31318437.jpeg?auto=compress&cs=tinysrgb&w=2200') center/cover no-repeat; }
+.welcome-page .seller-store-shell { position:absolute; z-index:4; left:6%; right:6%; top:7%; height:35%; padding:18px; border-radius:22px; border:1px solid rgba(255,255,255,.24); background:rgba(5,20,21,.46); box-shadow:0 20px 46px rgba(0,0,0,.24); backdrop-filter:blur(11px); -webkit-backdrop-filter:blur(11px); }
 .welcome-page .seller-store-header { color:#fff; }
 .welcome-page .seller-small-label { color:rgba(255,255,255,.72); }
 .welcome-page .seller-store-header strong { color:#fff; text-shadow:0 3px 16px rgba(0,0,0,.3); }
 .welcome-page .seller-display-row { display:none; }
 .welcome-page .seller-mall-sign { position:absolute; top:26px; right:28px; z-index:5; color:#fff; font-size:clamp(18px,3vw,34px); font-weight:900; letter-spacing:.15em; text-shadow:0 5px 20px rgba(0,0,0,.38); }
-.welcome-page .seller-dashboard { position:absolute; z-index:7; left:6%; right:6%; bottom:5%; padding:clamp(14px,2.2vw,24px); border-radius:24px; background:rgba(248,255,255,.91); border:1px solid rgba(255,255,255,.78); box-shadow:0 24px 56px rgba(0,0,0,.22); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
-.welcome-page .dashboard-head span,.welcome-page .dashboard-head strong,.welcome-page .metric-card span,.welcome-page .metric-card strong,.welcome-page .metric-card small,.welcome-page .seller-buy-strip strong,.welcome-page .seller-buy-strip span { color:#0b3c40; }
+.welcome-page .seller-dashboard { position:absolute; z-index:7; left:6%; right:6%; bottom:5%; padding:clamp(14px,2.2vw,24px); border-radius:24px; background:rgba(248,255,255,.93); border:1px solid rgba(255,255,255,.78); box-shadow:0 24px 56px rgba(0,0,0,.24); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+.welcome-page .dashboard-head span,.welcome-page .dashboard-head strong,.welcome-page .metric-card span,.welcome-page .metric-card strong,.welcome-page .metric-card small,.welcome-page .seller-buy-strip strong,.welcome-page .seller-buy-strip span { color:#142f31; }
 .welcome-page .dashboard-cards { grid-template-columns:repeat(3,1fr); gap:9px; }
 .welcome-page .metric-card { border-radius:14px; background:rgba(239,251,250,.9); box-shadow:inset 0 0 0 1px rgba(8,104,101,.1); }
 .welcome-page .seller-buy-strip { margin-top:10px; border-radius:16px; background:rgba(228,248,246,.9); }
