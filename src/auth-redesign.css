@@ -1,0 +1,65 @@
+/* VaniDaxi — Paso 2: rediseño visual del registro/inicio de sesión.
+   No modifica la arquitectura de Supabase ni la bienvenida existente. */
+.auth-overlay { place-items: center; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+.auth-backdrop { background: rgba(2,25,28,.72); backdrop-filter: blur(14px) saturate(.9); }
+.auth-panel {
+  width: min(760px,100%);
+  max-height: calc(100svh - 24px);
+  padding: clamp(20px,4vw,34px);
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 30px;
+  background: linear-gradient(145deg,rgba(255,255,255,.985),rgba(242,252,250,.985));
+  box-shadow: 0 38px 110px rgba(0,20,22,.42), 0 2px 0 rgba(255,255,255,.95) inset;
+  animation: vdAuthPanelIn .42s cubic-bezier(.2,.8,.18,1);
+}
+.auth-top { align-items:center; }
+.auth-top .vd-mark { width:48px; height:48px; border-radius:15px; }
+.auth-top h2 { font-size:clamp(24px,4vw,35px); }
+.auth-close { transition: transform .18s ease, background .18s ease; }
+.auth-close:hover { transform: rotate(4deg); background:#dff0ee; }
+.auth-intro-vd { display:none; }
+.auth-panel::after { content:''; display:block; position:absolute; inset:0 0 auto; height:3px; border-radius:30px 30px 0 0; background:linear-gradient(90deg,#087f79,#1ccbb9,#087f79); opacity:.85; pointer-events:none; }
+.auth-tabs { margin:18px 0; padding:5px; border-radius:17px; background:#e8f3f1; }
+.auth-tabs button { min-height:46px; border-radius:12px; transition:.18s ease; }
+.auth-tabs button.active { color:#075e5d; background:#fff; box-shadow:0 7px 18px rgba(4,83,83,.11); }
+.role-choice { padding:2px 0 0; }
+.role-choice > .field-label { color:#244b4c; font-size:12px; margin-bottom:9px; }
+.role-grid { gap:11px; }
+.role-card { position:relative; display:grid; grid-template-columns:auto 1fr; min-height:96px; padding:14px; text-align:left; border:1px solid #d6e7e4; border-radius:19px; background:#f7fbfa; transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease; }
+.role-card:hover { transform:translateY(-1px); border-color:#a9dcd5; }
+.role-card.active { border-color:#19bfae; background:linear-gradient(145deg,#edfffb,#f8fffe); box-shadow:0 11px 26px rgba(9,160,148,.12); }
+.role-icon { grid-row:1 / span 2; display:grid; place-items:center; width:43px; height:43px; margin-right:2px; border-radius:13px; background:#e8f4f2; font-size:20px; }
+.role-card strong { display:block; align-self:end; font-size:12px; }
+.role-card small { display:block; align-self:start; margin-top:4px; color:#6d8586; font-size:9px; line-height:1.4; }
+.role-card::after { content:'✓'; position:absolute; right:13px; top:13px; display:grid; place-items:center; width:21px; height:21px; border:1px solid #d0e2df; border-radius:50%; color:transparent; font-size:11px; font-weight:900; }
+.role-card.active::after { color:#fff; border-color:#0eaf9f; background:#0eaf9f; }
+.auth-form { gap:13px; margin-top:17px; }
+.auth-form label > span { color:#405f60; font-size:10px; font-weight:900; }
+.auth-form input { height:53px; border:1px solid #d2e3e1; border-radius:15px; background:#fff; box-shadow:0 2px 0 rgba(4,75,76,.025); transition:border-color .18s ease,box-shadow .18s ease; }
+.auth-form input:focus { border-color:#26bfb1; box-shadow:0 0 0 4px rgba(38,191,177,.11); outline:none; }
+.password-hint { margin:-3px 2px 0; padding:9px 11px; border:1px solid #dcece9; border-radius:12px; background:#f5fbfa; color:#647d7e; font-size:9px; line-height:1.5; }
+.captcha-slot { min-height:82px; margin-top:1px; padding:3px; border:1px solid #dbeae8; border-radius:14px; background:#f7fbfa; }
+.primary-action { min-height:54px; margin-top:2px; border-radius:16px; background:linear-gradient(135deg,#087f79,#0bb6a8 70%,#16c6b5); box-shadow:0 15px 28px rgba(5,130,121,.2); font-weight:900; transition:transform .18s ease,box-shadow .18s ease,filter .18s ease; }
+.primary-action:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 18px 32px rgba(5,130,121,.25); filter:saturate(1.04); }
+.divider { margin:17px 0 11px; }
+.social-row button { min-height:48px; border-radius:14px; border:1px solid #d6e5e3; background:#fff; transition:transform .18s ease,border-color .18s ease,background .18s ease; }
+.social-row button:hover { transform:translateY(-1px); border-color:#b8d8d4; background:#fbfffe; }
+.auth-message { margin-top:14px; border-radius:14px; }
+.legal-note { margin-top:15px; }
+@keyframes vdAuthPanelIn { from { opacity:0; transform:translateY(24px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media (max-width:640px) {
+  .auth-panel { width:100%; max-height:calc(100svh - 12px); padding:17px; border-radius:24px; }
+  .auth-top .vd-mark { width:42px; height:42px; border-radius:13px; }
+  .auth-top h2 { font-size:24px; }
+  .role-grid { grid-template-columns:1fr; gap:8px; }
+  .role-card { min-height:78px; }
+  .password-hint { font-size:9px; }
+}
+@media (max-width:420px) {
+  .auth-overlay { padding:6px; }
+  .auth-panel { padding:15px; border-radius:22px; }
+  .auth-tabs button { min-height:43px; font-size:11px; }
+  .auth-form input { height:50px; }
+  .social-row { grid-template-columns:1fr 1fr; }
+  .social-row button { min-height:45px; font-size:10px; }
+}
