@@ -25,9 +25,7 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
 
   useEffect(() => {
     if (!siteKey) return undefined
-
     let cancelled = false
-
     const ensureHcaptcha = () => {
       if (!window.hcaptcha || cancelled) return
       if (captchaRef.current && widgetId.current === null) {
@@ -39,18 +37,15 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
         })
       }
     }
-
     if (window.hcaptcha) {
       ensureHcaptcha()
       return () => { cancelled = true }
     }
-
     const existing = document.querySelector('script[data-vanidaxi-hcaptcha]')
     if (existing) {
       existing.addEventListener('load', ensureHcaptcha, { once: true })
       return () => { cancelled = true }
     }
-
     const script = document.createElement('script')
     script.src = 'https://js.hcaptcha.com/1/api.js?render=explicit'
     script.async = true
@@ -58,7 +53,6 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
     script.dataset.vanidaxiHcaptcha = 'true'
     script.addEventListener('load', ensureHcaptcha, { once: true })
     document.head.appendChild(script)
-
     return () => { cancelled = true }
   }, [siteKey])
 
@@ -79,13 +73,11 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
     event.preventDefault()
     setLoading(true)
     setMessage('')
-
     try {
       if (captchaRequired && !captchaToken) {
         setMessage('Completa la verificación de seguridad antes de continuar.')
         return
       }
-
       if (mode === 'register') {
         const cleanEmail = email.trim().toLowerCase()
         const cleanName = name.trim()
@@ -93,21 +85,15 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
           setMessage('Completa tu nombre, un correo válido y una contraseña de al menos 8 caracteres.')
           return
         }
-
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
           options: {
             captchaToken: captchaToken || undefined,
-            data: {
-              display_name: cleanName,
-              onboarding_role: role,
-            },
+            data: { display_name: cleanName, onboarding_role: role },
           },
         })
-
         if (error) throw error
-
         if (data.session) {
           setMessage('Cuenta creada. La siguiente etapa configurará tu experiencia según el rol elegido.')
         } else {
@@ -116,7 +102,6 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
         resetCaptcha()
         return
       }
-
       const cleanEmail = email.trim().toLowerCase()
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -156,57 +141,34 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
         <div className="auth-top">
           <button className="auth-close" onClick={onClose} aria-label="Cerrar">×</button>
           <VaniMark />
-          <div>
-            <span className="eyebrow">VaniDaxi</span>
-            <h2>{mode === 'register' ? 'Crea tu cuenta' : 'Bienvenido de nuevo'}</h2>
-          </div>
+          <div><span className="eyebrow">VaniDaxi</span><h2>{mode === 'register' ? 'Crea tu cuenta' : 'Bienvenido de nuevo'}</h2></div>
         </div>
-
         <div className="auth-tabs" role="tablist">
           <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')} role="tab" aria-selected={mode === 'register'}>Crear cuenta</button>
           <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')} role="tab" aria-selected={mode === 'login'}>Iniciar sesión</button>
         </div>
-
         {mode === 'register' && (
           <div className="role-choice" aria-label="Tipo de cuenta">
             <span className="field-label">¿Cómo usarás VaniDaxi?</span>
             <div className="role-grid">
-              <button className={role === 'buyer' ? 'role-card active' : 'role-card'} onClick={() => setRole('buyer')} type="button">
-                <span className="role-icon">🛍️</span>
-                <strong>Comprar</strong>
-                <small>Explora y compra</small>
-              </button>
-              <button className={role === 'seller' ? 'role-card active' : 'role-card'} onClick={() => setRole('seller')} type="button">
-                <span className="role-icon">🏪</span>
-                <strong>Vender / Empresa</strong>
-                <small>Gestiona tu tienda</small>
-              </button>
+              <button className={role === 'buyer' ? 'role-card active' : 'role-card'} onClick={() => setRole('buyer')} type="button"><span className="role-icon">🛍️</span><strong>Comprar</strong><small>Explora y compra</small></button>
+              <button className={role === 'seller' ? 'role-card active' : 'role-card'} onClick={() => setRole('seller')} type="button"><span className="role-icon">🏪</span><strong>Vender / Empresa</strong><small>Gestiona tu tienda</small></button>
             </div>
           </div>
         )}
-
         <form onSubmit={submit} className="auth-form">
-          {mode === 'register' && (
-            <label><span>Nombre</span><input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" /></label>
-          )}
+          {mode === 'register' && <label><span>Nombre</span><input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" /></label>}
           <label><span>Correo electrónico</span><input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" /></label>
           <label><span>Contraseña</span><input required type="password" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'register' ? 'Mínimo 8 caracteres' : 'Tu contraseña'} minLength={8} /></label>
-
           {mode === 'register' && <p className="password-hint">Usa al menos 8 caracteres. En la configuración final podremos endurecer estas reglas sin romper tu acceso existente.</p>}
-
           {siteKey && <div ref={captchaRef} className="captcha-slot" aria-label="Verificación de seguridad" />}
-
-          <button className="primary-action" type="submit" disabled={loading || (captchaRequired && !captchaToken)}>
-            {loading ? 'Procesando…' : mode === 'register' ? 'Crear cuenta' : 'Iniciar sesión'}
-          </button>
+          <button className="primary-action" type="submit" disabled={loading || (captchaRequired && !captchaToken)}>{loading ? 'Procesando…' : mode === 'register' ? 'Crear cuenta' : 'Iniciar sesión'}</button>
         </form>
-
         <div className="divider"><span>o continúa con</span></div>
         <div className="social-row">
           <button type="button" onClick={() => oauth('google')} disabled={loading}><strong>G</strong><span>Google</span></button>
           <button type="button" onClick={() => oauth('facebook')} disabled={loading}><strong>f</strong><span>Facebook</span></button>
         </div>
-
         {mode === 'login' && <button className="text-action" type="button" onClick={() => setMessage('La recuperación de contraseña quedará conectada al flujo de Auth existente.')}>¿Olvidaste tu contraseña?</button>}
         {message && <div className="auth-message" role="status">{message}</div>}
         <p className="legal-note">Al continuar, aceptas los términos aplicables y reconoces el aviso de privacidad de VaniDaxi.</p>
@@ -225,13 +187,9 @@ function Welcome() {
     setAuthMode(mode)
     setAuthOpen(true)
   }, [])
-
   const goTo = useCallback((nextScene) => setScene(nextScene), [])
 
-  const handlePointerDown = (event) => {
-    touchStart.current = event.clientX
-  }
-
+  const handlePointerDown = (event) => { touchStart.current = event.clientX }
   const handlePointerUp = (event) => {
     if (touchStart.current === null) return
     const delta = event.clientX - touchStart.current
@@ -240,31 +198,17 @@ function Welcome() {
     goTo(delta < 0 ? 'seller' : 'buyer')
   }
 
-  const handleSkip = () => openAuth('login')
-
   return (
-    <main
-      className={`reference-welcome reference-${scene}`}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={() => { touchStart.current = null }}
-    >
+    <main className={`reference-welcome reference-${scene}`} onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { touchStart.current = null }}>
       <div className="reference-viewport">
-        <img
-          className="reference-screen"
-          src={scene === 'buyer' ? '/VaniDaxi-Fontent/welcome-buyer-reference.svg' : '/VaniDaxi-Fontent/welcome-seller-reference.svg'}
-          alt={scene === 'buyer' ? 'Bienvenida VaniDaxi para compradores' : 'Bienvenida VaniDaxi para vendedores'}
-          draggable="false"
-        />
-
+        <img className="reference-screen" src={scene === 'buyer' ? '/VaniDaxi-Fontent/welcome-buyer.svg' : '/VaniDaxi-Fontent/welcome-seller.svg'} alt={scene === 'buyer' ? 'Bienvenida VaniDaxi para compradores' : 'Bienvenida VaniDaxi para vendedores'} draggable="false" />
         <div className="reference-hit-layer" aria-label={scene === 'buyer' ? 'Acciones de comprador' : 'Acciones de vendedor'}>
           <button className="hit-swipe" type="button" onClick={() => goTo(scene === 'buyer' ? 'seller' : 'buyer')} aria-label={scene === 'buyer' ? 'Cambiar a vendedor' : 'Cambiar a comprador'} />
           <button className="hit-login" type="button" onClick={() => openAuth('login')} aria-label="Iniciar sesión" />
           <button className="hit-register" type="button" onClick={() => openAuth('register')} aria-label="Crear cuenta" />
-          <button className="hit-skip" type="button" onClick={handleSkip} aria-label="Omitir bienvenida" />
+          <button className="hit-skip" type="button" onClick={() => openAuth('login')} aria-label="Omitir bienvenida" />
         </div>
       </div>
-
       {authOpen && <AuthPanel initialMode={authMode} onClose={() => setAuthOpen(false)} />}
     </main>
   )
@@ -272,24 +216,11 @@ function Welcome() {
 
 export default function App() {
   const [authenticated, setAuthenticated] = useState(false)
-
   useEffect(() => {
     let mounted = true
-    supabase.auth.getSession().then(({ data }) => {
-      if (mounted) setAuthenticated(Boolean(data.session))
-    })
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuthenticated(Boolean(session))
-    })
-    return () => {
-      mounted = false
-      listener.subscription.unsubscribe()
-    }
+    supabase.auth.getSession().then(({ data }) => { if (mounted) setAuthenticated(Boolean(data.session)) })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => { setAuthenticated(Boolean(session)) })
+    return () => { mounted = false; listener.subscription.unsubscribe() }
   }, [])
-
-  return (
-    <div className={authenticated ? 'app-root has-session' : 'app-root'}>
-      <Welcome />
-    </div>
-  )
+  return <div className={authenticated ? 'app-root has-session' : 'app-root'}><Welcome /></div>
 }
