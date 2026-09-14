@@ -15,6 +15,8 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [captchaToken, setCaptchaToken] = useState('')
   const [captchaRequired, setCaptchaRequired] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -78,16 +80,28 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
         setMessage('Completa la verificación de seguridad antes de continuar.')
         return
       }
+
       if (mode === 'register') {
         const cleanEmail = email.trim().toLowerCase()
         const cleanName = name.trim()
-        if (!cleanName || !cleanEmail || password.length < 8) {
+        const cleanPassword = password
+
+        if (!cleanName || !cleanEmail || cleanPassword.length < 8) {
           setMessage('Completa tu nombre, un correo válido y una contraseña de al menos 8 caracteres.')
           return
         }
+        if (/\s/.test(cleanPassword)) {
+          setMessage('La contraseña no puede contener espacios.')
+          return
+        }
+        if (cleanPassword !== confirmPassword) {
+          setMessage('Las contraseñas no coinciden.')
+          return
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
-          password,
+          password: cleanPassword,
           options: {
             captchaToken: captchaToken || undefined,
             data: { display_name: cleanName, onboarding_role: role },
@@ -102,6 +116,7 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
         resetCaptcha()
         return
       }
+
       const cleanEmail = email.trim().toLowerCase()
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -137,38 +152,90 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
   return (
     <div className="auth-overlay" role="dialog" aria-modal="true" aria-label={mode === 'register' ? 'Crear cuenta' : 'Iniciar sesión'}>
       <button className="auth-backdrop" onClick={onClose} aria-label="Cerrar" />
-      <section className="auth-panel">
-        <div className="auth-top">
+      <section className="auth-panel auth-panel-redesign">
+        <div className="auth-top auth-top-redesign">
+          <div className="auth-brand-lockup">
+            <VaniMark />
+            <div>
+              <span className="eyebrow">VaniDaxi</span>
+              <h2>{mode === 'register' ? 'Crea tu cuenta' : 'Bienvenido de nuevo'}</h2>
+            </div>
+          </div>
           <button className="auth-close" onClick={onClose} aria-label="Cerrar">×</button>
-          <VaniMark />
-          <div><span className="eyebrow">VaniDaxi</span><h2>{mode === 'register' ? 'Crea tu cuenta' : 'Bienvenido de nuevo'}</h2></div>
         </div>
+
+        <div className="auth-intro">
+          <span className="auth-step">{mode === 'register' ? 'REGISTRO SEGURO' : 'ACCESO SEGURO'}</span>
+          <p>{mode === 'register' ? 'Configura tu acceso a VaniDaxi en unos pasos. Tu experiencia se adaptará al tipo de cuenta que elijas.' : 'Accede a tu cuenta y continúa donde lo dejaste.'}</p>
+        </div>
+
         <div className="auth-tabs" role="tablist">
           <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')} role="tab" aria-selected={mode === 'register'}>Crear cuenta</button>
           <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')} role="tab" aria-selected={mode === 'login'}>Iniciar sesión</button>
         </div>
+
         {mode === 'register' && (
-          <div className="role-choice" aria-label="Tipo de cuenta">
-            <span className="field-label">¿Cómo usarás VaniDaxi?</span>
+          <div className="role-choice role-choice-redesign" aria-label="Tipo de cuenta">
+            <div className="section-heading">
+              <div>
+                <span className="field-label">Elige cómo usarás VaniDaxi</span>
+                <small>Podrás gestionar tu experiencia según tu elección.</small>
+              </div>
+            </div>
             <div className="role-grid">
-              <button className={role === 'buyer' ? 'role-card active' : 'role-card'} onClick={() => setRole('buyer')} type="button"><span className="role-icon">🛍️</span><strong>Comprar</strong><small>Explora y compra</small></button>
-              <button className={role === 'seller' ? 'role-card active' : 'role-card'} onClick={() => setRole('seller')} type="button"><span className="role-icon">🏪</span><strong>Vender / Empresa</strong><small>Gestiona tu tienda</small></button>
+              <button className={role === 'buyer' ? 'role-card active' : 'role-card'} onClick={() => setRole('buyer')} type="button">
+                <span className="role-icon">🛍️</span>
+                <span className="role-copy"><strong>Comprar</strong><small>Explora tiendas, productos y servicios.</small></span>
+                <span className="role-check" aria-hidden="true">✓</span>
+              </button>
+              <button className={role === 'seller' ? 'role-card active' : 'role-card'} onClick={() => setRole('seller')} type="button">
+                <span className="role-icon">🏪</span>
+                <span className="role-copy"><strong>Vender / Empresa</strong><small>Crea y administra tu propia tienda.</small></span>
+                <span className="role-check" aria-hidden="true">✓</span>
+              </button>
             </div>
           </div>
         )}
-        <form onSubmit={submit} className="auth-form">
-          {mode === 'register' && <label><span>Nombre</span><input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" /></label>}
-          <label><span>Correo electrónico</span><input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" /></label>
-          <label><span>Contraseña</span><input required type="password" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'register' ? 'Mínimo 8 caracteres' : 'Tu contraseña'} minLength={8} /></label>
-          {mode === 'register' && <p className="password-hint">Usa al menos 8 caracteres. En la configuración final podremos endurecer estas reglas sin romper tu acceso existente.</p>}
-          {siteKey && <div ref={captchaRef} className="captcha-slot" aria-label="Verificación de seguridad" />}
-          <button className="primary-action" type="submit" disabled={loading || (captchaRequired && !captchaToken)}>{loading ? 'Procesando…' : mode === 'register' ? 'Crear cuenta' : 'Iniciar sesión'}</button>
+
+        <form onSubmit={submit} className="auth-form auth-form-redesign">
+          {mode === 'register' && (
+            <label className="field-block">
+              <span>Nombre</span>
+              <div className="input-shell"><span className="input-icon" aria-hidden="true">◯</span><input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="¿Cómo te llamamos?" /></div>
+            </label>
+          )}
+
+          <label className="field-block">
+            <span>Correo electrónico</span>
+            <div className="input-shell"><span className="input-icon" aria-hidden="true">@</span><input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" /></div>
+          </label>
+
+          <label className="field-block">
+            <span>Contraseña</span>
+            <div className="input-shell"><span className="input-icon" aria-hidden="true">●</span><input required type={showPassword ? 'text' : 'password'} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'register' ? 'Crea una contraseña segura' : 'Tu contraseña'} minLength={8} /><button type="button" className="password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}>{showPassword ? 'Ocultar' : 'Mostrar'}</button></div>
+            {mode === 'register' && <div className="password-rules"><span className={password.length >= 8 ? 'valid' : ''}>✓ 8 caracteres mínimo</span><span className={!/\s/.test(password) && password.length > 0 ? 'valid' : ''}>✓ Sin espacios</span><span className={/[.\-_!@#$%^&*]/.test(password) ? 'valid' : ''}>✓ Admite símbolos como . - _ ! @</span></div>}
+          </label>
+
+          {mode === 'register' && (
+            <label className="field-block">
+              <span>Confirmar contraseña</span>
+              <div className="input-shell"><span className="input-icon" aria-hidden="true">●</span><input required type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repite tu contraseña" /></div>
+            </label>
+          )}
+
+          {siteKey && <div ref={captchaRef} className="captcha-slot captcha-slot-redesign" aria-label="Verificación de seguridad" />}
+
+          <button className="primary-action primary-action-redesign" type="submit" disabled={loading || (captchaRequired && !captchaToken)}>
+            <span>{loading ? 'Procesando…' : mode === 'register' ? 'Crear mi cuenta' : 'Iniciar sesión'}</span><span aria-hidden="true">→</span>
+          </button>
         </form>
+
         <div className="divider"><span>o continúa con</span></div>
         <div className="social-row">
           <button type="button" onClick={() => oauth('google')} disabled={loading}><strong>G</strong><span>Google</span></button>
           <button type="button" onClick={() => oauth('facebook')} disabled={loading}><strong>f</strong><span>Facebook</span></button>
         </div>
+
         {mode === 'login' && <button className="text-action" type="button" onClick={() => setMessage('La recuperación de contraseña quedará conectada al flujo de Auth existente.')}>¿Olvidaste tu contraseña?</button>}
         {message && <div className="auth-message" role="status">{message}</div>}
         <p className="legal-note">Al continuar, aceptas los términos aplicables y reconoces el aviso de privacidad de VaniDaxi.</p>
