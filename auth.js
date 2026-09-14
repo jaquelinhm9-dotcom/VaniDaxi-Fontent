@@ -24,6 +24,15 @@ export async function signIn(email, password, captchaToken = '') {
   return { ...data, access_token: session.access_token, refresh_token: session.refresh_token }
 }
 
+export async function signInWithPasskey() {
+  const { data, error } = await supabase.auth.signInWithPasskey()
+  if (error) throw new Error(error.message || 'No fue posible iniciar sesión con biometría.')
+  const session = data?.session
+  if (!session?.access_token) throw new Error('Supabase no devolvió una sesión válida.')
+  saveSession(session)
+  return { ...data, access_token: session.access_token, refresh_token: session.refresh_token }
+}
+
 export async function signInWithProvider(provider, accountType = 'customer') {
   const safeProvider = provider === 'facebook' ? 'facebook' : 'google'
   const safeType = accountType === 'seller' ? 'seller' : 'customer'
