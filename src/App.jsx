@@ -144,22 +144,22 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
           <div><span className="eyebrow">VaniDaxi</span><h2>{mode === 'register' ? 'Crea tu cuenta' : 'Bienvenido de nuevo'}</h2></div>
         </div>
         <div className="auth-tabs" role="tablist">
-          <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')} role="tab" aria-selected={mode === 'register'}>Crear cuenta</button>
-          <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')} role="tab" aria-selected={mode === 'login'}>Iniciar sesión</button>
+          <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')}>Crear cuenta</button>
+          <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>Iniciar sesión</button>
         </div>
         {mode === 'register' && (
           <div className="role-choice" aria-label="Tipo de cuenta">
             <span className="field-label">¿Cómo usarás VaniDaxi?</span>
             <div className="role-grid">
-              <button className={role === 'buyer' ? 'role-card active' : 'role-card'} onClick={() => setRole('buyer')} type="button"><span className="role-icon">🛍️</span><strong>Comprar</strong><small>Explora y compra</small></button>
-              <button className={role === 'seller' ? 'role-card active' : 'role-card'} onClick={() => setRole('seller')} type="button"><span className="role-icon">🏪</span><strong>Vender / Empresa</strong><small>Gestiona tu tienda</small></button>
+              <button type="button" className={role === 'buyer' ? 'role-card active' : 'role-card'} onClick={() => setRole('buyer')}><span className="role-icon">🛍️</span><strong>Comprar</strong><small>Explora y compra</small></button>
+              <button type="button" className={role === 'seller' ? 'role-card active' : 'role-card'} onClick={() => setRole('seller')}><span className="role-icon">🏪</span><strong>Vender / Empresa</strong><small>Gestiona tu tienda</small></button>
             </div>
           </div>
         )}
         <form onSubmit={submit} className="auth-form">
-          {mode === 'register' && <label><span>Nombre</span><input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" /></label>}
-          <label><span>Correo electrónico</span><input required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" /></label>
-          <label><span>Contraseña</span><input required type="password" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'register' ? 'Mínimo 8 caracteres' : 'Tu contraseña'} minLength={8} /></label>
+          {mode === 'register' && <label><span>Nombre</span><input required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></label>}
+          <label><span>Correo electrónico</span><input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
+          <label><span>Contraseña</span><input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} /></label>
           {mode === 'register' && <p className="password-hint">Usa al menos 8 caracteres. En la configuración final podremos endurecer estas reglas sin romper tu acceso existente.</p>}
           {siteKey && <div ref={captchaRef} className="captcha-slot" aria-label="Verificación de seguridad" />}
           <button className="primary-action" type="submit" disabled={loading || (captchaRequired && !captchaToken)}>{loading ? 'Procesando…' : mode === 'register' ? 'Crear cuenta' : 'Iniciar sesión'}</button>
@@ -169,7 +169,7 @@ function AuthPanel({ onClose, initialMode = 'register' }) {
           <button type="button" onClick={() => oauth('google')} disabled={loading}><strong>G</strong><span>Google</span></button>
           <button type="button" onClick={() => oauth('facebook')} disabled={loading}><strong>f</strong><span>Facebook</span></button>
         </div>
-        {mode === 'login' && <button className="text-action" type="button" onClick={() => setMessage('La recuperación de contraseña quedará conectada al flujo de Auth existente.')}>¿Olvidaste tu contraseña?</button>}
+        {mode === 'login' && <button className="forgot-link" type="button" onClick={() => setMessage('La recuperación de contraseña se configurará en la siguiente fase de Auth.')}>¿Olvidaste tu contraseña?</button>}
         {message && <div className="auth-message" role="status">{message}</div>}
         <p className="legal-note">Al continuar, aceptas los términos aplicables y reconoces el aviso de privacidad de VaniDaxi.</p>
       </section>
@@ -181,34 +181,42 @@ function Welcome() {
   const [scene, setScene] = useState('buyer')
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('register')
-  const touchStart = useRef(null)
-  const baseUrl = import.meta.env.BASE_URL || '/'
+  const swipeStartX = useRef(null)
 
-  const openAuth = useCallback((mode) => {
+  const openAuth = (mode) => {
     setAuthMode(mode)
     setAuthOpen(true)
-  }, [])
-  const goTo = useCallback((nextScene) => setScene(nextScene), [])
+  }
 
-  const handlePointerDown = (event) => { touchStart.current = event.clientX }
-  const handlePointerUp = (event) => {
-    if (touchStart.current === null) return
-    const delta = event.clientX - touchStart.current
-    touchStart.current = null
-    if (Math.abs(delta) < 45) return
-    goTo(delta < 0 ? 'seller' : 'buyer')
+  const onPointerDown = (event) => {
+    swipeStartX.current = event.clientX
+  }
+
+  const onPointerUp = (event) => {
+    if (swipeStartX.current === null) return
+    const delta = event.clientX - swipeStartX.current
+    swipeStartX.current = null
+    if (Math.abs(delta) < 55) return
+    if (delta < 0) setScene('seller')
+    else setScene('buyer')
   }
 
   return (
-    <main className={`reference-welcome reference-${scene}`} onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { touchStart.current = null }}>
-      <div className="reference-viewport">
-        <img className="reference-screen" src={`${baseUrl}${scene === 'buyer' ? 'welcome-buyer.svg' : 'welcome-seller.svg'}`} alt={scene === 'buyer' ? 'Bienvenida VaniDaxi para compradores' : 'Bienvenida VaniDaxi para vendedores'} draggable="false" />
-        <div className="reference-hit-layer" aria-label={scene === 'buyer' ? 'Acciones de comprador' : 'Acciones de vendedor'}>
-          <button className="hit-swipe" type="button" onClick={() => goTo(scene === 'buyer' ? 'seller' : 'buyer')} aria-label={scene === 'buyer' ? 'Cambiar a vendedor' : 'Cambiar a comprador'} />
-          <button className="hit-login" type="button" onClick={() => openAuth('login')} aria-label="Iniciar sesión" />
-          <button className="hit-register" type="button" onClick={() => openAuth('register')} aria-label="Crear cuenta" />
-          <button className="hit-skip" type="button" onClick={() => openAuth('login')} aria-label="Omitir bienvenida" />
+    <main className="welcome-shell">
+      <div className="welcome-stage" onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+        <div className={`welcome-scene ${scene === 'seller' ? 'seller' : 'buyer'}`}>
+          <img
+            className="welcome-art"
+            src={scene === 'buyer' ? `${import.meta.env.BASE_URL}welcome-buyer.svg` : `${import.meta.env.BASE_URL}welcome-seller.svg`}
+            alt={scene === 'buyer' ? 'VaniDaxi para compradores' : 'VaniDaxi para vendedores'}
+            draggable="false"
+          />
         </div>
+
+        <button className="welcome-hit welcome-hit-swipe" aria-label={scene === 'buyer' ? 'Deslizar para vender' : 'Deslizar para comprar'} />
+        <button className="welcome-hit welcome-hit-login" onClick={() => openAuth('login')} aria-label="Iniciar sesión" />
+        <button className="welcome-hit welcome-hit-register" onClick={() => openAuth('register')} aria-label="Crear cuenta" />
+        <button className="welcome-hit welcome-hit-skip" onClick={() => openAuth('login')}>Omitir</button>
       </div>
       {authOpen && <AuthPanel initialMode={authMode} onClose={() => setAuthOpen(false)} />}
     </main>
@@ -216,12 +224,21 @@ function Welcome() {
 }
 
 export default function App() {
-  const [authenticated, setAuthenticated] = useState(false)
+  const [session, setSession] = useState(null)
+
   useEffect(() => {
     let mounted = true
-    supabase.auth.getSession().then(({ data }) => { if (mounted) setAuthenticated(Boolean(data.session)) })
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => { setAuthenticated(Boolean(session)) })
-    return () => { mounted = false; listener.subscription.unsubscribe() }
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setSession(data.session)
+    })
+    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+    })
+    return () => {
+      mounted = false
+      data.subscription.unsubscribe()
+    }
   }, [])
-  return <div className={authenticated ? 'app-root has-session' : 'app-root'}><Welcome /></div>
+
+  return <Welcome session={session} />
 }
